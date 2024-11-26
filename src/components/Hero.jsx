@@ -32,7 +32,11 @@ const SlideRight = (delay) => {
   };
 };
 
+<<<<<<< HEAD
 const headphoneData = [
+=======
+const topProducts = [
+>>>>>>> origin/main
   {
     id: 1,
     image: Fanta1,
@@ -65,7 +69,11 @@ const headphoneData = [
   },
 ];
 const Hero = () => {
+<<<<<<< HEAD
   const [activeData, setActiveData] = React.useState(headphoneData[0]);
+=======
+  const [activeData, setActiveData] = React.useState(topProducts[0]);
+>>>>>>> origin/main
 
   const handleActiveData = (data) => {
     setActiveData(data);
@@ -146,7 +154,11 @@ const Hero = () => {
                 transition={{ duration: 0.8, delay: 0.2, ease: "easeInOut" }}
                 className="grid grid-cols-3 gap-10"
               >
+<<<<<<< HEAD
                 {headphoneData.map((item) => {
+=======
+                {topProducts.map((item) => {
+>>>>>>> origin/main
                   return (
                     
                       <div
@@ -182,7 +194,11 @@ const Hero = () => {
           </div>
 
           {/* ______ Hero Image ______ */}
+<<<<<<< HEAD
           <div className="flex flex-col justify-end items-center relative order-1 md:order-2 min-h-min">
+=======
+          <div className="flex flex-col justify-center items-center relative order-1 md:order-2 min-h-min">
+>>>>>>> origin/main
             <AnimatePresence mode="wait">
               <motion.img
                 key={activeData.id}
