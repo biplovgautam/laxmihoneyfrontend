@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Logo from "../assets/logo.png";
-import { MdMenu } from "react-icons/md";
+import { MdMenu, MdClose } from "react-icons/md";
 import { FaRegUser, FaShoppingCart } from "react-icons/fa";
 import { motion } from "framer-motion";
 
@@ -40,10 +40,16 @@ const Navbar = () => {
     setMenuOpen(!menuOpen);
   };
 
+  const closeMenu = () => {
+    setMenuOpen(false);
+  };
+
   return (
     <>
       {/* Full-page overlay for mobile view */}
-      <div className={`fixed inset-0 md:hidden ${menuOpen ? 'bg-black/10 backdrop-blur-md' : 'bg-transparent'} transition-all duration-300 ease-in-out z-40`} onClick={toggleMenu}></div>
+      {menuOpen && (
+        <div className="fixed inset-0 md:hidden bg-black/10 backdrop-blur-md transition-all duration-300 ease-in-out z-40" onClick={closeMenu}></div>
+      )}
       
       <nav className="sticky top-0 z-50 flex items-center justify-between p-4 bg-transparent text-white">
         <div className="flex items-center justify-center">
@@ -71,7 +77,11 @@ const Navbar = () => {
           </ul>
         </div>
         <div className="md:hidden ml-auto z-50">
-          <MdMenu className="text-4xl cursor-pointer" onClick={toggleMenu} />
+          {menuOpen ? (
+            <MdClose className="text-4xl cursor-pointer transition duration-300 ease-in-out transform hover:scale-110" onClick={toggleMenu} />
+          ) : (
+            <MdMenu className="text-4xl cursor-pointer transition duration-300 ease-in-out transform hover:scale-110" onClick={toggleMenu} />
+          )}
         </div>
       </nav>
     </>
