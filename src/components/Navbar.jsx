@@ -9,27 +9,27 @@ const NavbarMenu = [
   {
     id: 1,
     title: "Home",
-    link: "#",
+    link: "/",
   },
   {
     id: 2,
     title: "Products",
-    link: "#",
+    link: "/products",
   },
   {
     id: 3,
     title: "Contact",
-    link: "#",
+    link: "/contact",
   },
   {
     id: 4,
     title: "About",
-    link: "#",
+    link: "/about",
   },
   {
     id: 5,
     title: "Blogs",
-    link: "#",
+    link: "/blogs",
   },
 ];
 
@@ -61,9 +61,9 @@ const Navbar = () => {
           <ul className={`flex flex-col md:flex-row gap-2.5 ${menuOpen ? 'items-center' : 'items-center'}`}>
             {NavbarMenu.map((item) => (
               <li key={item.id} className="p-2">
-                <a href={item.link} className="inline-block text-base font-semibold py-2 px-3 uppercase hover:text-black transition duration-300 ease-in-out transform hover:scale-110 text-shadow hover:text-shadow-white">
+                <Link to={item.link} className="inline-block text-base font-semibold py-2 px-3 uppercase hover:text-black transition duration-300 ease-in-out transform hover:scale-110 text-shadow hover:text-shadow-white">
                   {item.title}
-                </a>
+                </Link>
               </li>
             ))}
             <li className="p-2 flex items-center space-x-4 w-32 justify-evenly">
