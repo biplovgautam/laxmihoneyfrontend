@@ -30,11 +30,11 @@ const Footer = () => {
                 +977-9819492581
               </p>
               <p className="flex items-center gap-2 mt-2">
-                {"Head :  "}
+                {"Head  "}
                 <FaMapLocation /> Kapilvastu, Nepal
               </p>
               <p className="flex items-center gap-2 mt-2">
-                {"Branch :  "}
+                {"Branch  "}
                 <FaMapLocation /> Kathmandu, Nepal
               </p>
             </div>
