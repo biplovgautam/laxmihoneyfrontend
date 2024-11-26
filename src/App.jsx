@@ -14,8 +14,8 @@ const App = () => {
       <main className="overflow-x-hidden relative">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/products" element={<About />} />
-          <Route path="/blogs" element={<Contact />} />
+          <Route path="/products" element={<Products />} />
+          <Route path="/blogs" element={<Blogs />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
         </Routes>

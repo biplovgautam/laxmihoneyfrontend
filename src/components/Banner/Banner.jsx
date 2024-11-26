@@ -1,6 +1,6 @@
 import React from "react";
-import BannerImg from "../../assets/Banner/juice.png";
-import Splash from "../../assets/Banner/splash.png";
+import BannerImg from "../../assets/Banner/jar.png";
+import Splash from "../../assets/Banner/splash2.png";
 import { motion } from "framer-motion";
 import { fadeUp } from "../../components/Products/Products";
 
@@ -16,7 +16,7 @@ const Banner = () => {
             transition={{ duration: 0.8, delay: 0.2, ease: "easeInOut" }}
             src={BannerImg}
             alt=""
-            className="w-[300px] md:w-[400px] mx-auto relative z-10"
+            className="w-50 md:w-[400px] mx-auto relative z-10"
           />
           <motion.img
             initial={{ opacity: 0, y: -100, rotate: -180, scale: 0 }}

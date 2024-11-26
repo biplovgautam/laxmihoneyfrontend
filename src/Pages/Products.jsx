@@ -11,7 +11,6 @@ const Product = () => {
   return (
     <>
     <Hero/>
-        <Products />
         <Banner />
         <BannerText />
     </>

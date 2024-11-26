@@ -1,7 +1,7 @@
 import React from "react";
 import Fanta1 from "../assets/logo4.png";
-import Fanta2 from "../assets/logo3.png";
-import Fanta3 from "../assets/logo2.png";
+import Fanta2 from "../assets/logo2.png";
+import Fanta3 from "../assets/logo3.png";
 import { FaWhatsapp } from "react-icons/fa";
 import { AnimatePresence, easeInOut, motion } from "framer-motion";
 import Navbar from "./Navbar.jsx";
@@ -83,7 +83,7 @@ const Hero = () => {
       >
         {/* navbar components */}
         <Navbar />
-        <div className="container grid grid-cols-1 md:grid-cols-2 min-h-[605px]">
+        <div className="container grid grid-cols-1 md:grid-cols-2 min-h-[95vh]">
           {/* ______ Headphone Info ______ */}
           <div className="flex flex-col justify-center py-14 md:py-0 xl:max-w-[500px] order-2 md:order-1">
             <div className="space-y-5 text-center md:text-left">
@@ -122,7 +122,7 @@ const Hero = () => {
                     animate="show"
                     exit="exit"
                     style={{ color: activeData.bgColor }}
-                    className="px-4 py-2 bg-white inline-block font-normal rounded-sm"
+                    className="px-4 py-2 bg-white inline-block font-normal shadow-lg rounded-sm hover:bg-opacity-80 duration-200 hover:shadow-xl"
                   >
                     Order Now
                   </motion.button>
@@ -164,7 +164,7 @@ const Hero = () => {
                             className={`w-60 h-40 object-contain img-shadow ${
                               activeData.image === item.image
                                 ? "opacity-100 scale-110"
-                                : "opacity-50"
+                                : "opacity-50 hover:opacity-60 hover:scale-103"
                             }`}
                           />
                         </div>
@@ -186,7 +186,7 @@ const Hero = () => {
 
           {/* ______ Hero Image ______ */}
 
-          <div className="flex flex-col justify-center items-center relative order-1 md:order-2 min-h-min">
+          <div className="flex flex-col justify-center items-center  relative mt-10 order-1 md:order-2 md:mt-0 min-h-min">
             <AnimatePresence mode="wait">
               <motion.img
                 key={activeData.id}
