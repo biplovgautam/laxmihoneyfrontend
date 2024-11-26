@@ -1,7 +1,7 @@
 import React from "react";
-import Fanta1 from "../assets/logo.png";
-import Fanta2 from "../assets/fanta2.png";
-import Fanta3 from "../assets/fanta3.png";
+import Fanta1 from "../assets/logo4.png";
+import Fanta2 from "../assets/logo3.png";
+import Fanta3 from "../assets/logo2.png";
 import { FaWhatsapp } from "react-icons/fa";
 import { AnimatePresence, easeInOut, motion } from "framer-motion";
 import Navbar from "./Navbar.jsx";
@@ -40,28 +40,28 @@ const topProducts = [
     title: "Raw Honey",
     subtitle:
       "Lorem ipsum dolor sit amet consectetur adipisicing elit. Recusandae iusto minima ad ut id eos iusto minima ad ut id eos ad ut id eos",
-    price: "$40",
+    price: "Rs. 1000",
     modal: "Raw",
     bgColor: "#cf4f00",
   },
   {
     id: 2,
     image: Fanta2,
-    title: "Cola Zero",
+    title: "Purified Honey",
     subtitle:
       "Lorem ipsum dolor sit amet consectetur adipisicing elit. Recusandae iusto minima ad ut id eos iusto minima ad ut id eos ad ut id eos",
-    price: "$100",
-    modal: "Zero",
+    price: "Rs. 1000",
+    modal: "Purified",
     bgColor: "#727272",
   },
   {
     id: 3,
     image: Fanta3,
-    title: "Coca Cola",
+    title: "Wild Honey",
     subtitle:
       "Lorem ipsum dolor sit amet consectetur adipisicing elit. Recusandae iusto minima ad ut id eos iusto minima ad ut id eos ad ut id eos",
-    price: "$100",
-    modal: "Cola",
+    price: "Rs. 5000",
+    modal: "Wild",
     bgColor: "#ac1a00",
   },
 ];
@@ -141,7 +141,7 @@ const Hero = () => {
                 <div className="w-20 h-[1px] bg-white"></div>
               </motion.div>
 
-              {/* Headphone list switcher */}
+              {/* Top Products list switcher */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -161,7 +161,7 @@ const Hero = () => {
                           <img
                             src={item.image}
                             alt=""
-                            className={`w-[80px] img-shadow ${
+                            className={`w-60 h-40 object-contain img-shadow ${
                               activeData.image === item.image
                                 ? "opacity-100 scale-110"
                                 : "opacity-50"
