@@ -81,6 +81,7 @@ const Hero = () => {
       >
         {/* navbar components */}
         <Navbar />
+        
         <div className="container grid grid-cols-1 md:grid-cols-2 min-h-[605px]">
           {/* ______ Headphone Info ______ */}
           <div className="flex flex-col justify-center py-14 md:py-0 xl:max-w-[500px] order-2 md:order-1">
