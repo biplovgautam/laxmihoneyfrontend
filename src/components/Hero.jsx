@@ -32,6 +32,7 @@ const SlideRight = (delay) => {
   };
 };
 
+
 const topProducts = [
   {
     id: 1,
@@ -65,6 +66,7 @@ const topProducts = [
   },
 ];
 const Hero = () => {
+
   const [activeData, setActiveData] = React.useState(topProducts[0]);
 
   const handleActiveData = (data) => {
@@ -146,6 +148,7 @@ const Hero = () => {
                 transition={{ duration: 0.8, delay: 0.2, ease: "easeInOut" }}
                 className="grid grid-cols-3 gap-10"
               >
+
                 {topProducts.map((item) => {
                   return (
                     
@@ -182,6 +185,7 @@ const Hero = () => {
           </div>
 
           {/* ______ Hero Image ______ */}
+
           <div className="flex flex-col justify-center items-center relative order-1 md:order-2 min-h-min">
             <AnimatePresence mode="wait">
               <motion.img
