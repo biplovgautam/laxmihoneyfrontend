@@ -11,6 +11,12 @@ export default {
         sans: ["Poppins", "sans-serif"],
         handwriting: ["Merienda", "cursive"],
       },
+      dropShadow: {
+        'custom-md': '2px 4px 2px rgba(0, 0, 0, 0.20)',
+        'custom-lg': '2px 4px 3px rgba(0, 0, 0, 0.30)',
+        'custom-xl': '4px 6px 5px rgba(0, 0, 0, 0.30)',
+        'custom-white': '2px 4px 6px rgba(255, 255, 255, 0.75)',
+      },
       container: {
         center: true,
         padding: {

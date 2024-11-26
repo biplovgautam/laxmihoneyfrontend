@@ -26,7 +26,7 @@ const Footer = () => {
             }}
             className="space-y-6"
           >
-            <img src={Logo} alt="" className="max-w-[100px] invert" />
+            <img src={Logo} alt="" className="max-w-[100px] " />
             <div>
               <p className="flex items-center gap-2">
                 <FaPhone />

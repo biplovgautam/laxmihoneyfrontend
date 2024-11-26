@@ -1,11 +1,10 @@
 import React from "react";
-import Fanta1 from "../assets/fanta1.png";
+import Fanta1 from "../assets/logo.png";
 import Fanta2 from "../assets/fanta2.png";
 import Fanta3 from "../assets/fanta3.png";
 import { FaWhatsapp } from "react-icons/fa";
-import { UpdateFollower } from "react-mouse-follower";
 import { AnimatePresence, easeInOut, motion } from "framer-motion";
-import Navbar from "../components/Navbar";
+import Navbar from "./Navbar.jsx";
 
 const SlideRight = (delay) => {
   return {
@@ -37,11 +36,11 @@ const headphoneData = [
   {
     id: 1,
     image: Fanta1,
-    title: "Orange Fanta",
+    title: "Raw Honey",
     subtitle:
       "Lorem ipsum dolor sit amet consectetur adipisicing elit. Recusandae iusto minima ad ut id eos iusto minima ad ut id eos ad ut id eos",
     price: "$40",
-    modal: "Orange",
+    modal: "Raw",
     bgColor: "#cf4f00",
   },
   {
@@ -78,26 +77,16 @@ const Hero = () => {
         initial={{ backgroundColor: activeData.bgColor }}
         animate={{ backgroundColor: activeData.bgColor }}
         transition={{ duration: 0.8 }}
-        className="bg-brandDark text-white"
+        className="bg-brandDark text-white min-h-[95vh] top-0"
       >
         {/* navbar components */}
         <Navbar />
-
         <div className="container grid grid-cols-1 md:grid-cols-2 min-h-[605px]">
           {/* ______ Headphone Info ______ */}
           <div className="flex flex-col justify-center py-14 md:py-0 xl:max-w-[500px] order-2 md:order-1">
             <div className="space-y-5 text-center md:text-left">
               <AnimatePresence mode="wait">
-                <UpdateFollower
-                  mouseOptions={{
-                    backgroundColor: "white",
-                    zIndex: 9999,
-                    followSpeed: 0.5,
-                    rotate: -720,
-                    mixBlendMode: "difference",
-                    scale: 10,
-                  }}
-                >
+                
                   <motion.h1
                     key={activeData.id}
                     variants={SlideRight(0.2)}
@@ -108,7 +97,6 @@ const Hero = () => {
                   >
                     {activeData.title}
                   </motion.h1>
-                </UpdateFollower>
               </AnimatePresence>
               <AnimatePresence mode="wait">
                 <motion.p
@@ -124,20 +112,7 @@ const Hero = () => {
               </AnimatePresence>
 
               <AnimatePresence mode="wait">
-                <UpdateFollower
-                  mouseOptions={{
-                    backgroundColor: activeData.bgColor,
-                    zIndex: 9999,
-                    followSpeed: 0.5,
-                    rotate: -720,
-                    scale: 6,
-                    backgroundElement: (
-                      <div>
-                        <img src={activeData.image} />
-                      </div>
-                    ),
-                  }}
-                >
+                
                   <motion.button
                     key={activeData.id}
                     variants={SlideRight(0.6)}
@@ -149,7 +124,6 @@ const Hero = () => {
                   >
                     Order Now
                   </motion.button>
-                </UpdateFollower>
               </AnimatePresence>
 
               {/* ______ Headphone List Separator ______ */}
@@ -174,16 +148,7 @@ const Hero = () => {
               >
                 {headphoneData.map((item) => {
                   return (
-                    <UpdateFollower
-                      mouseOptions={{
-                        backgroundColor: item.bgColor,
-                        zIndex: 9999,
-                        followSpeed: 0.5,
-                        scale: 5,
-                        text: "View Details",
-                        textFontSize: "3px",
-                      }}
-                    >
+                    
                       <div
                         key={item.id}
                         onClick={() => handleActiveData(item)}
@@ -210,7 +175,6 @@ const Hero = () => {
                           </p> */}
                         </div>
                       </div>
-                    </UpdateFollower>
                   );
                 })}
               </motion.div>
@@ -218,7 +182,7 @@ const Hero = () => {
           </div>
 
           {/* ______ Hero Image ______ */}
-          <div className="flex flex-col justify-end items-center relative order-1 md:order-2 ">
+          <div className="flex flex-col justify-end items-center relative order-1 md:order-2 min-h-min">
             <AnimatePresence mode="wait">
               <motion.img
                 key={activeData.id}
@@ -253,18 +217,18 @@ const Hero = () => {
                     duration: 0.4,
                   },
                 }}
-                className="text-white/5 text-[300px] font-poppins font-extrabold absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0"
+                className="text-white/5 text-[300px] font-poppins font-extrabold absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 pointer-events-none"
               >
                 {activeData.modal}
               </motion.div>
             </AnimatePresence>
           </div>
           {/* ______ WhatsApp Icon ______ */}
-          <div className="text-3xl text-white fixed bottom-10 right-10 hover:rotate-[360deg] duration-500 z-[99999] mix-blend-difference">
+          {/* <div className="text-3xl text-white fixed bottom-10 right-10 hover:rotate-[360deg] duration-500 z-[99999] mix-blend-difference">
             <a href="">
               <FaWhatsapp />
             </a>
-          </div>
+          </div> */}
         </div>
       </motion.section>
     </>
