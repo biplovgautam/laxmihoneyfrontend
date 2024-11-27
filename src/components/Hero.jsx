@@ -1,7 +1,7 @@
 import React from "react";
-import Fanta1 from "../assets/logo4.png";
-import Fanta2 from "../assets/logo2.png";
-import Fanta3 from "../assets/logo3.png";
+import Product1 from "../assets/logo4.png";
+import Product2 from "../assets/logo2.png";
+import Product3 from "../assets/logo3.png";
 import { FaWhatsapp } from "react-icons/fa";
 import { AnimatePresence, easeInOut, motion } from "framer-motion";
 import Navbar from "./Navbar.jsx";
@@ -37,7 +37,7 @@ const SlideRight = (delay) => {
 const topProducts = [
   {
     id: 1,
-    image: Fanta1,
+    image: Product1,
     title: "Raw Honey",
     subtitle:
     "Experience the pure essence of Nepali highlands with our raw, unprocessed honey. Harvested directly from pristine beehives, preserving all natural enzymes and beneficial properties for your wellness journey.",
@@ -47,7 +47,7 @@ const topProducts = [
   },
   {
     id: 2,
-    image: Fanta2,
+    image: Product2,
     title: "Purified Honey",
     subtitle:
     "Carefully filtered and crystallization-free, our purified honey brings you the smoothest golden nectar from the Himalayas. Perfect blend of traditional beekeeping and modern purification techniques.",
@@ -57,7 +57,7 @@ const topProducts = [
   },
   {
     id: 3,
-    image: Fanta3,
+    image: Product3,
     title: "Wild Honey",
     subtitle:
     "Rare and exotic wild honey collected from Nepal's untouched forests. A testament to nature's finest offering, harvested sustainably from wild bee colonies in pristine mountain ecosystems.",
@@ -89,7 +89,7 @@ const Hero = () => {
         className="bg-brandDark text-white min-h-screen relative"
       >
         
-        <div className="container grid grid-cols-1 pt-24 md:grid-cols-2 min-h-[90vh]">
+        <div className="container grid grid-cols-1 pt-28 md:grid-cols-2 min-h-[90vh]">
           {/* ______ Headphone Info ______ */}
           <div className="flex flex-col justify-center py-14 md:py-0 xl:max-w-[500px] order-2 md:order-1">
             <div className="space-y-5 text-center md:text-left">
@@ -210,7 +210,7 @@ const Hero = () => {
                 }}
                 src={activeData.image}
                 alt=""
-                className="w-[150px] md:w-[200px] xl:w-[350px] img-shadow relative z-10"
+                className="w-[150px] md:w-[300px] xl:w-[350px] img-shadow relative z-10"
               />
             </AnimatePresence>
             <AnimatePresence mode="wait">
