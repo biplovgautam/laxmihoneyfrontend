@@ -52,14 +52,14 @@ const Navbar = () => {
       <div className={`fixed inset-0 md:hidden bg-black/10 backdrop-blur-md transition-all duration-700 ease-in-out z-40 ${menuOpen ? 'top-0 transition-all duration-700 ease-in-out' : 'top-[-100%]'}`} onClick={closeMenu}></div>
     )}
       
-      <nav className="sticky top-0 z-50 flex items-center justify-between p-4 bg-transparent text-white">
+      <nav className="fixed w-full top-0 z-50 flex items-center justify-between p-4 bg-transparent text-white">
         <div className="flex items-center justify-center">
           <Link to="/" className="transition duration-300 ease-in-out transform hover:scale-105 drop-shadow-md hover:drop-shadow-lg">
             <img className={`brand ml-2 ${menuOpen ? 'blur-md' : ''}`} src={Logo} alt="Logo" style={{ height: '75px' }} />
           </Link>
         </div>
         <div className={`nav-links ${menuOpen ? 'top-16 opacity-100' : 'top-[-400px] opacity-0'} absolute left-0 w-full bg-transparent md:static md:w-auto md:opacity-100 md:flex md:items-center ml-auto pr-4 transition-all duration-300 ease-in-out`}>
-          <ul className={`flex flex-col md:flex-row gap-2.5 ${menuOpen ? 'items-center' : 'items-center'}`}>
+          <ul className={`flex flex-col  md:flex-row gap-2.5 ${menuOpen ? 'items-center mt-16' : ' items-center'}`}>
             {NavbarMenu.map((item) => (
               <li key={item.id} className="p-2">
                 <Link to={item.link} className="inline-block text-base font-semibold py-2 px-3 uppercase hover:text-black transition duration-300 ease-in-out transform hover:scale-110 text-shadow hover:text-shadow-white">

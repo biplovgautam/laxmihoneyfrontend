@@ -5,6 +5,7 @@ import Fanta3 from "../assets/logo3.png";
 import { FaWhatsapp } from "react-icons/fa";
 import { AnimatePresence, easeInOut, motion } from "framer-motion";
 import Navbar from "./Navbar.jsx";
+import { FaChevronDown } from "react-icons/fa";
 
 const SlideRight = (delay) => {
   return {
@@ -39,7 +40,7 @@ const topProducts = [
     image: Fanta1,
     title: "Raw Honey",
     subtitle:
-      "Lorem ipsum dolor sit amet consectetur adipisicing elit. Recusandae iusto minima ad ut id eos iusto minima ad ut id eos ad ut id eos",
+    "Experience the pure essence of Nepali highlands with our raw, unprocessed honey. Harvested directly from pristine beehives, preserving all natural enzymes and beneficial properties for your wellness journey.",
     price: "Rs. 1000",
     modal: "Raw",
     bgColor: "#cf4f00",
@@ -49,7 +50,7 @@ const topProducts = [
     image: Fanta2,
     title: "Purified Honey",
     subtitle:
-      "Lorem ipsum dolor sit amet consectetur adipisicing elit. Recusandae iusto minima ad ut id eos iusto minima ad ut id eos ad ut id eos",
+    "Carefully filtered and crystallization-free, our purified honey brings you the smoothest golden nectar from the Himalayas. Perfect blend of traditional beekeeping and modern purification techniques.",
     price: "Rs. 1000",
     modal: "Purified",
     bgColor: "#727272",
@@ -59,12 +60,18 @@ const topProducts = [
     image: Fanta3,
     title: "Wild Honey",
     subtitle:
-      "Lorem ipsum dolor sit amet consectetur adipisicing elit. Recusandae iusto minima ad ut id eos iusto minima ad ut id eos ad ut id eos",
+    "Rare and exotic wild honey collected from Nepal's untouched forests. A testament to nature's finest offering, harvested sustainably from wild bee colonies in pristine mountain ecosystems.",
     price: "Rs. 5000",
     modal: "Wild",
     bgColor: "#ac1a00",
   },
 ];
+const scrollDown = () => {
+  window.scrollTo({
+    top: window.innerHeight,
+    behavior: 'smooth'
+  });
+};
 const Hero = () => {
 
   const [activeData, setActiveData] = React.useState(topProducts[0]);
@@ -79,11 +86,10 @@ const Hero = () => {
         initial={{ backgroundColor: activeData.bgColor }}
         animate={{ backgroundColor: activeData.bgColor }}
         transition={{ duration: 0.8 }}
-        className="bg-brandDark text-white min-h-[95vh] top-0"
+        className="bg-brandDark text-white min-h-screen relative"
       >
-        {/* navbar components */}
-        <Navbar />
-        <div className="container grid grid-cols-1 md:grid-cols-2 min-h-[95vh]">
+        
+        <div className="container grid grid-cols-1 pt-24 md:grid-cols-2 min-h-[90vh]">
           {/* ______ Headphone Info ______ */}
           <div className="flex flex-col justify-center py-14 md:py-0 xl:max-w-[500px] order-2 md:order-1">
             <div className="space-y-5 text-center md:text-left">
@@ -128,7 +134,7 @@ const Hero = () => {
                   </motion.button>
               </AnimatePresence>
 
-              {/* ______ Headphone List Separator ______ */}
+              {/* ______ Top products List Separator ______ */}
 
               <motion.div
                 initial={{ opacity: 0 }}
