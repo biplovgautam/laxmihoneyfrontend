@@ -3,11 +3,22 @@ export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
-      colors: {
+      colors: {// Add your custom color here
+        customorangelight: '#f79051', 
+        customorangedark: '#f37623',
+        customorangelight2: '#f69868', 
+        productcard:"#ffb78b",
+        textdark:"#f2f2f3",
+       
         primary: "#f97316",
       },
 
       fontFamily: {
+        playfair : ['"Playfair Display"', 'serif'],
+        montserrat: ['Montserrat', 'sans-serif'],
+        // roboto-slab : ['"Roboto Slab"', 'serif'],
+        raleway : ["Raleway", 'sans-serif'],
+        merriweather: ['Merriweather', 'serif'],
         sans: ["Poppins", "sans-serif"],
         handwriting: ["Merienda", "cursive"],
       },

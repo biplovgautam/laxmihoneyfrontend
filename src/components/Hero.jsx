@@ -1,10 +1,11 @@
 import React from "react";
-import Fanta1 from "../assets/logo.png";
-import Fanta2 from "../assets/fanta2.png";
-import Fanta3 from "../assets/fanta3.png";
+import Product1 from "../assets/logo4.png";
+import Product2 from "../assets/logo2.png";
+import Product3 from "../assets/logo3.png";
 import { FaWhatsapp } from "react-icons/fa";
 import { AnimatePresence, easeInOut, motion } from "framer-motion";
 import Navbar from "./Navbar.jsx";
+import { FaChevronDown } from "react-icons/fa";
 
 const SlideRight = (delay) => {
   return {
@@ -36,35 +37,41 @@ const SlideRight = (delay) => {
 const topProducts = [
   {
     id: 1,
-    image: Fanta1,
+    image: Product1,
     title: "Raw Honey",
     subtitle:
-      "Lorem ipsum dolor sit amet consectetur adipisicing elit. Recusandae iusto minima ad ut id eos iusto minima ad ut id eos ad ut id eos",
-    price: "$40",
+    "Experience the pure essence of Nepali highlands with our raw, unprocessed honey. Harvested directly from pristine beehives, preserving all natural enzymes and beneficial properties for your wellness journey.",
+    price: "Rs. 1000",
     modal: "Raw",
     bgColor: "#cf4f00",
   },
   {
     id: 2,
-    image: Fanta2,
-    title: "Cola Zero",
+    image: Product2,
+    title: "Pure Honey",
     subtitle:
-      "Lorem ipsum dolor sit amet consectetur adipisicing elit. Recusandae iusto minima ad ut id eos iusto minima ad ut id eos ad ut id eos",
-    price: "$100",
-    modal: "Zero",
-    bgColor: "#727272",
+    "Carefully filtered and crystallization-free, our purified honey brings you the smoothest golden nectar from the Himalayas. Perfect blend of traditional beekeeping and modern purification techniques.",
+    price: "Rs. 1000",
+    modal: "Purified",
+    bgColor: "#f37623",
   },
   {
     id: 3,
-    image: Fanta3,
-    title: "Coca Cola",
+    image: Product3,
+    title: "Wild Honey",
     subtitle:
-      "Lorem ipsum dolor sit amet consectetur adipisicing elit. Recusandae iusto minima ad ut id eos iusto minima ad ut id eos ad ut id eos",
-    price: "$100",
-    modal: "Cola",
-    bgColor: "#ac1a00",
+    "Rare and exotic wild honey collected from Nepal's untouched forests. A testament to nature's finest offering, harvested sustainably from wild bee colonies in pristine mountain ecosystems.",
+    price: "Rs. 5000",
+    modal: "Wild",
+    bgColor: "#f79051",
   },
 ];
+const scrollDown = () => {
+  window.scrollTo({
+    top: window.innerHeight,
+    behavior: 'smooth'
+  });
+};
 const Hero = () => {
 
   const [activeData, setActiveData] = React.useState(topProducts[0]);
@@ -79,11 +86,10 @@ const Hero = () => {
         initial={{ backgroundColor: activeData.bgColor }}
         animate={{ backgroundColor: activeData.bgColor }}
         transition={{ duration: 0.8 }}
-        className="bg-brandDark text-white min-h-[95vh] top-0"
+        className="bg-brandDark text-white min-h-screen relative"
       >
-        {/* navbar components */}
-        <Navbar />
-        <div className="container grid grid-cols-1 md:grid-cols-2 min-h-[605px]">
+        
+        <div className="container grid grid-cols-1 pt-32 md:grid-cols-2 min-h-[90vh]">
           {/* ______ Headphone Info ______ */}
           <div className="flex flex-col justify-center py-14 md:py-0 xl:max-w-[500px] order-2 md:order-1">
             <div className="space-y-5 text-center md:text-left">
@@ -95,7 +101,7 @@ const Hero = () => {
                     initial="hidden"
                     animate="show"
                     exit="exit"
-                    className="text-3xl lg:text-6xl xl:text-7xl font-bold font-handwriting text-shadow"
+                    className="text-3xl lg:text-6xl xl:text-7xl font-bold font-raleway "
                   >
                     {activeData.title}
                   </motion.h1>
@@ -122,13 +128,13 @@ const Hero = () => {
                     animate="show"
                     exit="exit"
                     style={{ color: activeData.bgColor }}
-                    className="px-4 py-2 bg-white inline-block font-normal rounded-sm"
+                    className="px-4 py-2 bg-white inline-block font-normal shadow-lg rounded-sm hover:bg-opacity-80 duration-200 hover:shadow-xl"
                   >
                     Order Now
                   </motion.button>
               </AnimatePresence>
 
-              {/* ______ Headphone List Separator ______ */}
+              {/* ______ Top products List Separator ______ */}
 
               <motion.div
                 initial={{ opacity: 0 }}
@@ -141,7 +147,7 @@ const Hero = () => {
                 <div className="w-20 h-[1px] bg-white"></div>
               </motion.div>
 
-              {/* Headphone list switcher */}
+              {/* Top Products list switcher */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -161,10 +167,10 @@ const Hero = () => {
                           <img
                             src={item.image}
                             alt=""
-                            className={`w-[80px] img-shadow ${
+                            className={`w-60 h-40 object-contain img-shadow ${
                               activeData.image === item.image
                                 ? "opacity-100 scale-110"
-                                : "opacity-50"
+                                : "opacity-50 hover:opacity-60 hover:scale-103"
                             }`}
                           />
                         </div>
@@ -186,7 +192,7 @@ const Hero = () => {
 
           {/* ______ Hero Image ______ */}
 
-          <div className="flex flex-col justify-center items-center relative order-1 md:order-2 min-h-min">
+          <div className="flex flex-col justify-center items-center  relative mt-10 order-1 md:order-2 md:mt-0 min-h-min">
             <AnimatePresence mode="wait">
               <motion.img
                 key={activeData.id}
@@ -204,7 +210,7 @@ const Hero = () => {
                 }}
                 src={activeData.image}
                 alt=""
-                className="w-[150px] md:w-[200px] xl:w-[350px] img-shadow relative z-10"
+                className="w-[150px] md:w-[300px] xl:w-[350px] img-shadow relative z-10"
               />
             </AnimatePresence>
             <AnimatePresence mode="wait">

@@ -1,15 +1,12 @@
 import React from "react";
-import {
-  FaFacebook,
-  FaGoogle,
-  FaInstagram,
-  FaPhone,
-  FaTelegram,
-} from "react-icons/fa";
+import { FaFacebook, FaInstagram, FaLinkedin , FaPhone} from "react-icons/fa";
+import { AiOutlineShopping } from "react-icons/ai"; // Using a generic shopping icon for Daraz
 import { FaMapLocation } from "react-icons/fa6";
 import CardsImg from "../../assets/credit-cards.webp";
 import Logo from "../../assets/logo.png";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
+
 
 const Footer = () => {
   return (
@@ -30,11 +27,15 @@ const Footer = () => {
             <div>
               <p className="flex items-center gap-2">
                 <FaPhone />
-                +1 (123) 456-7890
+                +977-9819492581
               </p>
               <p className="flex items-center gap-2 mt-2">
-                {" "}
-                <FaMapLocation /> Noida, Uttar Pradesh
+                {"Head  "}
+                <FaMapLocation /> Kapilvastu, Nepal
+              </p>
+              <p className="flex items-center gap-2 mt-2">
+                {"Branch  "}
+                <FaMapLocation /> Kathmandu, Nepal
               </p>
             </div>
           </motion.div>
@@ -47,26 +48,41 @@ const Footer = () => {
               duration: 0.6,
             }}
             className="space-y-6"
-          >
-            <h1 className="text-3xl font-bold">Quick Links</h1>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <ul className="space-y-2">
-                  <li>Home</li>
-                  <li>About</li>
-                  <li>Contact us</li>
-                  <li>Privacy Policy</li>
-                </ul>
-              </div>
-              <div>
-                <ul className="space-y-2">
-                  <li>Home</li>
-                  <li>About</li>
-                  <li>Contact us</li>
-                  <li>Privacy Policy</li>
-                </ul>
-              </div>
+          ><h1 className="text-3xl font-bold">Quick Links</h1>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <ul className="space-y-2">
+                <li className="hover:text-black transition duration-300 ease-in-out transform hover:scale-105  ">
+                  <Link to="/">Home</Link>
+                </li>
+                <li className="hover:text-black transition duration-300 ease-in-out transform hover:scale-105  ">
+                  <Link to="/about">About</Link>
+                </li>
+                <li className="hover:text-black transition duration-300 ease-in-out transform hover:scale-105  ">
+                  <Link to="/contact">Contact us</Link>
+                </li>
+                <li className="hover:text-black transition duration-300 ease-in-out transform hover:scale-105  ">
+                  <Link to="/">Privacy Policy</Link>
+                </li>
+              </ul>
             </div>
+            <div>
+              <ul className="space-y-2">
+                <li className="hover:text-black transition duration-300 ease-in-out transform hover:scale-105 ">
+                  <Link to="/Products">Products</Link>
+                </li>
+                <li className="hover:text-black transition duration-300 ease-in-out transform hover:scale-105  ">
+                  <Link to="/Blogs">Blogs</Link>
+                </li>
+                <li className="hover:text-black transition duration-300 ease-in-out transform hover:scale-105  ">
+                  <Link to="/contact">Contact us</Link>
+                </li>
+                <li className="hover:text-black transition duration-300 ease-in-out transform hover:scale-105  ">
+                  <Link to="/privacy-policy">Privacy Policy</Link>
+                </li>
+              </ul>
+            </div>
+          </div>
           </motion.div>
           {/* Social Links section */}
           <motion.div
@@ -80,10 +96,18 @@ const Footer = () => {
           >
             <h1 className="text-3xl font-bold">Follow us</h1>
             <div className="flex items-center gap-3">
-              <FaFacebook className="text-3xl hover:scale-105 duration-300" />
-              <FaInstagram className="text-3xl hover:scale-105 duration-300" />
-              <FaTelegram className="text-3xl hover:scale-105 duration-300" />
-              <FaGoogle className="text-3xl hover:scale-105 duration-300" />
+              <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer">
+                <FaFacebook className="text-3xl hover:text-black hover:scale-105 transition duration-300 ease-in-out transform drop-shadow-lg hover:drop-shadow-xl" />
+              </a>
+              <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer">
+                <FaInstagram className="text-3xl hover:text-black hover:scale-105 transition duration-300 ease-in-out transform drop-shadow-lg hover:drop-shadow-xl" />
+              </a>
+              <a href="https://www.daraz.com.np" target="_blank" rel="noopener noreferrer">
+                <AiOutlineShopping className="text-3xl hover:text-black hover:scale-105 transition duration-300 ease-in-out transform drop-shadow-lg hover:drop-shadow-xl" />
+              </a>
+              <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer">
+                <FaLinkedin className="text-3xl hover:text-black hover:scale-105 transition duration-300 ease-in-out transform drop-shadow-lg hover:drop-shadow-xl" />
+              </a>
             </div>
             <div className="space-y-2">
               <p>Payment Methods</p>
