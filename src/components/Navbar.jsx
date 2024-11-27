@@ -6,6 +6,8 @@ import { FaRegUser, FaShoppingCart } from "react-icons/fa";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [cartItemCount, setCartItemCount] = useState(1);
+
   const menuRef = useRef(null);
 
   const NavbarMenu = useMemo(() => [
@@ -90,12 +92,17 @@ const Navbar = () => {
             </li>
           ))}
           <li className="p-2 flex items-center space-x-4 w-32 justify-evenly">
-            <button className="text-xl hover:text-black transition duration-300 ease-in-out ">
-              <FaShoppingCart className="drop-shadow-custom-md  transform hover:scale-110" />
-            </button>
-            <button className="text-xl hover:text-black transition duration-300 ease-in-out mt-1">
-              <FaRegUser className="drop-shadow-custom-lg  transform hover:scale-110" />
-            </button>
+          <Link to="/cart" className="text-xl hover:text-black hover:scale-110 transition duration-300 ease-in-out relative group">
+            <FaShoppingCart className="drop-shadow-custom-md transform " />
+            {cartItemCount > 0 && (
+              <span className="absolute top-0 w-5 h-5 right-0 inline-flex drop-shadow-custom-md items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-[#E06A21] rounded-full transform translate-x-1/2 -translate-y-1/2 transition duration-300 ease-in-out group-hover:bg-[#c74c00] ">
+                {cartItemCount}
+              </span>
+            )}
+          </Link>
+          <Link to="/account" className="text-xl hover:text-black transition duration-300 ease-in-out mt-1">
+            <FaRegUser className="drop-shadow-custom-lg transform hover:scale-110" />
+          </Link>
           </li>
         </ul>
       </div>
