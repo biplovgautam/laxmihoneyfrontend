@@ -1,40 +1,40 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { Link } from "react-router-dom";
 import Logo from "../assets/logo.png";
 import { MdMenu, MdClose } from "react-icons/md";
 import { FaRegUser, FaShoppingCart } from "react-icons/fa";
 
-const NavbarMenu = [
-  {
-    id: 1,
-    title: "Home",
-    link: "/",
-  },
-  {
-    id: 2,
-    title: "Products",
-    link: "/products",
-  },
-  {
-    id: 3,
-    title: "Contact",
-    link: "/contact",
-  },
-  {
-    id: 4,
-    title: "About",
-    link: "/about",
-  },
-  {
-    id: 5,
-    title: "Blogs",
-    link: "/blogs",
-  },
-];
-
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
+
+  const NavbarMenu = useMemo(() => [
+    {
+      id: 1,
+      title: "Home",
+      link: "/",
+    },
+    {
+      id: 2,
+      title: "Products",
+      link: "/products",
+    },
+    {
+      id: 3,
+      title: "Contact",
+      link: "/contact",
+    },
+    {
+      id: 4,
+      title: "About",
+      link: "/about",
+    },
+    {
+      id: 5,
+      title: "Blogs",
+      link: "/blogs",
+    },
+  ], []); // Empty dependency array since menu items are static
 
   useEffect(() => {
     const handleResize = () => {
@@ -70,7 +70,7 @@ const Navbar = () => {
     <nav className="fixed w-full top-0 z-50 flex items-center justify-between p-4 bg-transparent text-white">
       <div className="flex items-center justify-center">
         <Link to="/" className="transition duration-300 ease-in-out transform hover:scale-105 drop-shadow-md hover:drop-shadow-lg">
-          <img className={`brand ml-2 ${menuOpen ? 'blur-sm' : ''}`} src={Logo} alt="Logo" style={{ height: '75px',minWidth: '65px', objectFit: 'contain' }} />
+          <img className={`brand ml-2 ${menuOpen ? 'blur-sm' : ''}`} src={Logo} alt="Logo" style={{ height: '75px', minWidth: '65px', objectFit: 'contain' }} />
         </Link>
       </div>
       
@@ -83,18 +83,18 @@ const Navbar = () => {
               <Link 
                 to={item.link} 
                 onClick={closeMenu}
-                className="inline-block text-base font-semibold py-2 px-3 uppercase hover:text-black transition duration-300 ease-in-out transform hover:scale-110 text-shadow hover:text-shadow-white"
+                className="inline-block text-base font-semibold py-2 px-3 uppercase hover:text-black transition duration-300 ease-in-out transform hover:scale-110 "
               >
                 {item.title}
               </Link>
             </li>
           ))}
           <li className="p-2 flex items-center space-x-4 w-32 justify-evenly">
-            <button className="text-xl hover:text-black transition duration-300 ease-in-out text-shadow hover:text-shadow-lg">
-              <FaShoppingCart className="drop-shadow-custom-lg hover:drop-shadow-custom-xl transform hover:scale-110" />
+            <button className="text-xl hover:text-black transition duration-300 ease-in-out ">
+              <FaShoppingCart className="drop-shadow-custom-md  transform hover:scale-110" />
             </button>
-            <button className="text-xl hover:text-black transition duration-300 ease-in-out text-shadow hover:text-shadow-lg mt-1">
-              <FaRegUser className="drop-shadow-custom-lg hover:drop-shadow-custom-xl transform hover:scale-110" />
+            <button className="text-xl hover:text-black transition duration-300 ease-in-out mt-1">
+              <FaRegUser className="drop-shadow-custom-lg  transform hover:scale-110" />
             </button>
           </li>
         </ul>

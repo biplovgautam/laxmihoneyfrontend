@@ -37,7 +37,7 @@ const BlogsData = [
 const Blogs = () => {
   return (
     <section className="bg-gray-50">
-      <div className="container py-14">
+      <div className="container pt-32 py-14">
         <h1 className="text-3xl font-bold text-center pb-8">Blogs</h1>
         {/* card section */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

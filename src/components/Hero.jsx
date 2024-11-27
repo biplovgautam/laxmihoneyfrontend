@@ -48,12 +48,12 @@ const topProducts = [
   {
     id: 2,
     image: Product2,
-    title: "Purified Honey",
+    title: "Pure Honey",
     subtitle:
     "Carefully filtered and crystallization-free, our purified honey brings you the smoothest golden nectar from the Himalayas. Perfect blend of traditional beekeeping and modern purification techniques.",
     price: "Rs. 1000",
     modal: "Purified",
-    bgColor: "#727272",
+    bgColor: "#f37623",
   },
   {
     id: 3,
@@ -63,7 +63,7 @@ const topProducts = [
     "Rare and exotic wild honey collected from Nepal's untouched forests. A testament to nature's finest offering, harvested sustainably from wild bee colonies in pristine mountain ecosystems.",
     price: "Rs. 5000",
     modal: "Wild",
-    bgColor: "#ac1a00",
+    bgColor: "#f79051",
   },
 ];
 const scrollDown = () => {
@@ -89,7 +89,7 @@ const Hero = () => {
         className="bg-brandDark text-white min-h-screen relative"
       >
         
-        <div className="container grid grid-cols-1 pt-28 md:grid-cols-2 min-h-[90vh]">
+        <div className="container grid grid-cols-1 pt-32 md:grid-cols-2 min-h-[90vh]">
           {/* ______ Headphone Info ______ */}
           <div className="flex flex-col justify-center py-14 md:py-0 xl:max-w-[500px] order-2 md:order-1">
             <div className="space-y-5 text-center md:text-left">
@@ -101,7 +101,7 @@ const Hero = () => {
                     initial="hidden"
                     animate="show"
                     exit="exit"
-                    className="text-3xl lg:text-6xl xl:text-7xl font-bold font-handwriting text-shadow"
+                    className="text-3xl lg:text-6xl xl:text-7xl font-bold font-raleway "
                   >
                     {activeData.title}
                   </motion.h1>
