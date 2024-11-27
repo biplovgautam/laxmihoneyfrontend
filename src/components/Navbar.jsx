@@ -6,7 +6,7 @@ import { FaRegUser, FaShoppingCart } from "react-icons/fa";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [cartItemCount, setCartItemCount] = useState(1);
+  const [cartItemCount, setCartItemCount] = useState(5);
 
   const menuRef = useRef(null);
 
