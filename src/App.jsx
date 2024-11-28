@@ -7,6 +7,7 @@ import Products from "./Pages/Products";
 import Blogs from "./Pages/Blogs";
 import About from "./Pages/About";
 import Contact from "./Pages/Contact";
+import NotFound from "./Pages/Not_found";
 
 const App = () => {
   return (
