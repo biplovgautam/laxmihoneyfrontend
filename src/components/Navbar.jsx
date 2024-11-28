@@ -101,7 +101,7 @@ const Navbar = () => {
         className={`nav-links ${
           menuOpen
             ? "top-0 opacity-100 h-screen backdrop-blur-md bg-black/10 pointer-events-auto "
-            : "top-[-100%] opacity-0 pointer-events-none"
+            : "top-[-100%] opacity-0 pointer-events-none md:pointer-events-auto"
         } 
         absolute left-0 w-full md:h-auto md:bg-transparent md:backdrop-blur-none md:static md:w-auto md:opacity-100 md:flex md:items-center 
         ml-auto pr-4 transition-all duration-300 ease-in-out`}
