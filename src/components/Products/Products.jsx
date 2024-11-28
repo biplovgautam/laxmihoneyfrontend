@@ -90,10 +90,10 @@ const Products = () => {
         {ProductsData.map((item) => (
           <Link to={`/product/${item.id}`} key={item.id} className="group">
           <motion.div
-            variants={fadeUp(0.5)}
+            variants={fadeUp(0.2)}
             initial="hidden"
             whileInView={"show"}
-            className="flex flex-col items-center justify-center p-5 max-w-[300px] mx-auto shadow-lg rounded-xl bg-customorangelight2 h-[380px] transform transition duration-300 group-hover:scale-105 group-hover:bg-customorangelight"
+            className="flex flex-col items-center justify-center p-5 max-w-[300px] mx-auto shadow-lg rounded-xl bg-customorangelight2 h-[380px] transform transition ease-in-out duration-300 group-hover:scale-105 group-hover:bg-customorangelight"
           >
             <img
               src={item.image}

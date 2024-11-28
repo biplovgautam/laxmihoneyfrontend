@@ -79,7 +79,7 @@ const Navbar = () => {
   return (
     <nav
       className={`fixed w-full top-0 z-50 flex items-center justify-between p-4 text-white transition-transform duration-300 ${
-        isVisible ? "translate-y-0" : "-translate-y-full"
+        isVisible ? "translate-y-0 " : "-translate-y-full "
       } ${lastScrollY > 50 ? "bg-transparent" : "bg-transparent"}`}
     >
       <div className="flex items-center justify-center">
@@ -100,8 +100,8 @@ const Navbar = () => {
         ref={menuRef}
         className={`nav-links ${
           menuOpen
-            ? "top-0 opacity-100 h-screen backdrop-blur-md bg-black/10"
-            : "top-[-100%] opacity-0"
+            ? "top-0 opacity-100 h-screen backdrop-blur-md bg-black/10 pointer-events-auto "
+            : "top-[-100%] opacity-0 pointer-events-none"
         } 
         absolute left-0 w-full md:h-auto md:bg-transparent md:backdrop-blur-none md:static md:w-auto md:opacity-100 md:flex md:items-center 
         ml-auto pr-4 transition-all duration-300 ease-in-out`}
