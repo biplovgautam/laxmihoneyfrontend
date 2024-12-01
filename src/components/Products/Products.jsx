@@ -85,7 +85,7 @@ const Products = () => {
         >
           OUR PRODUCTS
         </motion.h1>
-        {/* card section */}
+        
         <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-4 gap-6">
         {ProductsData.map((item) => (
           <Link to={`/product/${item.id}`} key={item.id} className="group">
@@ -109,7 +109,7 @@ const Products = () => {
               </p>
               <hr className="w-full mx-auto border-1 border-white" />
               <div className="flex justify-between items-center pt-8 mt-20 w-full px-4">
-                <span className="text-lg text-white font-semibold">${item.price}</span> {/* Price */}
+                <span className="text-lg text-white font-semibold">${item.price}</span> 
                 <button className="border-2 border-white text-white px-4 py-2 rounded-md hover:bg-white hover:border-3 hover:scale-105 hover:text-customorangelight duration-200">
                   Add to cart
                 </button>
@@ -120,6 +120,7 @@ const Products = () => {
         ))}
       </div>
       </div>
+      
     </div>
   );
 };
