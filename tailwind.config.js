@@ -1,4 +1,7 @@
 /** @type {import('tailwindcss').Config} */
+
+
+
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
@@ -36,6 +39,16 @@ export default {
           lg: "4rem",
           xl: "5rem",
           "2xl": "6rem",
+        },
+      },
+      animation: {
+        buzzingBee: 'buzzing 3s ease-in-out infinite',
+      },
+      keyframes: {
+        buzzing: {
+          '0%': { transform: 'translateX(-50px) translateY(0px)' },
+          '50%': { transform: 'translateX(50px) translateY(-30px)' },
+          '100%': { transform: 'translateX(-50px) translateY(0)' },
         },
       },
     },
