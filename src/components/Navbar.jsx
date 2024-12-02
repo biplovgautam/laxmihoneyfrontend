@@ -7,7 +7,17 @@ import { FaRegUser, FaShoppingCart } from "react-icons/fa";
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true); // Tracks navbar visibility
-  const [lastScrollY, setLastScrollY] = useState(0); // Tracks the last scroll position
+  const [isBlurred, setIsBlurred] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollThreshold = window.innerWidth * 0.1;
+      setIsBlurred(window.scrollY > scrollThreshold);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const menuRef = useRef(null);
 
@@ -35,21 +45,6 @@ const Navbar = () => {
       }
     };
 
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-
-      if (currentScrollY > lastScrollY && currentScrollY > 80) {
-        // Scrolling down and passed threshold
-        setIsVisible(false);
-      } else {
-        // Scrolling up
-        setIsVisible(true);
-      }
-
-      setLastScrollY(currentScrollY); // Update the last scroll position
-    };
-
-    // Prevent background scrolling when menu is open
     if (menuOpen) {
       document.body.classList.add("overflow-hidden");
     } else {
@@ -58,15 +53,13 @@ const Navbar = () => {
 
     window.addEventListener("resize", handleResize);
     document.addEventListener("mousedown", handleClickOutside);
-    window.addEventListener("scroll", handleScroll);
 
     return () => {
-      document.body.classList.remove("overflow-hidden"); // Cleanup on unmount
+      document.body.classList.remove("overflow-hidden");
       window.removeEventListener("resize", handleResize);
       document.removeEventListener("mousedown", handleClickOutside);
-      window.removeEventListener("scroll", handleScroll);
     };
-  }, [menuOpen, lastScrollY]);
+  }, [menuOpen]);
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -79,8 +72,10 @@ const Navbar = () => {
   return (
     <nav
       className={`fixed w-full top-0 z-50 flex items-center justify-between p-4 text-white transition-transform duration-300 ${
-        isVisible ? "translate-y-0 " : "-translate-y-full "
-      } ${lastScrollY > 50 ? "bg-transparent" : "bg-transparent"}`}
+        isBlurred
+          ? " backdrop-blur-md shadow-lg"
+          : "bg-transparent"
+      }`}
     >
       <div className="flex items-center justify-center">
         <Link
@@ -100,7 +95,7 @@ const Navbar = () => {
         ref={menuRef}
         className={`nav-links ${
           menuOpen
-            ? "top-0 opacity-100 h-screen backdrop-blur-md bg-black/10 pointer-events-auto "
+            ? "top-0 opacity-100 h-screen backdrop-blur-md bg-black/10 pointer-events-auto"
             : "top-[-100%] opacity-0 pointer-events-none md:pointer-events-auto"
         } 
         absolute left-0 w-full md:h-auto md:bg-transparent md:backdrop-blur-none md:static md:w-auto md:opacity-100 md:flex md:items-center 
