@@ -1,204 +1,209 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import signupPoster from '@assets/loginposter2.png';
+import { FcGoogle } from 'react-icons/fc';
 
 const Signup = () => {
-  const [username, setUsername] = useState('');
+  const [step, setStep] = useState(1);
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
-  const [countryCode, setCountryCode] = useState('+977');
-  const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [isValid, setIsValid] = useState({
-    username: true,
-    email: true,
-    phoneNumber: true,
-    password: true,
-    confirmPassword: true,
-  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  const handleNextStep = () => {
+    setStep(step + 1);
+  };
+
+  const handlePreviousStep = () => {
+    setStep(step - 1);
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Validate password and confirm password
-    const isPasswordValid = password.length >= 6;
-    const isConfirmPasswordValid = confirmPassword.length >= 6 && password === confirmPassword;
-    const isUsernameValid = username.trim() !== '' && !username.includes(' ');
-  
-    setIsValid({
-      ...isValid,
-      password: isPasswordValid,
-      confirmPassword: isConfirmPasswordValid,
-      username: isUsernameValid,
-    });
-  
-    // Prevent form submission if there are validation errors
-    if (!isPasswordValid || !isConfirmPasswordValid || !isUsernameValid) {
+    if (password !== confirmPassword) {
+      alert("Passwords do not match");
       return;
     }
-  
-    // Log the data to the console before sending to the API
-    console.log('Form Data:', {
-      username,
-      email,
-      phone_number: `${countryCode}${phoneNumber}`,
-      password,
-    });
-  
+    setLoading(true);
     try {
-        const response = await axios.post('http://127.0.0.1:8000/api/register/', {
-          username,
-          email,
-          phone_number: `${countryCode}${phoneNumber}`,
-          password,
-        });
-        console.log('Form submitted', response.data);
-        navigate('/login');
-      } catch (error) {
-        console.error('Error message:', error.message);
-        console.error('Full error:', error.response ? error.response.data : error);
-      }
-  };
-  
-
-  const handleValidation = (field, value) => {
-    let valid = true;
-    let message = '';
-    if (field === 'email') {
-      valid = /\S+@\S+\.\S+/.test(value);
-      message = valid ? '' : 'Please enter a valid email address.';
-    } else if (field === 'phoneNumber') {
-      valid = /^\d+$/.test(value);
-      message = valid ? '' : 'Please enter a valid phone number.';
-    } else if (field === 'password') {
-      valid = value.length >= 6;
-      message = valid ? '' : 'Password must be at least 6 characters long.';
-    } else if (field === 'confirmPassword') {
-      valid = value === password;
-      message = valid ? '' : 'Passwords do not match.';
-    } else if (field === 'username') {
-      valid = !value.includes(' ');
-      message = valid ? '' : 'Username should not contain spaces.';
-    } else {
-      valid = value.trim() !== '';
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/register/`, {
+        first_name: firstName,
+        last_name: lastName,
+        email,
+        password,
+      });
+      console.log('Signup successful', response.data);
+      navigate('/login');
+    } catch (error) {
+      console.error('Error message:', error.message);
+      console.error('Full error:', error.response ? error.response.data : error);
+    } finally {
+      setLoading(false);
     }
-    setIsValid({ ...isValid, [field]: valid });
-    return message;
-  };
-
-  const handleInputChange = (field, value) => {
-    if (field === 'username') {
-        setUsername(value.trim());  // Remove leading/trailing spaces
-    } else if (field === 'email') {
-      setEmail(value);
-    } else if (field === 'phoneNumber') {
-      setPhoneNumber(value);
-    } else if (field === 'password') {
-      setPassword(value);
-    } else if (field === 'confirmPassword') {
-      setConfirmPassword(value);
-    }
-    const message = handleValidation(field, value);
-    document.getElementById(field).setCustomValidity(message);
   };
 
   return (
-    <div className="min-h-screen pt-16 flex items-center justify-center bg-customorangedark">
-      <div className="bg-gray-100 p-8 rounded-lg shadow-lg w-full max-w-md mx-4">
-        <h2 className="text-2xl font-bold mb-6 text-center text-customorangedark">Sign Up</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-customorangedark">Username</label>
-            <input
-              type="text"
-              id="username"
-              value={username}
-              onChange={(e) => handleInputChange('username', e.target.value)}
-              className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-300 transition-transform duration-300 transform hover:scale-[1.02] ${
-                isValid.username ? '' : 'border-red-500'
-              }`}
-              required
-            />
+    <section
+      className="min-h-screen flex items-center justify-center bg-cover bg-center"
+      style={{ backgroundImage: `url(${signupPoster})` }}
+    >
+      <div className="bg-customorangelight bg-opacity-10 backdrop-blur-lg flex rounded-2xl shadow-lg max-w-3xl p-5 items-center">
+        {/* Image */}
+        <div className="md:block hidden w-1/2">
+          <img
+            className="rounded-2xl"
+            src={signupPoster}
+            alt="Signup"
+          />
+        </div>
+        {/* Form */}
+        <div className="md:w-1/2 px-8 md:px-16">
+          <h2 className="font-bold text-2xl text-black">Sign Up</h2>
+          <p className="text-xs mt-4 text-black">
+            Create an account to get started!
+          </p>
+          <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+            {step === 1 && (
+              <>
+                <input
+                  className="p-2 mt-8 rounded-xl border"
+                  type="text"
+                  name="firstName"
+                  placeholder="First Name"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  required
+                />
+                <input
+                  className="p-2 rounded-xl border"
+                  type="text"
+                  name="lastName"
+                  placeholder="Last Name"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  required
+                />
+                <button
+                  type="button"
+                  className="bg-customorangedark rounded-xl text-white py-2 hover:scale-105 duration-300"
+                  onClick={handleNextStep}
+                >
+                  Next
+                </button>
+              </>
+            )}
+            {step === 2 && (
+              <>
+                <input
+                  className="p-2 mt-8 rounded-xl border"
+                  type="email"
+                  name="email"
+                  placeholder="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+                <button
+                  type="button"
+                  className="bg-customorangedark rounded-xl text-white py-2 hover:scale-105 duration-300"
+                  onClick={handleNextStep}
+                >
+                  Next
+                </button>
+                <button
+                  type="button"
+                  className="bg-gray-500 rounded-xl text-white py-2 hover:scale-105 duration-300 mt-2"
+                  onClick={handlePreviousStep}
+                >
+                  Previous
+                </button>
+              </>
+            )}
+            {step === 3 && (
+              <>
+                <div className="relative">
+                  <input
+                    className="p-2 mt-8 rounded-xl border w-full"
+                    type={showPassword ? 'text' : 'password'}
+                    name="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                  
+                </div>
+                <div className="relative">
+                  <input
+                    className="p-2 rounded-xl border w-full"
+                    type={showPassword ? 'text' : 'password'}
+                    name="confirmPassword"
+                    placeholder="Confirm Password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                  />
+                  <svg
+                    onClick={togglePasswordVisibility}
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    fill="gray"
+                    className="bi bi-eye absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer"
+                    viewBox="0 0 16 16"
+                  >
+                    <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z" />
+                    <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z" />
+                  </svg>
+                </div>
+                <div className='flex justify-evenly mt-4'>
+                <button
+                  type="button"
+                  className="bg-customorangedarkopp px-4 rounded-xl text-white py-2 hover:scale-105 duration-300 mt-2"
+                  onClick={handlePreviousStep}
+                >
+                  Previous
+                </button>
+                <button
+                  type="submit"
+                  className="bg-customorangedark px-4 rounded-xl text-white py-2 hover:scale-105 duration-300"
+                  disabled={loading}
+                >
+                  {loading ? 'Signing up...' : 'Sign Up'}
+                </button>
+                
+                </div>
+              </>
+            )}
+          </form>
+          <div className="mt-6 grid grid-cols-3 items-center text-black-400">
+            <hr className="border-black" />
+            <p className="text-center text-sm">OR</p>
+            <hr className="border-black" />
           </div>
-          <div className="mb-4">
-            <label className="block text-customorangedark">Email</label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => handleInputChange('email', e.target.value)}
-              className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-300 transition-transform duration-300 transform hover:scale-[1.02] ${
-                isValid.email ? '' : 'border-red-500'
-              }`}
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-customorangedark">Phone Number</label>
-            <div className="flex">
-              <select
-                value={countryCode}
-                onChange={(e) => setCountryCode(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-1 focus:ring-gray-300 bg-white"
-              >
-                <option value="+977">Nepal (+977)</option>
-                <option value="+1">USA (+1)</option>
-                <option value="+91">India (+91)</option>
-                {/* Add more country codes as needed */}
-              </select>
-              <input
-                type="tel"
-                id="phoneNumber"
-                value={phoneNumber}
-                onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
-                className={`w-full px-3 py-2 border border-gray-300 rounded-r-lg focus:outline-none focus:ring-1 focus:ring-gray-300 transition-transform duration-300 transform hover:scale-[1.02] ${
-                  isValid.phoneNumber ? '' : 'border-red-500'
-                }`}
-                required
-              />
-            </div>
-          </div>
-          <div className="mb-4">
-            <label className="block text-customorangedark">Password</label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => handleInputChange('password', e.target.value)}
-              className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-300 transition-transform duration-300 transform hover:scale-[1.02] ${
-                isValid.password ? '' : 'border-red-500'
-              }`}
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-customorangedark">Confirm Password</label>
-            <input
-              type="password"
-              id="confirmPassword"
-              value={confirmPassword}
-              onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-              className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-300 transition-transform duration-300 transform hover:scale-[1.02] ${
-                isValid.confirmPassword ? '' : 'border-red-500'
-              }`}
-              required
-            />
-          </div>
+
           <div className='flex justify-center'>
-          <button
-            type="submit"
-            className="w-[90%] bg-customorangedark text-white py-2 rounded-lg hover:bg-customorangelight transition duration-200"
-          >
-            Sign Up
+          <button className="bg-white border py-2 w-[80%] rounded-xl mt-5 flex justify-center items-center text-sm hover:scale-[1.03] duration-300 text-black">
+          <FcGoogle className="mr-3 text-xl" />
+
+            Signup with Google
           </button>
           </div>
-        </form>
-        <p className="mt-4 text-center text-customorangedark">
-          Already have an account? <Link to="/login" className="text-customorangelight hover:underline hover:text-customorangedark transition duration-200">Log In</Link>
-        </p>
+          <p className="mt-4 ml-[-1rem] text-center text-black">
+            Already have an account? <Link to="/login" className="text-black ml-4 hover:underline duration-300">Log In</Link>
+          </p>
+        </div>
       </div>
-    </div>
+    </section>
   );
 };
 

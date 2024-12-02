@@ -12,7 +12,9 @@ export default {
         customorangelight2: '#f69868', 
         productcard:"#ffb78b",
         textdark:"#f2f2f3",
-       
+        customorangedarkopp: '#6085a0',
+
+        
         primary: "#f97316",
       },
 
