@@ -7,18 +7,7 @@ import { FaRegUser, FaShoppingCart } from "react-icons/fa";
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true); // Tracks navbar visibility
-  const [isBlurred, setIsBlurred] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollThreshold = window.innerWidth * 0.1;
-      setIsBlurred(window.scrollY > scrollThreshold);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
+  const [lastScrollY, setLastScrollY] = useState(0);
   const menuRef = useRef(null);
 
   const NavbarMenu = useMemo(
@@ -44,7 +33,18 @@ const Navbar = () => {
         setMenuOpen(false);
       }
     };
-
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY > lastScrollY && currentScrollY > 80) {
+        // Scrolling down and passed threshold
+        setIsVisible(false);
+      } else {
+        // Scrolling up
+        setIsVisible(true);
+      }
+      setLastScrollY(currentScrollY); // Update the last scroll position
+    };
+    // Prevent background scrolling when menu is open
     if (menuOpen) {
       document.body.classList.add("overflow-hidden");
     } else {
@@ -53,13 +53,15 @@ const Navbar = () => {
 
     window.addEventListener("resize", handleResize);
     document.addEventListener("mousedown", handleClickOutside);
+    window.removeEventListener("scroll", handleScroll);
 
     return () => {
       document.body.classList.remove("overflow-hidden");
       window.removeEventListener("resize", handleResize);
       document.removeEventListener("mousedown", handleClickOutside);
+      window.addEventListener("scroll", handleScroll);
     };
-  }, [menuOpen]);
+  }, [menuOpen, lastScrollY]);
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -72,10 +74,8 @@ const Navbar = () => {
   return (
     <nav
       className={`fixed w-full top-0 z-50 flex items-center justify-between p-4 text-white transition-transform duration-300 ${
-        isBlurred
-          ? " backdrop-blur-md shadow-lg"
-          : "bg-transparent"
-      }`}
+        isVisible ? "translate-y-0 " : "-translate-y-full "
+      } ${lastScrollY > 50 ? "bg-transparent" : "bg-transparent"}`}
     >
       <div className="flex items-center justify-center">
         <Link
