@@ -1,0 +1,107 @@
+/* The outer container */
+.outer-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f0f0f0; /* background color for the whole page */
+}
+
+.container {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.bee {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.body {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 60px;
+  height: 80px;
+  background-color: yellow;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.line {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 100%;
+  background-color: #000;
+  transform: translateX(-50%);
+}
+
+.wing-right, .wing-left {
+  position: absolute;
+  top: 10%;
+  width: 40px;
+  height: 60px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+}
+
+.wing-right {
+  right: 10%;
+}
+
+.wing-left {
+  left: 10%;
+}
+
+.path {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  transform: translate(-50%, -50%);
+  border: 2px solid #000;
+  border-radius: 50%;
+  animation: pathAnimation 4s infinite;
+}
+
+.pollen {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background-color: pink;
+  border-radius: 50%;
+  opacity: 0;
+  animation: pollenAnimation 2s infinite;
+}
+
+@keyframes pathAnimation {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+@keyframes pollenAnimation {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+}
