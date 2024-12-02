@@ -13,6 +13,8 @@ const Contact = React.lazy(() => import('./Pages/Contact'))
 //import About from "./Pages/About";
 //import Contact from "./Pages/Contact";
 import NotFound from "./Pages/Not_found";
+import Signup from "./Pages/Signup";
+import Login from "./Pages/Login";
 
 
 
@@ -27,8 +29,9 @@ const App = () => {
         <Route path="/blogs" element={<Suspense fallback={<Bee/>}><Blogs /></Suspense>} />
         <Route path="/about" element={<Suspense fallback={<Bee/>}><About /></Suspense>} />
         <Route path="/contact" element={<Suspense fallback={<Bee/>}><Contact /></Suspense>} />
-        
-        <Route path="*" element={<NotFound/>} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
       <Footer />
     </main>
