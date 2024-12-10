@@ -9,6 +9,8 @@ const Signup = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -35,10 +37,12 @@ const Signup = () => {
     }
     setLoading(true);
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/register/`, {
+      const response = await axios.post(`${import.meta.env.REACT_APP_API_URL}/register/`, {
         first_name: firstName,
         last_name: lastName,
         email,
+        phone_number: phoneNumber,
+        username,
         password,
       });
       console.log('Signup successful', response.data);
@@ -110,6 +114,24 @@ const Signup = () => {
                   placeholder="Email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+                <input
+                  className="p-2 mt-4 rounded-xl border"
+                  type="text"
+                  name="username"
+                  placeholder="Username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  required
+                />
+                <input
+                  className="p-2 rounded-xl border"
+                  type="text"
+                  name="phoneNumber"
+                  placeholder="Phone Number"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
                   required
                 />
                 <button

@@ -1,14 +1,17 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Logo from "../assets/logo.png";
 import { MdMenu, MdClose } from "react-icons/md";
 import { FaRegUser, FaShoppingCart } from "react-icons/fa";
+import { useAuth } from '../context/AuthContext'; // Import useAuth
 
 const Navbar = () => {
+  const { user } = useAuth(); // Access user from AuthContext
   const [menuOpen, setMenuOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true); // Tracks navbar visibility
   const [lastScrollY, setLastScrollY] = useState(0);
   const menuRef = useRef(null);
+  const navigate = useNavigate();
 
   const NavbarMenu = useMemo(
     () => [
@@ -63,6 +66,14 @@ const Navbar = () => {
     };
   }, [menuOpen, lastScrollY]);
 
+  const handleUserClick = () => {
+    if (user) {
+      navigate('/account');
+    } else {
+      navigate('/login');
+    }
+  };
+
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
@@ -97,7 +108,7 @@ const Navbar = () => {
           menuOpen
             ? "top-0 opacity-100 h-screen backdrop-blur-md bg-black/10 pointer-events-auto"
             : "top-[-100%] opacity-0 pointer-events-none md:pointer-events-auto"
-        } 
+        }
         absolute left-0 w-full md:h-auto md:bg-transparent md:backdrop-blur-none md:static md:w-auto md:opacity-100 md:flex md:items-center 
         ml-auto pr-4 transition-all duration-300 ease-in-out`}
       >
@@ -127,16 +138,12 @@ const Navbar = () => {
                 5
               </span>
             </Link>
-            <Link
-              to="/account"
-              className="text-xl hover:text-black transition duration-300 ease-in-out mt-1"
-            >
-              <FaRegUser className="drop-shadow-custom-lg transform hover:scale-110" />
-            </Link>
+            <button onClick={handleUserClick} className="text-xl hover:text-black transition duration-300 ease-in-out mt-1 group">
+              <FaRegUser className="drop-shadow-custom-lg transform group-hover:scale-110" />
+            </button>
           </li>
         </ul>
       </div>
-
       <div className="md:hidden ml-auto z-50">
         {menuOpen ? (
           <MdClose
