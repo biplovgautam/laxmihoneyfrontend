@@ -16,11 +16,12 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/login/`, {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/login/`, {
         email,
         password,
       });
       console.log('Login successful', response.data);
+      localStorage.setItem('token', response.data.access); // Store the token in localStorage
       navigate('/');
     } catch (error) {
       setError('Invalid credentials, please try again!');

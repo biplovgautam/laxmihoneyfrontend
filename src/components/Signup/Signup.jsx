@@ -36,8 +36,9 @@ const Signup = () => {
       return;
     }
     setLoading(true);
+    console.log('API URL:', import.meta.env.VITE_API_URL);
     try {
-      const response = await axios.post(`${import.meta.env.REACT_APP_API_URL}/register/`, {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/register/`, {
         first_name: firstName,
         last_name: lastName,
         email,
