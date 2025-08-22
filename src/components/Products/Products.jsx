@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { FaStar, FaShoppingCart, FaHeart, FaLeaf, FaAward } from "react-icons/fa";
 import { HiSparkles, HiBadgeCheck } from "react-icons/hi";
 import { motion } from "framer-motion";
+import OrderButton from "../OrderButton";
 
 export const fadeUp = (delay) => {
   return {
@@ -260,8 +261,12 @@ const Products = () => {
                   
                   {/* Action Buttons */}
                   <div className="flex gap-3">
-                    <button
+                    <OrderButton
                       disabled={!item.inStock}
+                      onClick={() => {
+                        // Add to cart logic here
+                        console.log('Adding to cart:', item.title);
+                      }}
                       className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-semibold transition-all duration-300 ${
                         item.inStock
                           ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg hover:shadow-xl hover:-translate-y-1'
@@ -270,7 +275,7 @@ const Products = () => {
                     >
                       <FaShoppingCart className="w-4 h-4" />
                       <span>{item.inStock ? 'Add to Cart' : 'Out of Stock'}</span>
-                    </button>
+                    </OrderButton>
                     
                     <button className="p-3 bg-white border-2 border-amber-200 text-amber-600 rounded-xl hover:bg-amber-50 hover:border-amber-300 transition-all duration-300 hover:-translate-y-1 shadow-lg hover:shadow-xl">
                       <FaHeart className="w-4 h-4" />

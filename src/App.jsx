@@ -1,6 +1,6 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import { AuthProvider } from "./context/AuthContext";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 import Navbar from "./components/Navbar";
 import Home from "./Pages/Home";
 import Products from "./Pages/Products";
@@ -11,31 +11,52 @@ import Login from "./Pages/Login";
 import Signup from "./Pages/Signup";
 import Account from "./Pages/Account";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import PhoneNumberModal from "./components/PhoneNumberModal";
+import ProfileCompletionModal from "./components/ProfileCompletionModal";
+
+const AppContent = () => {
+  const { needsPhoneNumber, setNeedsPhoneNumber, needsProfileCompletion } = useAuth();
+
+  return (
+    <main className="overflow-x-hidden min-h-screen relative">
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/" element={<><Navbar /><Home /></>} />
+        <Route path="/products" element={<><Navbar /><Products /></>} />
+        <Route path="/contact" element={<><Navbar /><Contact /></>} />
+        <Route path="/about" element={<><Navbar /><About /></>} />
+        <Route path="/blogs" element={<><Navbar /><Blogs /></>} />
+        <Route 
+          path="/account" 
+          element={
+            <ProtectedRoute>
+              <Navbar />
+              <Account />
+            </ProtectedRoute>
+          } 
+        />
+        <Route path="*" element={<><Navbar /><div className="p-8 text-center">404 - Page Not Found</div></>} />
+      </Routes>
+
+      {/* Modals */}
+      <PhoneNumberModal 
+        isOpen={needsPhoneNumber}
+        onClose={() => setNeedsPhoneNumber(false)}
+      />
+      
+      <ProfileCompletionModal 
+        isOpen={needsProfileCompletion}
+        onClose={() => {}} // Profile completion modal can only be closed by completing or skipping
+      />
+    </main>
+  );
+};
 
 const App = () => {
   return (
     <AuthProvider>
-      <main className="overflow-x-hidden min-h-screen relative">
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/" element={<><Navbar /><Home /></>} />
-          <Route path="/products" element={<><Navbar /><Products /></>} />
-          <Route path="/contact" element={<><Navbar /><Contact /></>} />
-          <Route path="/about" element={<><Navbar /><About /></>} />
-          <Route path="/blogs" element={<><Navbar /><Blogs /></>} />
-          <Route 
-            path="/account" 
-            element={
-              <ProtectedRoute>
-                <Navbar />
-                <Account />
-              </ProtectedRoute>
-            } 
-          />
-          <Route path="*" element={<><Navbar /><div className="p-8 text-center">404 - Page Not Found</div></>} />
-        </Routes>
-      </main>
+      <AppContent />
     </AuthProvider>
   );
 };export default App;

@@ -9,7 +9,7 @@ import {
   updateProfile,
   fetchSignInMethodsForEmail
 } from 'firebase/auth';
-import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, updateDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { auth, googleProvider, db } from '../config/firebase';
 
 const AuthContext = createContext(null);
@@ -25,6 +25,8 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [needsPhoneNumber, setNeedsPhoneNumber] = useState(false);
+  const [needsProfileCompletion, setNeedsProfileCompletion] = useState(false);
+  const [lastProfilePrompt, setLastProfilePrompt] = useState(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
@@ -42,7 +44,18 @@ export const AuthProvider = ({ children }) => {
           ...userDoc.data()
         };
 
-        // Check if Google user needs phone number
+        // Check if profile is complete
+        const profileComplete = userData.phoneNumber && userData.address;
+        const lastPrompt = localStorage.getItem(`lastProfilePrompt_${firebaseUser.uid}`);
+        const twelveHoursAgo = Date.now() - (12 * 60 * 60 * 1000);
+        
+        if (!profileComplete) {
+          if (!lastPrompt || parseInt(lastPrompt) < twelveHoursAgo) {
+            setNeedsProfileCompletion(true);
+          }
+        }
+
+        // Check if Google user needs phone number (legacy check)
         if (firebaseUser.providerData[0]?.providerId === 'google.com' && !userData.phoneNumber) {
           setNeedsPhoneNumber(true);
         }
@@ -198,16 +211,64 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const skipProfileCompletion = () => {
+    if (user) {
+      // Store timestamp when user skips profile completion
+      localStorage.setItem(`lastProfilePrompt_${user.uid}`, Date.now().toString());
+    }
+    setNeedsProfileCompletion(false);
+  };
+
+  const markProfileComplete = async (profileData) => {
+    if (!user) return false;
+
+    try {
+      const userRef = doc(db, 'users', user.uid);
+      await updateDoc(userRef, {
+        phoneNumber: profileData.phoneNumber,
+        address: profileData.address,
+        profileCompleted: true,
+        profileCompletedAt: new Date()
+      });
+
+      // Remove the profile prompt timestamp
+      localStorage.removeItem(`lastProfilePrompt_${user.uid}`);
+      
+      // Update local user state
+      setUser(prev => ({
+        ...prev,
+        phoneNumber: profileData.phoneNumber,
+        address: profileData.address,
+        profileCompleted: true
+      }));
+
+      setNeedsProfileCompletion(false);
+      return true;
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      return false;
+    }
+  };
+
+  const checkIfCanOrder = () => {
+    if (!user) return false;
+    return user.phoneNumber && user.address;
+  };
+
   const value = {
     user,
     loading,
     needsPhoneNumber,
+    needsProfileCompletion,
     register,
     login,
     signInWithGoogle,
     logout,
     updatePhoneNumber,
     checkEmailExists,
+    skipProfileCompletion,
+    markProfileComplete,
+    checkIfCanOrder,
     isAdmin: user?.isAdmin || false
   };
 
