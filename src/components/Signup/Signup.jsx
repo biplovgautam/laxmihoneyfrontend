@@ -1,21 +1,23 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import signupPoster from '@assets/loginposter2.png';
 import { FcGoogle } from 'react-icons/fc';
+import { FaSpinner } from 'react-icons/fa';
+import { useAuth } from '../../context/AuthContext';
+import signupPoster from '../../assets/loginposter2.png';
 
 const Signup = () => {
+  const navigate = useNavigate();
+  const { register, signInWithGoogle } = useAuth();
+  
   const [step, setStep] = useState(1);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
-  const [username, setUsername] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
   const handleNextStep = () => {
     setStep(step + 1);
@@ -36,21 +38,41 @@ const Signup = () => {
       return;
     }
     setLoading(true);
-    console.log('API URL:', import.meta.env.VITE_API_URL);
+    
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/register/`, {
-        first_name: firstName,
-        last_name: lastName,
+      const fullName = `${firstName} ${lastName}`;
+      const result = await register({
         email,
-        phone_number: phoneNumber,
-        username,
         password,
+        fullName,
+        phoneNumber
       });
-      console.log('Signup successful', response.data);
-      navigate('/login');
+      
+      if (result.success) {
+        console.log('Signup successful');
+        // Show success message and redirect
+        alert('Account created successfully! Welcome to Laxmi Honey Industry!');
+        navigate('/');
+      } else {
+        alert(result.error);
+      }
     } catch (error) {
       console.error('Error message:', error.message);
-      console.error('Full error:', error.response ? error.response.data : error);
+      alert(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSignup = async () => {
+    setLoading(true);
+    try {
+      await signInWithGoogle();
+      alert('Welcome to Laxmi Honey Industry!');
+      navigate('/');
+    } catch (error) {
+      console.error('Google signup error:', error.message);
+      alert(error.message);
     } finally {
       setLoading(false);
     }
@@ -61,7 +83,7 @@ const Signup = () => {
       className="min-h-screen flex items-center justify-center bg-cover bg-center"
       style={{ backgroundImage: `url(${signupPoster})` }}
     >
-      <div className="bg-customorangelight bg-opacity-10 backdrop-blur-lg flex rounded-2xl shadow-lg max-w-3xl p-5 items-center">
+      <div className="glass-honey rounded-2xl shadow-lg max-w-3xl p-5 items-center flex border border-white/30 backdrop-blur-lg">
         {/* Image */}
         <div className="md:block hidden w-1/2">
           <img
@@ -72,15 +94,15 @@ const Signup = () => {
         </div>
         {/* Form */}
         <div className="md:w-1/2 px-8 md:px-16">
-          <h2 className="font-bold text-2xl text-black">Sign Up</h2>
-          <p className="text-xs mt-4 text-black">
+          <h2 className="font-bold text-2xl text-[#bc7b13]">Sign Up</h2>
+          <p className="text-xs mt-4 text-gray-700">
             Create an account to get started!
           </p>
           <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
             {step === 1 && (
               <>
                 <input
-                  className="p-2 mt-8 rounded-xl border"
+                  className="p-2 mt-8 rounded-xl border border-gray-300 focus:border-[#f37623] focus:outline-none transition-colors"
                   type="text"
                   name="firstName"
                   placeholder="First Name"
@@ -89,7 +111,7 @@ const Signup = () => {
                   required
                 />
                 <input
-                  className="p-2 rounded-xl border"
+                  className="p-2 rounded-xl border border-gray-300 focus:border-[#f37623] focus:outline-none transition-colors"
                   type="text"
                   name="lastName"
                   placeholder="Last Name"
@@ -99,7 +121,7 @@ const Signup = () => {
                 />
                 <button
                   type="button"
-                  className="bg-customorangedark rounded-xl text-white py-2 hover:scale-105 duration-300"
+                  className="bg-[#f37623] rounded-xl text-white py-2 hover:bg-[#bc7b13] hover:scale-105 duration-300 transition-all"
                   onClick={handleNextStep}
                 >
                   Next
@@ -109,7 +131,7 @@ const Signup = () => {
             {step === 2 && (
               <>
                 <input
-                  className="p-2 mt-8 rounded-xl border"
+                  className="p-2 mt-8 rounded-xl border border-gray-300 focus:border-[#f37623] focus:outline-none transition-colors"
                   type="email"
                   name="email"
                   placeholder="Email"
@@ -118,16 +140,7 @@ const Signup = () => {
                   required
                 />
                 <input
-                  className="p-2 mt-4 rounded-xl border"
-                  type="text"
-                  name="username"
-                  placeholder="Username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  required
-                />
-                <input
-                  className="p-2 rounded-xl border"
+                  className="p-2 rounded-xl border border-gray-300 focus:border-[#f37623] focus:outline-none transition-colors"
                   type="text"
                   name="phoneNumber"
                   placeholder="Phone Number"
@@ -137,14 +150,14 @@ const Signup = () => {
                 />
                 <button
                   type="button"
-                  className="bg-customorangedark rounded-xl text-white py-2 hover:scale-105 duration-300"
+                  className="bg-[#f37623] rounded-xl text-white py-2 hover:bg-[#bc7b13] hover:scale-105 duration-300 transition-all"
                   onClick={handleNextStep}
                 >
                   Next
                 </button>
                 <button
                   type="button"
-                  className="bg-gray-500 rounded-xl text-white py-2 hover:scale-105 duration-300 mt-2"
+                  className="bg-gray-500 rounded-xl text-white py-2 hover:bg-gray-600 hover:scale-105 duration-300 transition-all mt-2"
                   onClick={handlePreviousStep}
                 >
                   Previous
@@ -155,7 +168,7 @@ const Signup = () => {
               <>
                 <div className="relative">
                   <input
-                    className="p-2 mt-8 rounded-xl border w-full"
+                    className="p-2 mt-8 rounded-xl border border-gray-300 focus:border-[#f37623] focus:outline-none transition-colors w-full"
                     type={showPassword ? 'text' : 'password'}
                     name="password"
                     placeholder="Password"
@@ -163,11 +176,10 @@ const Signup = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                   />
-                  
                 </div>
                 <div className="relative">
                   <input
-                    className="p-2 rounded-xl border w-full"
+                    className="p-2 rounded-xl border border-gray-300 focus:border-[#f37623] focus:outline-none transition-colors w-full"
                     type={showPassword ? 'text' : 'password'}
                     name="confirmPassword"
                     placeholder="Confirm Password"
@@ -181,7 +193,7 @@ const Signup = () => {
                     width="16"
                     height="16"
                     fill="gray"
-                    className="bi bi-eye absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer"
+                    className="bi bi-eye absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer hover:fill-[#f37623] transition-colors"
                     viewBox="0 0 16 16"
                   >
                     <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z" />
@@ -189,40 +201,58 @@ const Signup = () => {
                   </svg>
                 </div>
                 <div className='flex justify-evenly mt-4'>
-                <button
-                  type="button"
-                  className="bg-customorangedarkopp px-4 rounded-xl text-white py-2 hover:scale-105 duration-300 mt-2"
-                  onClick={handlePreviousStep}
-                >
-                  Previous
-                </button>
-                <button
-                  type="submit"
-                  className="bg-customorangedark px-4 rounded-xl text-white py-2 hover:scale-105 duration-300"
-                  disabled={loading}
-                >
-                  {loading ? 'Signing up...' : 'Sign Up'}
-                </button>
-                
+                  <button
+                    type="button"
+                    className="bg-gray-500 px-4 rounded-xl text-white py-2 hover:bg-gray-600 hover:scale-105 duration-300 transition-all mt-2"
+                    onClick={handlePreviousStep}
+                  >
+                    Previous
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="bg-[#f37623] px-4 rounded-xl text-white py-2 hover:bg-[#bc7b13] hover:scale-105 duration-300 transition-all disabled:opacity-50"
+                  >
+                    {loading ? (
+                      <div className="flex items-center justify-center">
+                        <FaSpinner className="animate-spin mr-2" />
+                        Creating Account...
+                      </div>
+                    ) : (
+                      'Sign Up'
+                    )}
+                  </button>
                 </div>
               </>
             )}
           </form>
-          <div className="mt-6 grid grid-cols-3 items-center text-black-400">
-            <hr className="border-black" />
-            <p className="text-center text-sm">OR</p>
-            <hr className="border-black" />
+          <div className="mt-6 grid grid-cols-3 items-center text-gray-400">
+            <hr className="border-gray-300" />
+            <p className="text-center text-sm text-gray-600">OR</p>
+            <hr className="border-gray-300" />
           </div>
 
           <div className='flex justify-center'>
-          <button className="bg-white border py-2 w-[80%] rounded-xl mt-5 flex justify-center items-center text-sm hover:scale-[1.03] duration-300 text-black">
-          <FcGoogle className="mr-3 text-xl" />
-
-            Signup with Google
-          </button>
+            <button 
+              onClick={handleGoogleSignup}
+              disabled={loading}
+              className="bg-white border border-gray-300 py-2 w-[80%] rounded-xl mt-5 flex justify-center items-center text-sm hover:scale-[1.03] hover:shadow-lg duration-300 text-gray-700 transition-all disabled:opacity-50"
+            >
+              {loading ? (
+                <div className="flex items-center justify-center">
+                  <FaSpinner className="animate-spin mr-3 text-[#f37623]" />
+                  Creating Account...
+                </div>
+              ) : (
+                <>
+                  <FcGoogle className="mr-3 text-xl" />
+                  Signup with Google
+                </>
+              )}
+            </button>
           </div>
-          <p className="mt-4 ml-[-1rem] text-center text-black">
-            Already have an account? <Link to="/login" className="text-black ml-4 hover:underline duration-300">Log In</Link>
+          <p className="mt-4 text-center text-gray-700">
+            Already have an account? <Link to="/login" className="text-[#f37623] hover:underline duration-300">Log In</Link>
           </p>
         </div>
       </div>

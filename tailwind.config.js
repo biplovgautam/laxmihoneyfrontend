@@ -13,7 +13,13 @@ export default {
         productcard:"#ffb78b",
         textdark:"#f2f2f3",
         customorangedarkopp: '#6085a0',
-
+        
+        // Honey theme colors
+        honey: {
+          light: '#f3c23d',
+          dark: '#bc7b13',
+          accent: '#f37623',
+        },
         
         primary: "#f97316",
       },

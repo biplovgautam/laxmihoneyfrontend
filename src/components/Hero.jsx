@@ -2,10 +2,9 @@ import React from "react";
 import Product1 from "../assets/logo4.png";
 import Product2 from "../assets/logo2.png";
 import Product3 from "../assets/logo3.png";
-import { FaWhatsapp } from "react-icons/fa";
+import { FaWhatsapp, FaStar, FaLeaf, FaHeart, FaShoppingCart, FaChevronDown } from "react-icons/fa";
+import { HiSparkles, HiBadgeCheck } from "react-icons/hi";
 import { AnimatePresence, easeInOut, motion } from "framer-motion";
-import Navbar from "./Navbar.jsx";
-import { FaChevronDown } from "react-icons/fa";
 
 const SlideRight = (delay) => {
   return {
@@ -17,7 +16,7 @@ const SlideRight = (delay) => {
       opacity: 1,
       x: 0,
       transition: {
-        duration: 0.5,
+        duration: 0.6,
         delay: delay,
         ease: easeInOut,
       },
@@ -26,54 +25,81 @@ const SlideRight = (delay) => {
       opacity: 0,
       x: -50,
       transition: {
-        duration: 0.2,
+        duration: 0.3,
         ease: easeInOut,
       },
     },
   };
 };
 
+const FadeIn = (delay) => {
+  return {
+    hidden: {
+      opacity: 0,
+      y: 50,
+    },
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.8,
+        delay: delay,
+        ease: easeInOut,
+      },
+    },
+  };
+};
 
 const topProducts = [
   {
     id: 1,
     image: Product1,
-    title: "Raw Honey",
-    subtitle:
-    "Experience the pure essence of Nepali highlands with our raw, unprocessed honey. Harvested directly from pristine beehives, preserving all natural enzymes and beneficial properties for your wellness journey.",
-    price: "Rs. 1000",
+    title: "Premium Raw Honey",
+    subtitle: "Experience the pure essence of Nepali highlands with our raw, unprocessed honey. Harvested directly from pristine beehives in the mountains, preserving all natural enzymes and beneficial properties for your wellness journey.",
+    price: "Rs. 1,200",
+    originalPrice: "Rs. 1,500",
     modal: "Raw",
-    bgColor: "#cf4f00",
+    bgColor: "#f3762350",
+    rating: 4.9,
+    reviews: 342,
+    badges: ["100% Natural", "Mountain Harvested", "Raw & Unprocessed"],
   },
   {
     id: 2,
     image: Product2,
-    title: "Pure Honey",
-    subtitle:
-    "Carefully filtered and crystallization-free, our purified honey brings you the smoothest golden nectar from the Himalayas. Perfect blend of traditional beekeeping and modern purification techniques.",
-    price: "Rs. 1000",
-    modal: "Purified",
-    bgColor: "#f37623",
+    title: "Organic Wildflower Honey",
+    subtitle: "A delightful blend of nature's finest nectar from diverse wildflowers across Nepal's valleys. Rich in antioxidants and natural minerals, perfect for daily health and wellness.",
+    price: "Rs. 950",
+    originalPrice: "Rs. 1,200",
+    modal: "Wildflower",
+    bgColor: "#f3c23d50",
+    rating: 4.8,
+    reviews: 287,
+    badges: ["Organic Certified", "Wildflower Blend", "Antioxidant Rich"],
   },
   {
     id: 3,
     image: Product3,
-    title: "Wild Honey",
-    subtitle:
-    "Rare and exotic wild honey collected from Nepal's untouched forests. A testament to nature's finest offering, harvested sustainably from wild bee colonies in pristine mountain ecosystems.",
-    price: "Rs. 5000",
-    modal: "Wild",
-    bgColor: "#f79051",
+    title: "Himalayan Forest Honey",
+    subtitle: "Rare and exotic honey collected from the pristine Himalayan forests. This dark, richly flavored honey offers unique medicinal properties and an unforgettable taste experience.",
+    price: "Rs. 1,800",
+    originalPrice: "Rs. 2,200",
+    modal: "Forest",
+    bgColor: "#bc7b1350",
+    rating: 5.0,
+    reviews: 156,
+    badges: ["Himalayan Source", "Limited Edition", "Medicinal Grade"],
   },
 ];
+
 const scrollDown = () => {
   window.scrollTo({
     top: window.innerHeight,
     behavior: 'smooth'
   });
 };
-const Hero = () => {
 
+const Hero = () => {
   const [activeData, setActiveData] = React.useState(topProducts[0]);
 
   const handleActiveData = (data) => {
@@ -81,167 +107,290 @@ const Hero = () => {
   };
 
   return (
-    <>
-      <motion.section
-        initial={{ backgroundColor: activeData.bgColor }}
-        animate={{ backgroundColor: activeData.bgColor }}
-        transition={{ duration: 0.8 }}
-        className="bg-brandDark text-white min-h-screen relative"
-      >
-        
-        <div className="container grid grid-cols-1 pt-32 md:grid-cols-2 min-h-[90vh]">
-          {/* ______ Headphone Info ______ */}
-          <div className="flex flex-col justify-center py-14 md:py-0 xl:max-w-[500px] order-2 md:order-1">
-            <div className="space-y-5 text-center md:text-left">
-              <AnimatePresence mode="wait">
-                
-                  <motion.h1
-                    key={activeData.id}
-                    variants={SlideRight(0.2)}
-                    initial="hidden"
-                    animate="show"
-                    exit="exit"
-                    className="text-3xl lg:text-6xl xl:text-7xl font-bold font-raleway "
-                  >
-                    {activeData.title}
-                  </motion.h1>
-              </AnimatePresence>
-              <AnimatePresence mode="wait">
-                <motion.p
-                  key={activeData.id}
-                  variants={SlideRight(0.4)}
-                  initial="hidden"
-                  animate="show"
-                  exit="exit"
-                  className="text-sm leading-loose text-white/80"
-                >
-                  {activeData.subtitle}
-                </motion.p>
-              </AnimatePresence>
+    <main className="bg-gradient-to-br from-amber-600 via-orange-500 to-amber-500 min-h-screen relative overflow-hidden">
+      {/* Background decorative elements */}
+      <div className="absolute inset-0 opacity-30">
+        <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-white/5 rounded-full animate-pulse"></div>
+        <div className="absolute bottom-1/3 right-1/4 w-24 h-24 bg-white/5 rounded-full animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 right-1/3 w-16 h-16 bg-white/5 rounded-full animate-pulse delay-2000"></div>
+      </div>
+      
+      <div className="container-modern relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 min-h-screen items-center gap-8 lg:gap-12 pt-20 lg:pt-0">
+          
+          {/* Left Content Section */}
+          <div className="flex flex-col justify-center space-y-8 text-center lg:text-left order-2 lg:order-1">
+            
+            {/* Badge */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="flex justify-center lg:justify-start"
+            >
+              <div className="inline-flex items-center gap-2 px-4 py-2 glass-white rounded-full text-white/90 text-sm font-medium">
+                <HiBadgeCheck className="w-4 h-4 text-amber-200" />
+                <span>100% Pure & Natural</span>
+                <HiSparkles className="w-4 h-4 text-amber-200 animate-bounce-gentle" />
+              </div>
+            </motion.div>
 
-              <AnimatePresence mode="wait">
-                
+            {/* Main Title */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeData.id}
+                variants={SlideRight(0.2)}
+                initial="hidden"
+                animate="show"
+                exit="exit"
+                className="space-y-4"
+              >
+                <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white leading-tight">
+                  <span className="bg-gradient-to-r from-white to-amber-100 bg-clip-text text-transparent">
+                    {activeData.title}
+                  </span>
+                  <br />
+                  <span className="text-2xl md:text-3xl lg:text-4xl font-medium text-amber-100/90 animate-glow">
+                    from Nepal
+                  </span>
+                </h1>
+              </motion.div>
+            </AnimatePresence>
+
+            {/* Subtitle */}
+            <AnimatePresence mode="wait">
+              <motion.p
+                key={activeData.id}
+                variants={SlideRight(0.4)}
+                initial="hidden"
+                animate="show"
+                exit="exit"
+                className="text-base md:text-lg leading-relaxed text-white/90 max-w-xl mx-auto lg:mx-0"
+              >
+                {activeData.subtitle}
+              </motion.p>
+            </AnimatePresence>
+
+            {/* Features */}
+            <motion.div
+              variants={SlideRight(0.5)}
+              initial="hidden"
+              animate="show"
+              className="flex flex-wrap justify-center lg:justify-start gap-6 text-white/80"
+            >
+              <div className="flex items-center gap-2">
+                <FaLeaf className="w-5 h-5 text-green-300" />
+                <span className="text-sm font-medium">Organic</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <FaHeart className="w-5 h-5 text-red-300" />
+                <span className="text-sm font-medium">Health Benefits</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <FaStar className="w-5 h-5 text-yellow-300" />
+                <span className="text-sm font-medium">{activeData.rating}/5 ({activeData.reviews} reviews)</span>
+              </div>
+            </motion.div>
+
+            {/* Price and Action */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeData.id}
+                variants={SlideRight(0.6)}
+                initial="hidden"
+                animate="show"
+                exit="exit"
+                className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-3xl md:text-4xl font-bold text-white">{activeData.price}</span>
+                  {activeData.originalPrice && (
+                    <span className="text-lg text-white/60 line-through">{activeData.originalPrice}</span>
+                  )}
+                </div>
+                <div className="flex gap-3">
                   <motion.button
-                    key={activeData.id}
-                    variants={SlideRight(0.6)}
-                    initial="hidden"
-                    animate="show"
-                    exit="exit"
-                    style={{ color: activeData.bgColor }}
-                    className="px-4 py-2 bg-white inline-block font-normal shadow-lg rounded-sm hover:bg-opacity-80 duration-200 hover:shadow-xl"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="btn-primary flex items-center gap-2"
                   >
+                    <FaShoppingCart className="w-4 h-4" />
                     Order Now
                   </motion.button>
-              </AnimatePresence>
-
-              {/* ______ Top products List Separator ______ */}
-
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.8, delay: 0.2, ease: "easeInOut" }}
-                className="flex items-center justify-center md:justify-start gap-4 !md:mt-24 !mb-10"
-              >
-                <div className="w-20 h-[1px] bg-white"></div>
-                <p className="uppercase text-sm ">Top Recommendation</p>
-                <div className="w-20 h-[1px] bg-white"></div>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="btn-secondary flex items-center gap-2"
+                  >
+                    <FaWhatsapp className="w-4 h-4" />
+                    WhatsApp
+                  </motion.button>
+                </div>
               </motion.div>
+            </AnimatePresence>
 
-              {/* Top Products list switcher */}
+            {/* Product Badges */}
+            <AnimatePresence mode="wait">
               <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.8, delay: 0.2, ease: "easeInOut" }}
-                className="grid grid-cols-3 gap-10"
+                key={activeData.id}
+                variants={SlideRight(0.7)}
+                initial="hidden"
+                animate="show"
+                exit="exit"
+                className="flex flex-wrap justify-center lg:justify-start gap-2"
               >
+                {activeData.badges?.map((badge, index) => (
+                  <span
+                    key={index}
+                    className="px-3 py-1 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full text-xs font-medium text-white"
+                  >
+                    {badge}
+                  </span>
+                ))}
+              </motion.div>
+            </AnimatePresence>
 
-                {topProducts.map((item) => {
-                  return (
-                    
-                      <div
-                        key={item.id}
-                        onClick={() => handleActiveData(item)}
-                        className="cursor-pointer space-y-3 hover:scale-105 transition-all"
-                      >
-                        <div className="flex justify-center">
-                          <img
-                            src={item.image}
-                            alt=""
-                            className={`w-60 h-40 object-contain img-shadow ${
-                              activeData.image === item.image
-                                ? "opacity-100 scale-110"
-                                : "opacity-50 hover:opacity-60 hover:scale-103"
-                            }`}
-                          />
-                        </div>
-                        <div className="!mt-6 space-y-1 text-center">
-                          <p className="text-base line-through opacity-50">
-                            {item.price}
-                          </p>
-                          <p className="text-xl font-bold">{item.price}</p>
-                          {/* <p className="text-xs font-normal text-nowrap">
-                            {item.modal}
-                          </p> */}
-                        </div>
+            {/* Product Selector */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.8 }}
+              className="!mt-12 space-y-6"
+            >
+              <div className="flex items-center justify-center lg:justify-start gap-4">
+                <div className="w-16 md:w-20 h-[1px] bg-white/40"></div>
+                <p className="uppercase text-xs md:text-sm font-medium tracking-wide text-white/80">
+                  Choose Your Honey
+                </p>
+                <div className="w-16 md:w-20 h-[1px] bg-white/40"></div>
+              </div>
+
+              <div className="flex flex-wrap justify-center lg:justify-start gap-4">
+                {topProducts.map((item) => (
+                  <motion.div
+                    key={item.id}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => handleActiveData(item)}
+                    className={`relative cursor-pointer p-3 rounded-2xl transition-all duration-300 ${
+                      activeData.id === item.id
+                        ? "glass-white border-2 border-amber-300 shadow-lg"
+                        : "glass hover:glass-white border border-white/20"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="relative">
+                        <img
+                          src={item.image}
+                          alt={item.title}
+                          className="w-12 h-12 rounded-xl object-cover"
+                        />
+                        {activeData.id === item.id && (
+                          <div className="absolute -top-1 -right-1 w-5 h-5 bg-amber-400 rounded-full flex items-center justify-center">
+                            <HiSparkles className="w-3 h-3 text-white" />
+                          </div>
+                        )}
                       </div>
-                  );
-                })}
-              </motion.div>
-            </div>
+                      <div>
+                        <h4 className="font-semibold text-white text-sm">{item.modal}</h4>
+                        <p className="text-xs text-white/70">{item.price}</p>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
           </div>
 
-          {/* ______ Hero Image ______ */}
-
-          <div className="flex flex-col justify-center items-center  relative mt-10 order-1 md:order-2 md:mt-0 min-h-min">
-            <AnimatePresence mode="wait">
-              <motion.img
-                key={activeData.id}
-                initial={{ opacity: 0, x: 100 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.4, delay: 0, ease: easeInOut }}
-                exit={{
-                  opacity: 0,
-                  // scale: 0.9,
-                  x: -100,
-
-                  transition: {
-                    duration: 0.4,
-                  },
-                }}
-                src={activeData.image}
-                alt=""
-                className="w-[150px] md:w-[300px] xl:w-[350px] img-shadow relative z-10"
-              />
-            </AnimatePresence>
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeData.id}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.4, delay: 0, ease: easeInOut }}
-                exit={{
-                  opacity: 0,
-                  // scale: 0.9,
-
-                  transition: {
-                    duration: 0.4,
-                  },
-                }}
-                className="text-white/5 text-[300px] font-poppins font-extrabold absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 pointer-events-none"
-              >
-                {activeData.modal}
-              </motion.div>
-            </AnimatePresence>
+          {/* Right Image Section */}
+          <div className="flex justify-center items-center order-1 lg:order-2 relative">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8, rotate: -10 }}
+              animate={{ opacity: 1, scale: 1, rotate: 0 }}
+              transition={{ duration: 1, delay: 0.2 }}
+              className="relative"
+            >
+              {/* Background decoration */}
+              <div className="absolute inset-0 bg-gradient-to-br from-amber-300/20 to-orange-400/20 rounded-full blur-3xl scale-150 animate-pulse"></div>
+              
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeData.id}
+                  initial={{ opacity: 0, scale: 0.8, rotateY: 90 }}
+                  animate={{ opacity: 1, scale: 1, rotateY: 0 }}
+                  exit={{ opacity: 0, scale: 0.8, rotateY: -90 }}
+                  transition={{ duration: 0.6 }}
+                  className="relative z-10"
+                >
+                  <div
+                    className="w-80 h-80 md:w-96 md:h-96 lg:w-[450px] lg:h-[450px] rounded-full p-8 animate-float"
+                    style={{
+                      background: `linear-gradient(135deg, ${activeData.bgColor}, ${activeData.bgColor}80)`,
+                      boxShadow: `0 25px 50px -12px ${activeData.bgColor}40`,
+                    }}
+                  >
+                    <img
+                      src={activeData.image}
+                      alt={activeData.title}
+                      className="w-full h-full object-contain drop-shadow-2xl"
+                    />
+                  </div>
+                  
+                  {/* Floating rating badge */}
+                  <motion.div
+                    initial={{ opacity: 0, x: 50 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.8 }}
+                    className="absolute top-8 -right-4 glass-white p-4 rounded-2xl shadow-xl"
+                  >
+                    <div className="flex items-center gap-2">
+                      <FaStar className="w-5 h-5 text-yellow-400" />
+                      <div>
+                        <p className="font-bold text-white text-lg">{activeData.rating}</p>
+                        <p className="text-white/70 text-xs">{activeData.reviews} reviews</p>
+                      </div>
+                    </div>
+                  </motion.div>
+                  
+                  {/* Floating discount badge */}
+                  {activeData.originalPrice && (
+                    <motion.div
+                      initial={{ opacity: 0, x: -50 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 1 }}
+                      className="absolute bottom-8 -left-4 bg-gradient-to-r from-red-500 to-pink-500 p-3 rounded-2xl shadow-xl"
+                    >
+                      <p className="text-white font-bold text-sm">
+                        {Math.round(((parseFloat(activeData.originalPrice.replace(/[^0-9]/g, '')) - parseFloat(activeData.price.replace(/[^0-9]/g, ''))) / parseFloat(activeData.originalPrice.replace(/[^0-9]/g, ''))) * 100)}% OFF
+                      </p>
+                    </motion.div>
+                  )}
+                </motion.div>
+              </AnimatePresence>
+            </motion.div>
           </div>
-          {/* ______ WhatsApp Icon ______ */}
-          {/* <div className="text-3xl text-white fixed bottom-10 right-10 hover:rotate-[360deg] duration-500 z-[99999] mix-blend-difference">
-            <a href="">
-              <FaWhatsapp />
-            </a>
-          </div> */}
         </div>
-      </motion.section>
-    </>
+        
+        {/* Scroll indicator */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.5 }}
+          className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+        >
+          <motion.button
+            onClick={scrollDown}
+            className="flex flex-col items-center gap-2 text-white/70 hover:text-white transition-colors duration-300"
+            whileHover={{ y: -5 }}
+            animate={{ y: [0, -10, 0] }}
+            transition={{ repeat: Infinity, duration: 2 }}
+          >
+            <span className="text-sm font-medium">Discover More</span>
+            <FaChevronDown className="w-5 h-5" />
+          </motion.button>
+        </motion.div>
+      </div>
+    </main>
   );
 };
 
