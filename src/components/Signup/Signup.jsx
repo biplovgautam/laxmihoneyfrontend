@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FcGoogle } from 'react-icons/fc';
 import { FaSpinner } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import signupPoster from '../../assets/loginposter2.png';
+import PhoneNumberModal from '../PhoneNumberModal';
+import EmailExistsModal from '../EmailExistsModal';
 
 const Signup = () => {
   const navigate = useNavigate();
-  const { register, signInWithGoogle } = useAuth();
+  const { register, signInWithGoogle, checkEmailExists, needsPhoneNumber } = useAuth();
   
   const [step, setStep] = useState(1);
   const [firstName, setFirstName] = useState('');
@@ -18,6 +20,43 @@ const Signup = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [emailExists, setEmailExists] = useState(null);
+  const [checkingEmail, setCheckingEmail] = useState(false);
+  const [showEmailExistsModal, setShowEmailExistsModal] = useState(false);
+
+  // Debounced email checking
+  const debounceEmailCheck = useCallback(
+    (() => {
+      let timeoutId;
+      return (email) => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(async () => {
+          if (email && email.includes('@')) {
+            setCheckingEmail(true);
+            try {
+              const exists = await checkEmailExists(email);
+              setEmailExists(exists);
+              if (exists) {
+                setShowEmailExistsModal(true);
+              }
+            } catch (error) {
+              console.error('Error checking email:', error);
+              setEmailExists(null);
+            } finally {
+              setCheckingEmail(false);
+            }
+          } else {
+            setEmailExists(null);
+          }
+        }, 500);
+      };
+    })(),
+    [checkEmailExists]
+  );
+
+  useEffect(() => {
+    debounceEmailCheck(email);
+  }, [email, debounceEmailCheck]);
 
   const handleNextStep = () => {
     setStep(step + 1);
@@ -33,10 +72,23 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Check if email already exists
+    if (emailExists) {
+      setShowEmailExistsModal(true);
+      return;
+    }
+    
     if (password !== confirmPassword) {
       alert("Passwords do not match");
       return;
     }
+    
+    if (password.length < 6) {
+      alert("Password must be at least 6 characters");
+      return;
+    }
+    
     setLoading(true);
     
     try {
@@ -130,15 +182,32 @@ const Signup = () => {
             )}
             {step === 2 && (
               <>
-                <input
-                  className="p-2 mt-8 rounded-xl border border-gray-300 focus:border-[#f37623] focus:outline-none transition-colors"
-                  type="email"
-                  name="email"
-                  placeholder="Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
+                <div className="relative">
+                  <input
+                    className="p-2 mt-8 rounded-xl border border-gray-300 focus:border-[#f37623] focus:outline-none transition-colors w-full"
+                    type="email"
+                    name="email"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                  {checkingEmail && (
+                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                      <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                  )}
+                  {emailExists === true && email.includes('@') && (
+                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-500">
+                      <span className="text-xs">Email taken</span>
+                    </div>
+                  )}
+                  {emailExists === false && email.includes('@') && (
+                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500">
+                      ✓
+                    </div>
+                  )}
+                </div>
                 <input
                   className="p-2 rounded-xl border border-gray-300 focus:border-[#f37623] focus:outline-none transition-colors"
                   type="text"
@@ -256,6 +325,19 @@ const Signup = () => {
           </p>
         </div>
       </div>
+      
+      {/* Email Exists Modal */}
+      <EmailExistsModal 
+        isOpen={showEmailExistsModal}
+        onClose={() => setShowEmailExistsModal(false)}
+        email={email}
+      />
+      
+      {/* Phone Number Modal for Google users */}
+      <PhoneNumberModal 
+        isOpen={needsPhoneNumber} 
+        onClose={() => {}} // Can't close until phone number is provided
+      />
     </section>
   );
 };

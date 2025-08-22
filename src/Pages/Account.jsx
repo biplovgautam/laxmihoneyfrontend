@@ -322,20 +322,25 @@ const Account = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#f3c23d]/10 to-[#bc7b13]/10 py-8">
-      <div className="container mx-auto px-4">
+    <div className="min-h-screen bg-gradient-to-br from-amber-600 via-orange-500 to-amber-500 py-8 relative overflow-hidden">
+      {/* Animated Background Elements */}
+      <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-white/5 rounded-full animate-pulse"></div>
+      <div className="absolute bottom-1/3 right-1/4 w-24 h-24 bg-white/5 rounded-full animate-pulse delay-1000"></div>
+      <div className="absolute top-1/2 right-1/3 w-16 h-16 bg-white/5 rounded-full animate-pulse delay-2000"></div>
+      
+      <div className="container mx-auto px-4 relative z-10">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="flex items-center justify-between mb-8 glass-honey rounded-2xl p-6 border border-white/30 backdrop-blur-lg"
+          className="flex items-center justify-between mb-8 bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-6 shadow-2xl"
         >
           <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-[#bc7b13] to-[#f3c23d] bg-clip-text text-transparent">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-amber-100 bg-clip-text text-transparent">
               My Account
             </h1>
-            <p className="text-gray-600 mt-1">Manage your profile and orders</p>
+            <p className="text-white/80 mt-1">Manage your profile and orders</p>
           </div>
           <button
             onClick={handleLogout}
@@ -355,7 +360,7 @@ const Account = () => {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="col-span-12 lg:col-span-3"
           >
-            <div className="glass-honey rounded-2xl p-4 border border-white/30 backdrop-blur-lg">
+            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-4 shadow-2xl">
               <nav className="space-y-2">
                 {tabs.map((tab) => (
                   <button
@@ -363,8 +368,8 @@ const Account = () => {
                     onClick={() => setActiveTab(tab.id)}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${
                       activeTab === tab.id
-                        ? 'bg-[#f37623] text-white shadow-lg scale-105'
-                        : 'text-gray-700 hover:bg-white/20 hover:scale-105'
+                        ? 'bg-gradient-to-r from-amber-400 to-orange-500 text-white shadow-lg scale-105'
+                        : 'text-white/80 hover:bg-white/20 hover:scale-105 hover:text-white'
                     }`}
                   >
                     <tab.icon className="text-lg" />

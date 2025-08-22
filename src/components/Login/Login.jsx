@@ -1,28 +1,65 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import loginposter from '@assets/loginposter2.png';
 import { FcGoogle } from 'react-icons/fc';
-
 import { Link, useNavigate } from 'react-router-dom';
-
+import { useAuth } from '../../context/AuthContext';
+import PhoneNumberModal from '../PhoneNumberModal';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const navigate = useNavigate();
-
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [emailExists, setEmailExists] = useState(null);
+  const [checkingEmail, setCheckingEmail] = useState(false);
+  
+  const navigate = useNavigate();
+  const { login, signInWithGoogle, checkEmailExists, needsPhoneNumber } = useAuth();
+
+  // Debounced email checking
+  const debounceEmailCheck = useCallback(
+    (() => {
+      let timeoutId;
+      return (email) => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(async () => {
+          if (email && email.includes('@')) {
+            setCheckingEmail(true);
+            try {
+              const exists = await checkEmailExists(email);
+              setEmailExists(exists);
+            } catch (error) {
+              console.error('Error checking email:', error);
+              setEmailExists(null);
+            } finally {
+              setCheckingEmail(false);
+            }
+          } else {
+            setEmailExists(null);
+          }
+        }, 500);
+      };
+    })(),
+    [checkEmailExists]
+  );
+
+  useEffect(() => {
+    debounceEmailCheck(email);
+  }, [email, debounceEmailCheck]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError('');
+    
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/login/`, {
-        email,
-        password,
-      });
-      console.log('Login successful', response.data);
-      localStorage.setItem('token', response.data.access); // Store the token in localStorage
-      navigate('/');
+      const result = await login(email, password);
+      if (result.success) {
+        navigate('/');
+      } else {
+        setError(result.error || 'Login failed. Please try again.');
+      }
     } catch (error) {
       setError('Invalid credentials, please try again!');
     } finally {
@@ -30,8 +67,23 @@ const Login = () => {
     }
   };
 
-
-  const [showPassword, setShowPassword] = useState(false);
+  const handleGoogleSignIn = async () => {
+    setLoading(true);
+    setError('');
+    
+    try {
+      const result = await signInWithGoogle();
+      if (result.success) {
+        navigate('/');
+      } else {
+        setError(result.error || 'Google sign in failed. Please try again.');
+      }
+    } catch (error) {
+      setError('Google sign in failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -52,14 +104,39 @@ const Login = () => {
             Login into your account!
           </p>
 
-          <form className="flex flex-col gap-4">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <br/>
-            <input
-              className="p-2 rounded-xl border border-gray-300 outline-none hover:scale-[1.02] transition-all duration-300 focus:border-gray-600 focus:scale-[1.03]"
-              type="email"
-              name="email"
-              placeholder="Email"
-            />
+            {error && (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                {error}
+              </div>
+            )}
+            <div className="relative">
+              <input
+                className="p-2 rounded-xl border border-gray-300 w-full outline-none hover:scale-[1.02] transition-all duration-300 focus:border-gray-600 focus:scale-[1.03]"
+                type="email"
+                name="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+              {checkingEmail && (
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                  <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                </div>
+              )}
+              {emailExists === false && email.includes('@') && (
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-500">
+                  <span className="text-xs">Account not found</span>
+                </div>
+              )}
+              {emailExists === true && email.includes('@') && (
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500">
+                  ✓
+                </div>
+              )}
+            </div>
             <div className="relative">
             <input
               className="p-2 rounded-xl border border-gray-300 w-full outline-none hover:scale-[1.02] transition-all duration-300 focus:border-gray-600 focus:scale-[1.03]"
@@ -88,7 +165,8 @@ const Login = () => {
               Forgot Password?
             </Link>
             <button
-              className="bg-customorangedark rounded-xl text-white py-2 hover:scale-[1.03] duration-300"
+              type="submit"
+              className="bg-customorangedark rounded-xl text-white py-2 hover:scale-[1.03] duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={loading}
             >
               {loading ? 'Logging in...' : 'Login'}
@@ -101,10 +179,14 @@ const Login = () => {
             <hr className="border-black" />
           </div>
           <div className='flex justify-center'>
-          <button className="bg-white border py-2 w-[80%] rounded-xl mt-5 flex justify-center items-center text-sm hover:scale-[1.03] duration-300 text-black">
+          <button 
+            type="button"
+            onClick={handleGoogleSignIn}
+            className="bg-white border py-2 w-[80%] rounded-xl mt-5 flex justify-center items-center text-sm hover:scale-[1.03] duration-300 text-black disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={loading}
+          >
           <FcGoogle className="mr-3 text-xl" />
-
-            Login with Google
+            {loading ? 'Signing in...' : 'Login with Google'}
           </button>
           </div>
 
@@ -122,6 +204,12 @@ const Login = () => {
           />
         </div>
       </div>
+      
+      {/* Phone Number Modal for Google users */}
+      <PhoneNumberModal 
+        isOpen={needsPhoneNumber} 
+        onClose={() => {}} // Can't close until phone number is provided
+      />
     </section>
   );
 };

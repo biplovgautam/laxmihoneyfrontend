@@ -6,7 +6,8 @@ import {
   createUserWithEmailAndPassword,
   signInWithPopup,
   signOut,
-  updateProfile
+  updateProfile,
+  fetchSignInMethodsForEmail
 } from 'firebase/auth';
 import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
 import { auth, googleProvider, db } from '../config/firebase';
@@ -62,6 +63,12 @@ export const AuthProvider = ({ children }) => {
     try {
       const { email, password, fullName, phoneNumber } = userData;
       
+      // Check if email already exists
+      const emailExists = await checkEmailExists(email);
+      if (emailExists) {
+        return { success: false, error: 'An account with this email already exists. Please sign in instead.' };
+      }
+      
       // Create user with email and password
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
@@ -81,10 +88,20 @@ export const AuthProvider = ({ children }) => {
         provider: 'email'
       });
 
-      return { success: true };
+      return { success: true, message: 'Account created successfully! Welcome to Laxmi Honey Industry!' };
     } catch (error) {
       console.error('Registration error:', error);
-      return { success: false, error: error.message };
+      let errorMessage = 'Registration failed. Please try again.';
+      
+      if (error.code === 'auth/email-already-in-use') {
+        errorMessage = 'An account with this email already exists.';
+      } else if (error.code === 'auth/weak-password') {
+        errorMessage = 'Password is too weak. Please choose a stronger password.';
+      } else if (error.code === 'auth/invalid-email') {
+        errorMessage = 'Please enter a valid email address.';
+      }
+      
+      return { success: false, error: errorMessage };
     }
   };
 
@@ -92,10 +109,24 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      return { success: true };
+      return { success: true, message: 'Welcome back!' };
     } catch (error) {
       console.error('Login error:', error);
-      return { success: false, error: error.message };
+      let errorMessage = 'Login failed. Please try again.';
+      
+      if (error.code === 'auth/user-not-found') {
+        errorMessage = 'No account found with this email address.';
+      } else if (error.code === 'auth/wrong-password') {
+        errorMessage = 'Incorrect password. Please try again.';
+      } else if (error.code === 'auth/invalid-email') {
+        errorMessage = 'Please enter a valid email address.';
+      } else if (error.code === 'auth/user-disabled') {
+        errorMessage = 'This account has been disabled.';
+      } else if (error.code === 'auth/too-many-requests') {
+        errorMessage = 'Too many failed attempts. Please try again later.';
+      }
+      
+      return { success: false, error: errorMessage };
     }
   };
 
@@ -158,9 +189,13 @@ export const AuthProvider = ({ children }) => {
 
   // Check if email exists
   const checkEmailExists = async (email) => {
-    // This will be implemented using a Firebase function or by attempting to sign in
-    // For now, we'll use a simple approach
-    return false; // Implement actual check
+    try {
+      const signInMethods = await fetchSignInMethodsForEmail(auth, email);
+      return signInMethods.length > 0;
+    } catch (error) {
+      console.error('Error checking email:', error);
+      return false;
+    }
   };
 
   const value = {
