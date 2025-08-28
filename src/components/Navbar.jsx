@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Logo from "../assets/logo.png";
 import { MdMenu, MdClose } from "react-icons/md";
-import { FaRegUser, FaShoppingCart, FaCog, FaUserCircle } from "react-icons/fa";
+import { FaRegUser, FaShoppingCart, FaCog, FaUserCircle, FaExclamationTriangle } from "react-icons/fa";
 import { HiSparkles } from "react-icons/hi";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from '../context/AuthContext';
@@ -101,6 +101,11 @@ const Navbar = () => {
     if (user.photoURL) return user.photoURL;
     const name = user.displayName || user.email?.split('@')[0] || 'U';
     return name.charAt(0).toUpperCase();
+  };
+
+  const isProfileIncomplete = () => {
+    if (!user) return false;
+    return !user.phoneNumber || !user.address || !user.city || !user.displayName;
   };
 
   const toggleMenu = () => {
@@ -202,19 +207,27 @@ const Navbar = () => {
                   whileHover={{ scale: 1.05, y: -2 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={toggleUserMenu}
-                  className="flex items-center space-x-2 p-2 rounded-xl bg-black/20 hover:bg-black/30 backdrop-blur-sm border border-white/10 hover:border-amber-300/40 transition-all duration-300 shadow-lg"
+                  className="flex items-center space-x-2 p-2 rounded-xl bg-black/20 hover:bg-black/30 backdrop-blur-sm border border-white/10 hover:border-amber-300/40 transition-all duration-300 shadow-lg relative"
                 >
-                  {user.photoURL ? (
-                    <img
-                      src={user.photoURL}
-                      alt="Profile"
-                      className="w-8 h-8 rounded-full object-cover border-2 border-amber-300/70 ring-1 ring-white/20"
-                    />
-                  ) : (
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center text-white font-bold text-sm ring-1 ring-white/20">
-                      {getUserAvatar()}
-                    </div>
-                  )}
+                  <div className="relative">
+                    {user.photoURL ? (
+                      <img
+                        src={user.photoURL}
+                        alt="Profile"
+                        className="w-8 h-8 rounded-full object-cover border-2 border-amber-300/70 ring-1 ring-white/20"
+                      />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center text-white font-bold text-sm ring-1 ring-white/20">
+                        {getUserAvatar()}
+                      </div>
+                    )}
+                    {/* Warning icon for incomplete profile */}
+                    {isProfileIncomplete() && (
+                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center shadow-lg">
+                        <FaExclamationTriangle className="w-2 h-2 text-white" />
+                      </div>
+                    )}
+                  </div>
                   <div className="hidden lg:block text-left">
                     <p className="text-white font-semibold text-sm drop-shadow-md">{getUserDisplayName()}</p>
                     {isAdmin && (
@@ -392,17 +405,25 @@ const Navbar = () => {
                   {user && (
                     <div className="p-6 border-b border-white/10 bg-gradient-to-r from-amber-700/40 to-orange-700/40">
                       <div className="flex items-center space-x-4 mb-4">
-                        {user.photoURL ? (
-                          <img
-                            src={user.photoURL}
-                            alt="Profile"
-                            className="w-14 h-14 rounded-full object-cover ring-3 ring-amber-300/50"
-                          />
-                        ) : (
-                          <div className="w-14 h-14 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center text-white font-bold text-xl ring-3 ring-amber-300/50">
-                            {getUserAvatar()}
-                          </div>
-                        )}
+                        <div className="relative">
+                          {user.photoURL ? (
+                            <img
+                              src={user.photoURL}
+                              alt="Profile"
+                              className="w-14 h-14 rounded-full object-cover ring-3 ring-amber-300/50"
+                            />
+                          ) : (
+                            <div className="w-14 h-14 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center text-white font-bold text-xl ring-3 ring-amber-300/50">
+                              {getUserAvatar()}
+                            </div>
+                          )}
+                          {/* Warning icon for incomplete profile */}
+                          {isProfileIncomplete() && (
+                            <div className="absolute -top-1 -right-1 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center shadow-lg">
+                              <FaExclamationTriangle className="w-3 h-3 text-white" />
+                            </div>
+                          )}
+                        </div>
                         <div className="flex-1">
                           <p className="text-white font-semibold text-lg">{getUserDisplayName()}</p>
                           <p className="text-amber-100/80 text-sm">{user.email}</p>
