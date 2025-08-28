@@ -234,11 +234,25 @@ const Navbar = () => {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -10, scale: 0.95 }}
                       transition={{ duration: 0.2 }}
-                      className="absolute right-0 mt-2 w-56 glass-honey rounded-2xl shadow-xl border border-amber-200/30 overflow-hidden"
+                      className="absolute right-0 mt-2 w-56 bg-black/20 backdrop-blur-sm rounded-2xl shadow-xl border border-white/10 overflow-hidden"
                     >
-                      <div className="p-4 border-b border-amber-200/20">
-                        <p className="text-white font-semibold">{getUserDisplayName()}</p>
-                        <p className="text-amber-100/80 text-sm">{user.email}</p>
+                      <div className="p-4 border-b border-white/10">
+                        <p 
+                          className="text-white font-semibold"
+                          style={{
+                            textShadow: '0 0 20px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.15), 0 0 60px rgba(0, 0, 0, 0.1)'
+                          }}
+                        >
+                          {getUserDisplayName()}
+                        </p>
+                        <p 
+                          className="text-amber-100/80 text-sm"
+                          style={{
+                            textShadow: '0 0 20px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.15), 0 0 60px rgba(0, 0, 0, 0.1)'
+                          }}
+                        >
+                          {user.email}
+                        </p>
                         {isAdmin && (
                           <span className="inline-flex items-center px-2 py-1 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 text-white text-xs font-medium mt-2">
                             <HiSparkles className="w-3 h-3 mr-1" />
@@ -251,6 +265,9 @@ const Navbar = () => {
                         <button
                           onClick={() => { handleUserClick(); setUserMenuOpen(false); }}
                           className="w-full px-4 py-3 text-left text-white/90 hover:text-white hover:bg-white/10 transition-colors duration-200 flex items-center space-x-3"
+                          style={{
+                            textShadow: '0 0 20px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.15), 0 0 60px rgba(0, 0, 0, 0.1)'
+                          }}
                         >
                           <FaRegUser className="w-4 h-4" />
                           <span>My Profile</span>
@@ -260,17 +277,23 @@ const Navbar = () => {
                           <button
                             onClick={() => { navigate('/admin'); setUserMenuOpen(false); }}
                             className="w-full px-4 py-3 text-left text-white/90 hover:text-white hover:bg-white/10 transition-colors duration-200 flex items-center space-x-3"
+                            style={{
+                              textShadow: '0 0 20px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.15), 0 0 60px rgba(0, 0, 0, 0.1)'
+                            }}
                           >
                             <FaCog className="w-4 h-4" />
                             <span>Admin Panel</span>
                           </button>
                         )}
                         
-                        <hr className="my-2 border-amber-200/20" />
+                        <hr className="my-2 border-white/20" />
                         
                         <button
                           onClick={handleLogout}
                           className="w-full px-4 py-3 text-left text-red-300 hover:text-red-200 hover:bg-red-500/10 transition-colors duration-200 flex items-center space-x-3"
+                          style={{
+                            textShadow: '0 0 20px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.15), 0 0 60px rgba(0, 0, 0, 0.1)'
+                          }}
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -288,6 +311,9 @@ const Navbar = () => {
                   <Link
                     to="/login"
                     className="px-4 py-2 text-white/90 hover:text-white font-medium transition-colors duration-300"
+                    style={{
+                      textShadow: '0 0 20px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.15), 0 0 60px rgba(0, 0, 0, 0.1)'
+                    }}
                   >
                     Login
                   </Link>
