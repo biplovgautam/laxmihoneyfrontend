@@ -130,7 +130,7 @@ const Navbar = () => {
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 lg:h-20">
+        <div className="flex items-center justify-between h-14 lg:h-16">
           
           {/* Logo Section */}
           <motion.div 
@@ -234,7 +234,11 @@ const Navbar = () => {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -10, scale: 0.95 }}
                       transition={{ duration: 0.2 }}
-                      className="absolute right-0 mt-2 w-56 bg-black/20 backdrop-blur-sm rounded-2xl shadow-xl border border-white/10 overflow-hidden"
+                      className="absolute right-0 mt-2 w-56 bg-black/30 backdrop-blur-xl rounded-2xl shadow-xl border border-white/20 overflow-hidden"
+                      style={{
+                        backdropFilter: 'blur(20px) saturate(150%)',
+                        WebkitBackdropFilter: 'blur(20px) saturate(150%)'
+                      }}
                     >
                       <div className="p-4 border-b border-white/10">
                         <p 
@@ -290,7 +294,7 @@ const Navbar = () => {
                         
                         <button
                           onClick={handleLogout}
-                          className="w-full px-4 py-3 text-left text-red-300 hover:text-red-200 hover:bg-red-500/10 transition-colors duration-200 flex items-center space-x-3"
+                          className="w-full px-4 py-3 text-left text-red-400 hover:text-red-300 hover:bg-red-500/20 transition-colors duration-200 flex items-center space-x-3"
                           style={{
                             textShadow: '0 0 20px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.15), 0 0 60px rgba(0, 0, 0, 0.1)'
                           }}
@@ -298,7 +302,7 @@ const Navbar = () => {
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                           </svg>
-                          <span>Sign Out</span>
+                          <span>Logout</span>
                         </button>
                       </div>
                     </motion.div>
@@ -357,7 +361,7 @@ const Navbar = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="fixed inset-0 top-16 lg:top-20 z-40 md:hidden mobile-blur-backdrop"
+              className="fixed inset-0 top-14 lg:top-16 z-40 md:hidden mobile-blur-backdrop"
               onClick={closeMenu}
             />
             
@@ -368,7 +372,7 @@ const Navbar = () => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: "100%" }}
               transition={{ duration: 0.3, ease: "easeInOut" }}
-              className="fixed top-16 lg:top-20 right-0 bottom-0 z-50 md:hidden w-80 max-w-[85vw]"
+              className="fixed top-14 lg:top-16 right-0 bottom-0 z-50 md:hidden w-80 max-w-[85vw]"
             >
               <div className="h-full bg-black/85 backdrop-blur-xl border-l border-white/10 shadow-2xl">
                 <div className="flex flex-col h-full overflow-hidden">
