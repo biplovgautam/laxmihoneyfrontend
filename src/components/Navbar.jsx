@@ -163,14 +163,18 @@ const Navbar = () => {
             {NavbarMenu.map((item) => (
               <motion.div
                 key={item.id}
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
+                transition={{ duration: 0.2 }}
               >
                 <Link
                   to={item.link}
-                  className="px-4 py-2 rounded-xl text-white/90 hover:text-white hover:bg-white/10 transition-all duration-300 group"
+                  className="px-4 py-2.5 rounded-xl text-white font-semibold hover:text-amber-100 transition-all duration-300 group"
+                  style={{
+                    textShadow: '0 0 20px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.15), 0 0 60px rgba(0, 0, 0, 0.1)'
+                  }}
                 >
-                  <span className="font-medium text-sm lg:text-base">{item.title}</span>
+                  <span className="text-sm lg:text-base">{item.title}</span>
                 </Link>
               </motion.div>
             ))}
@@ -181,9 +185,9 @@ const Navbar = () => {
             
             {/* Cart Icon */}
             <motion.button
-              whileHover={{ scale: 1.1 }}
+              whileHover={{ scale: 1.1, y: -2 }}
               whileTap={{ scale: 0.9 }}
-              className="relative p-2.5 rounded-xl glass hover:glass-accent transition-all duration-300 text-white/90 hover:text-white shadow-lg"
+              className="relative p-2.5 rounded-xl bg-black/20 hover:bg-black/30 backdrop-blur-sm border border-white/10 hover:border-amber-300/40 transition-all duration-300 text-white shadow-lg hover:shadow-xl"
             >
               <FaShoppingCart className="w-5 h-5" />
               <span className="absolute -top-1 -right-1 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold shadow-lg animate-pulse-soft">
@@ -191,30 +195,30 @@ const Navbar = () => {
               </span>
             </motion.button>
 
-            {/* User Section */}
+            {/* Desktop User Section */}
             {user ? (
               <div className="relative hidden md:block" ref={userMenuRef}>
                 <motion.button
-                  whileHover={{ scale: 1.05 }}
+                  whileHover={{ scale: 1.05, y: -2 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={toggleUserMenu}
-                  className="flex items-center space-x-2 p-2 rounded-xl glass hover:glass-accent transition-all duration-300"
+                  className="flex items-center space-x-2 p-2 rounded-xl bg-black/20 hover:bg-black/30 backdrop-blur-sm border border-white/10 hover:border-amber-300/40 transition-all duration-300 shadow-lg"
                 >
                   {user.photoURL ? (
                     <img
                       src={user.photoURL}
                       alt="Profile"
-                      className="w-8 h-8 rounded-full object-cover border-2 border-amber-300/50"
+                      className="w-8 h-8 rounded-full object-cover border-2 border-amber-300/70 ring-1 ring-white/20"
                     />
                   ) : (
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center text-white font-bold text-sm">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center text-white font-bold text-sm ring-1 ring-white/20">
                       {getUserAvatar()}
                     </div>
                   )}
                   <div className="hidden lg:block text-left">
-                    <p className="text-white font-medium text-sm">{getUserDisplayName()}</p>
+                    <p className="text-white font-semibold text-sm drop-shadow-md">{getUserDisplayName()}</p>
                     {isAdmin && (
-                      <p className="text-amber-200 text-xs flex items-center">
+                      <p className="text-amber-200 text-xs flex items-center drop-shadow-sm">
                         <HiSparkles className="w-3 h-3 mr-1" />
                         Admin
                       </p>
@@ -340,11 +344,11 @@ const Navbar = () => {
               transition={{ duration: 0.3, ease: "easeInOut" }}
               className="fixed top-16 lg:top-20 right-0 bottom-0 z-50 md:hidden w-80 max-w-[85vw]"
             >
-              <div className="h-full mobile-menu-panel border-l border-amber-200/30 shadow-2xl">
+              <div className="h-full bg-black/85 backdrop-blur-xl border-l border-white/10 shadow-2xl">
                 <div className="flex flex-col h-full overflow-hidden">
                   
                   {/* Mobile Menu Header */}
-                  <div className="p-6 border-b border-amber-200/20 bg-gradient-to-r from-amber-600/20 to-orange-600/20">
+                  <div className="p-6 border-b border-white/10 bg-gradient-to-r from-amber-600/30 to-orange-600/30">
                     <div className="flex items-center space-x-3">
                       <img src={Logo} alt="Logo" className="w-12 h-12 rounded-full ring-2 ring-amber-300/50" />
                       <div>
@@ -356,7 +360,7 @@ const Navbar = () => {
 
                   {/* User Profile Section - Top Priority in Mobile */}
                   {user && (
-                    <div className="p-6 border-b border-amber-200/20 bg-gradient-to-r from-amber-700/30 to-orange-700/30">
+                    <div className="p-6 border-b border-white/10 bg-gradient-to-r from-amber-700/40 to-orange-700/40">
                       <div className="flex items-center space-x-4 mb-4">
                         {user.photoURL ? (
                           <img
@@ -437,7 +441,7 @@ const Navbar = () => {
                   </div>
 
                   {/* Mobile Auth Section */}
-                  <div className="p-6 border-t border-amber-200/20 bg-gradient-to-r from-amber-700/30 to-orange-700/30">
+                  <div className="p-6 border-t border-white/10 bg-gradient-to-r from-amber-700/40 to-orange-700/40">
                     {user ? (
                       <motion.button
                         whileHover={{ scale: 1.02 }}
