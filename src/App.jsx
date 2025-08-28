@@ -11,7 +11,6 @@ import Login from "./Pages/Login";
 import Signup from "./Pages/Signup";
 import Account from "./Pages/Account";
 import { ProtectedRoute } from "./components/ProtectedRoute";
-import PhoneNumberModal from "./components/PhoneNumberModal";
 import ProfileCompletionModal from "./components/ProfileCompletionModal";
 
 const AppContent = () => {
@@ -39,14 +38,9 @@ const AppContent = () => {
         <Route path="*" element={<><Navbar /><div className="p-8 text-center">404 - Page Not Found</div></>} />
       </Routes>
 
-      {/* Modals */}
-      <PhoneNumberModal 
-        isOpen={needsPhoneNumber}
-        onClose={() => setNeedsPhoneNumber(false)}
-      />
-      
+      {/* Modals - Only show ProfileCompletionModal (handles both phone and address) */}
       <ProfileCompletionModal 
-        isOpen={needsProfileCompletion}
+        isOpen={needsProfileCompletion || needsPhoneNumber}
         onClose={() => {}} // Profile completion modal can only be closed by completing or skipping
       />
     </main>

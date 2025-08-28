@@ -3,7 +3,6 @@ import loginposter from '@assets/loginposter2.png';
 import { FcGoogle } from 'react-icons/fc';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import PhoneNumberModal from '../PhoneNumberModal';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -204,12 +203,6 @@ const Login = () => {
           />
         </div>
       </div>
-      
-      {/* Phone Number Modal for Google users */}
-      <PhoneNumberModal 
-        isOpen={needsPhoneNumber} 
-        onClose={() => {}} // Can't close until phone number is provided
-      />
     </section>
   );
 };

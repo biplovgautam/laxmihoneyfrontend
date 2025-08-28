@@ -15,6 +15,10 @@ const ProfileCompletionModal = ({ isOpen, onClose }) => {
   const [phoneError, setPhoneError] = useState('');
   const [checkingPhone, setCheckingPhone] = useState(false);
 
+  // Determine if this is just for phone number (legacy) or full profile
+  const isPhoneOnlyMode = user && !user.phoneNumber && user.address;
+  const isFullProfileMode = user && (!user.phoneNumber || !user.address);
+
   useEffect(() => {
     if (user) {
       setFormData({
@@ -75,18 +79,20 @@ const ProfileCompletionModal = ({ isOpen, onClose }) => {
     
     const newErrors = {};
     
-    // Validate phone number
+    // Validate phone number (always required)
     if (!formData.phoneNumber) {
       newErrors.phoneNumber = 'Phone number is required';
     } else if (!validatePhone(formData.phoneNumber)) {
       newErrors.phoneNumber = 'Please enter a valid 10-digit phone number';
     }
     
-    // Validate address
-    if (!formData.address.trim()) {
-      newErrors.address = 'Address is required';
-    } else if (formData.address.trim().length < 10) {
-      newErrors.address = 'Please enter a complete address (minimum 10 characters)';
+    // Validate address (only if not in phone-only mode)
+    if (!isPhoneOnlyMode) {
+      if (!formData.address.trim()) {
+        newErrors.address = 'Address is required';
+      } else if (formData.address.trim().length < 10) {
+        newErrors.address = 'Please enter a complete address (minimum 10 characters)';
+      }
     }
     
     if (phoneError) {
@@ -106,10 +112,12 @@ const ProfileCompletionModal = ({ isOpen, onClose }) => {
         return;
       }
       
-      const success = await markProfileComplete({
+      const profileData = {
         phoneNumber: formData.phoneNumber,
-        address: formData.address.trim()
-      });
+        address: isPhoneOnlyMode ? (user.address || '') : formData.address.trim()
+      };
+      
+      const success = await markProfileComplete(profileData);
       
       if (success) {
         onClose();
@@ -144,9 +152,14 @@ const ProfileCompletionModal = ({ isOpen, onClose }) => {
           onClick={(e) => e.stopPropagation()}
         >
           <div className="bg-gradient-to-r from-amber-600 via-orange-500 to-amber-500 p-6 text-white">
-            <h2 className="text-2xl font-bold mb-2">Complete Your Profile</h2>
+            <h2 className="text-2xl font-bold mb-2">
+              {isPhoneOnlyMode ? 'Add Phone Number' : 'Complete Your Profile'}
+            </h2>
             <p className="text-amber-100">
-              Complete your profile to enjoy all features and place orders
+              {isPhoneOnlyMode 
+                ? 'Please add your phone number to complete your account setup'
+                : 'Complete your profile to enjoy all features and place orders'
+              }
             </p>
           </div>
 
@@ -184,24 +197,26 @@ const ProfileCompletionModal = ({ isOpen, onClose }) => {
               <p className="mt-1 text-xs text-gray-500">Enter 10-digit phone number without country code</p>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Complete Address *
-              </label>
-              <textarea
-                value={formData.address}
-                onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
-                placeholder="Enter your complete address including street, city, state, and postal code"
-                rows="3"
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent resize-none ${
-                  errors.address ? 'border-red-300' : 'border-gray-300'
-                }`}
-              />
-              {errors.address && (
-                <p className="mt-1 text-sm text-red-600">{errors.address}</p>
-              )}
-              <p className="mt-1 text-xs text-gray-500">This address will be used for delivery</p>
-            </div>
+            {!isPhoneOnlyMode && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Complete Address *
+                </label>
+                <textarea
+                  value={formData.address}
+                  onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
+                  placeholder="Enter your complete address including street, city, state, and postal code"
+                  rows="3"
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent resize-none ${
+                    errors.address ? 'border-red-300' : 'border-gray-300'
+                  }`}
+                />
+                {errors.address && (
+                  <p className="mt-1 text-sm text-red-600">{errors.address}</p>
+                )}
+                <p className="mt-1 text-xs text-gray-500">This address will be used for delivery</p>
+              </div>
+            )}
 
             <div className="flex space-x-3 pt-4">
               <button
@@ -216,7 +231,7 @@ const ProfileCompletionModal = ({ isOpen, onClose }) => {
                 disabled={loading || checkingPhone || phoneError}
                 className="flex-1 bg-gradient-to-r from-amber-600 via-orange-500 to-amber-500 text-white px-4 py-3 rounded-lg hover:from-amber-700 hover:via-orange-600 hover:to-amber-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? 'Saving...' : 'Complete Profile'}
+                {loading ? 'Saving...' : (isPhoneOnlyMode ? 'Add Phone Number' : 'Complete Profile')}
               </button>
             </div>
           </form>
@@ -229,11 +244,22 @@ const ProfileCompletionModal = ({ isOpen, onClose }) => {
                 </svg>
               </div>
               <div className="text-sm text-amber-800">
-                <p className="font-medium">Why complete your profile?</p>
+                <p className="font-medium">
+                  {isPhoneOnlyMode ? 'Why add your phone number?' : 'Why complete your profile?'}
+                </p>
                 <ul className="mt-1 space-y-1 text-xs">
                   <li>• Required to place orders</li>
-                  <li>• Faster checkout process</li>
-                  <li>• Better customer support</li>
+                  {isPhoneOnlyMode ? (
+                    <>
+                      <li>• Customer support and order updates</li>
+                      <li>• Secure account verification</li>
+                    </>
+                  ) : (
+                    <>
+                      <li>• Faster checkout process</li>
+                      <li>• Better customer support</li>
+                    </>
+                  )}
                   <li>• You can skip and complete later (we'll remind you)</li>
                 </ul>
               </div>

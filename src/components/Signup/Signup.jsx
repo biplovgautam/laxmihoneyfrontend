@@ -4,7 +4,6 @@ import { FcGoogle } from 'react-icons/fc';
 import { FaSpinner } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import signupPoster from '../../assets/loginposter2.png';
-import PhoneNumberModal from '../PhoneNumberModal';
 import EmailExistsModal from '../EmailExistsModal';
 
 const Signup = () => {
@@ -331,12 +330,6 @@ const Signup = () => {
         isOpen={showEmailExistsModal}
         onClose={() => setShowEmailExistsModal(false)}
         email={email}
-      />
-      
-      {/* Phone Number Modal for Google users */}
-      <PhoneNumberModal 
-        isOpen={needsPhoneNumber} 
-        onClose={() => {}} // Can't close until phone number is provided
       />
     </section>
   );

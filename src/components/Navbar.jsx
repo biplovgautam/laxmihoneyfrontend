@@ -183,17 +183,17 @@ const Navbar = () => {
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              className="relative p-2 rounded-xl glass hover:glass-accent transition-all duration-300 text-white/90 hover:text-white"
+              className="relative p-2.5 rounded-xl glass hover:glass-accent transition-all duration-300 text-white/90 hover:text-white shadow-lg"
             >
               <FaShoppingCart className="w-5 h-5" />
-              <span className="absolute -top-1 -right-1 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+              <span className="absolute -top-1 -right-1 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold shadow-lg animate-pulse-soft">
                 3
               </span>
             </motion.button>
 
             {/* User Section */}
             {user ? (
-              <div className="relative" ref={userMenuRef}>
+              <div className="relative hidden md:block" ref={userMenuRef}>
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -279,7 +279,7 @@ const Navbar = () => {
                 </AnimatePresence>
               </div>
             ) : (
-              <div className="flex items-center space-x-2">
+              <div className="hidden md:flex items-center space-x-2">
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Link
                     to="/login"
@@ -304,9 +304,14 @@ const Navbar = () => {
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               onClick={toggleMenu}
-              className="md:hidden p-2 rounded-xl glass hover:glass-accent transition-all duration-300 text-white"
+              className="md:hidden p-2.5 rounded-xl glass hover:glass-accent transition-all duration-300 text-white shadow-lg"
             >
-              {menuOpen ? <MdClose className="w-6 h-6" /> : <MdMenu className="w-6 h-6" />}
+              <motion.div
+                animate={{ rotate: menuOpen ? 180 : 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                {menuOpen ? <MdClose className="w-6 h-6" /> : <MdMenu className="w-6 h-6" />}
+              </motion.div>
             </motion.button>
           </div>
         </div>
@@ -315,133 +320,163 @@ const Navbar = () => {
       {/* Mobile Menu */}
       <AnimatePresence>
         {menuOpen && (
-          <motion.div
-            ref={menuRef}
-            initial={{ opacity: 0, x: "100%" }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: "100%" }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="fixed inset-0 top-16 lg:top-20 z-40 md:hidden"
-          >
-            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={closeMenu} />
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="fixed inset-0 top-16 lg:top-20 z-40 md:hidden mobile-blur-backdrop"
+              onClick={closeMenu}
+            />
             
-            <div className="absolute right-0 top-0 h-full w-80 max-w-[90vw] glass-honey border-l border-amber-200/30">
-              <div className="flex flex-col h-full">
-                
-                {/* Mobile Menu Header */}
-                <div className="p-6 border-b border-amber-200/20">
-                  <div className="flex items-center space-x-3">
-                    <img src={Logo} alt="Logo" className="w-10 h-10 rounded-full" />
-                    <div>
-                      <h2 className="text-white font-bold text-lg">Laxmi Honey</h2>
-                      <p className="text-amber-100/80 text-sm">Pure & Natural</p>
+            {/* Menu Panel */}
+            <motion.div
+              ref={menuRef}
+              initial={{ opacity: 0, x: "100%" }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: "100%" }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+              className="fixed top-16 lg:top-20 right-0 bottom-0 z-50 md:hidden w-80 max-w-[85vw]"
+            >
+              <div className="h-full mobile-menu-panel border-l border-amber-200/30 shadow-2xl">
+                <div className="flex flex-col h-full overflow-hidden">
+                  
+                  {/* Mobile Menu Header */}
+                  <div className="p-6 border-b border-amber-200/20 bg-gradient-to-r from-amber-600/20 to-orange-600/20">
+                    <div className="flex items-center space-x-3">
+                      <img src={Logo} alt="Logo" className="w-12 h-12 rounded-full ring-2 ring-amber-300/50" />
+                      <div>
+                        <h2 className="text-white font-bold text-xl">Laxmi Honey</h2>
+                        <p className="text-amber-100/80 text-sm">Pure & Natural</p>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Mobile Navigation Links */}
-                <div className="flex-1 px-6 py-6 space-y-2">
-                  {NavbarMenu.map((item, index) => (
-                    <motion.div
-                      key={item.id}
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                    >
-                      <Link
-                        to={item.link}
-                        onClick={closeMenu}
-                        className="flex items-center space-x-4 p-4 rounded-xl text-white/90 hover:text-white hover:bg-white/10 transition-all duration-300 group"
-                      >
-                        <span className="font-medium text-lg">{item.title}</span>
-                      </Link>
-                    </motion.div>
-                  ))}
-                </div>
-
-                {/* Mobile User Section */}
-                <div className="p-6 border-t border-amber-200/20">
-                  {user ? (
-                    <div className="space-y-4">
-                      <div className="flex items-center space-x-3 p-4 rounded-xl glass">
+                  {/* User Profile Section - Top Priority in Mobile */}
+                  {user && (
+                    <div className="p-6 border-b border-amber-200/20 bg-gradient-to-r from-amber-700/30 to-orange-700/30">
+                      <div className="flex items-center space-x-4 mb-4">
                         {user.photoURL ? (
                           <img
                             src={user.photoURL}
                             alt="Profile"
-                            className="w-10 h-10 rounded-full object-cover"
+                            className="w-14 h-14 rounded-full object-cover ring-3 ring-amber-300/50"
                           />
                         ) : (
-                          <div className="w-10 h-10 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center text-white font-bold">
+                          <div className="w-14 h-14 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center text-white font-bold text-xl ring-3 ring-amber-300/50">
                             {getUserAvatar()}
                           </div>
                         )}
-                        <div>
-                          <p className="text-white font-medium">{getUserDisplayName()}</p>
+                        <div className="flex-1">
+                          <p className="text-white font-semibold text-lg">{getUserDisplayName()}</p>
+                          <p className="text-amber-100/80 text-sm">{user.email}</p>
                           {isAdmin && (
-                            <p className="text-amber-200 text-sm flex items-center">
+                            <span className="inline-flex items-center px-2 py-1 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 text-white text-xs font-medium mt-1">
                               <HiSparkles className="w-3 h-3 mr-1" />
                               Admin
-                            </p>
+                            </span>
                           )}
                         </div>
                       </div>
                       
-                      <div className="space-y-2">
-                        <button
+                      {/* Quick Actions */}
+                      <div className="grid grid-cols-2 gap-3">
+                        <motion.button
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
                           onClick={() => { handleUserClick(); closeMenu(); }}
-                          className="w-full flex items-center space-x-3 p-3 rounded-xl text-white/90 hover:text-white hover:bg-white/10 transition-all duration-300"
+                          className="flex items-center justify-center space-x-2 p-3 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 text-white transition-all duration-300"
                         >
-                          <FaRegUser className="w-4 h-4" />
-                          <span>My Profile</span>
-                        </button>
+                          <FaUserCircle className="w-4 h-4" />
+                          <span className="text-sm font-medium">Profile</span>
+                        </motion.button>
                         
                         {isAdmin && (
-                          <button
+                          <motion.button
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
                             onClick={() => { navigate('/admin'); closeMenu(); }}
-                            className="w-full flex items-center space-x-3 p-3 rounded-xl text-white/90 hover:text-white hover:bg-white/10 transition-all duration-300"
+                            className="flex items-center justify-center space-x-2 p-3 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 text-white transition-all duration-300"
                           >
                             <FaCog className="w-4 h-4" />
-                            <span>Admin Panel</span>
-                          </button>
+                            <span className="text-sm font-medium">Admin</span>
+                          </motion.button>
                         )}
-                        
-                        <button
-                          onClick={handleLogout}
-                          className="w-full flex items-center space-x-3 p-3 rounded-xl text-red-300 hover:text-red-200 hover:bg-red-500/10 transition-all duration-300"
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                          </svg>
-                          <span>Sign Out</span>
-                        </button>
                       </div>
                     </div>
-                  ) : (
-                    <div className="space-y-3">
-                      <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                        <Link
-                          to="/login"
-                          onClick={closeMenu}
-                          className="block w-full p-4 text-center glass rounded-xl text-white font-medium hover:glass-accent transition-all duration-300"
-                        >
-                          Login
-                        </Link>
-                      </motion.div>
-                      <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                        <Link
-                          to="/signup"
-                          onClick={closeMenu}
-                          className="block w-full p-4 text-center bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-medium rounded-xl transition-all duration-300"
-                        >
-                          Sign Up
-                        </Link>
-                      </motion.div>
-                    </div>
                   )}
+
+                  {/* Mobile Navigation Links */}
+                  <div className="flex-1 px-6 py-6 space-y-1 overflow-y-auto">
+                    {NavbarMenu.map((item, index) => (
+                      <motion.div
+                        key={item.id}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                      >
+                        <Link
+                          to={item.link}
+                          onClick={closeMenu}
+                          className="mobile-menu-item flex items-center space-x-4 p-4 rounded-xl text-white/90 hover:text-white transition-all duration-300 group border border-transparent hover:border-white/20"
+                        >
+                          <span className="font-medium text-lg">{item.title}</span>
+                          <motion.div
+                            className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                            whileHover={{ x: 5 }}
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                          </motion.div>
+                        </Link>
+                      </motion.div>
+                    ))}
+                  </div>
+
+                  {/* Mobile Auth Section */}
+                  <div className="p-6 border-t border-amber-200/20 bg-gradient-to-r from-amber-700/30 to-orange-700/30">
+                    {user ? (
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={handleLogout}
+                        className="w-full flex items-center justify-center space-x-3 p-4 rounded-xl bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-200 hover:text-red-100 transition-all duration-300"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                        <span className="font-medium">Sign Out</span>
+                      </motion.button>
+                    ) : (
+                      <div className="space-y-3">
+                        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                          <Link
+                            to="/login"
+                            onClick={closeMenu}
+                            className="block w-full p-4 text-center bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 rounded-xl text-white font-medium transition-all duration-300"
+                          >
+                            Login
+                          </Link>
+                        </motion.div>
+                        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                          <Link
+                            to="/signup"
+                            onClick={closeMenu}
+                            className="block w-full p-4 text-center bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-medium rounded-xl transition-all duration-300 shadow-lg"
+                          >
+                            Sign Up
+                          </Link>
+                        </motion.div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </motion.nav>

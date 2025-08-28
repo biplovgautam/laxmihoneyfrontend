@@ -55,11 +55,6 @@ export const AuthProvider = ({ children }) => {
           }
         }
 
-        // Check if Google user needs phone number (legacy check)
-        if (firebaseUser.providerData[0]?.providerId === 'google.com' && !userData.phoneNumber) {
-          setNeedsPhoneNumber(true);
-        }
-
         setUser(userData);
       } else {
         setUser(null);
@@ -163,7 +158,7 @@ export const AuthProvider = ({ children }) => {
           provider: 'google',
           photoURL: user.photoURL
         });
-        setNeedsPhoneNumber(true);
+        // New Google users will be prompted for profile completion via the existing logic
       }
 
       return { success: true };
@@ -173,26 +168,12 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Update phone number for Google users
-  const updatePhoneNumber = async (phoneNumber) => {
-    try {
-      if (user) {
-        const userDocRef = doc(db, 'users', user.uid);
-        await updateDoc(userDocRef, { phoneNumber });
-        setNeedsPhoneNumber(false);
-        return { success: true };
-      }
-    } catch (error) {
-      console.error('Phone number update error:', error);
-      return { success: false, error: error.message };
-    }
-  };
-
   // Logout
   const logout = async () => {
     try {
       await signOut(auth);
       setNeedsPhoneNumber(false);
+      setNeedsProfileCompletion(false);
       return { success: true };
     } catch (error) {
       console.error('Logout error:', error);
@@ -217,6 +198,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem(`lastProfilePrompt_${user.uid}`, Date.now().toString());
     }
     setNeedsProfileCompletion(false);
+    setNeedsPhoneNumber(false);
   };
 
   const markProfileComplete = async (profileData) => {
@@ -242,7 +224,9 @@ export const AuthProvider = ({ children }) => {
         profileCompleted: true
       }));
 
+      // Reset both modal states
       setNeedsProfileCompletion(false);
+      setNeedsPhoneNumber(false);
       return true;
     } catch (error) {
       console.error('Error updating profile:', error);
@@ -264,7 +248,6 @@ export const AuthProvider = ({ children }) => {
     login,
     signInWithGoogle,
     logout,
-    updatePhoneNumber,
     checkEmailExists,
     skipProfileCompletion,
     markProfileComplete,
