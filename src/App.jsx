@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import Navbar from "./components/Navbar";
 import Home from "./Pages/Home";
@@ -15,35 +15,41 @@ import ProfileCompletionModal from "./components/ProfileCompletionModal";
 
 const AppContent = () => {
   const { needsPhoneNumber, setNeedsPhoneNumber, needsProfileCompletion } = useAuth();
+  const location = useLocation();
+  
+  // Don't show navbar on login/signup pages
+  const hideNavbar = ['/login', '/signup'].includes(location.pathname);
 
   return (
-    <main className="overflow-x-hidden min-h-screen relative">
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/" element={<><Navbar /><Home /></>} />
-        <Route path="/products" element={<><Navbar /><Products /></>} />
-        <Route path="/contact" element={<><Navbar /><Contact /></>} />
-        <Route path="/about" element={<><Navbar /><About /></>} />
-        <Route path="/blogs" element={<><Navbar /><Blogs /></>} />
-        <Route 
-          path="/account" 
-          element={
-            <ProtectedRoute>
-              <Navbar />
-              <Account />
-            </ProtectedRoute>
-          } 
-        />
-        <Route path="*" element={<><Navbar /><div className="p-8 text-center">404 - Page Not Found</div></>} />
-      </Routes>
+    <>
+      {!hideNavbar && <Navbar />}
+      <main className="overflow-x-hidden min-h-screen relative">
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/" element={<Home />} />
+          <Route path="/products" element={<Products />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/blogs" element={<Blogs />} />
+          <Route 
+            path="/account" 
+            element={
+              <ProtectedRoute>
+                <Account />
+              </ProtectedRoute>
+            } 
+          />
+          <Route path="*" element={<div className="p-8 text-center">404 - Page Not Found</div>} />
+        </Routes>
 
-      {/* Modals - Only show ProfileCompletionModal (handles both phone and address) */}
-      <ProfileCompletionModal 
-        isOpen={needsProfileCompletion || needsPhoneNumber}
-        onClose={() => {}} // Profile completion modal can only be closed by completing or skipping
-      />
-    </main>
+        {/* Modals - Only show ProfileCompletionModal (handles both phone and address) */}
+        <ProfileCompletionModal 
+          isOpen={needsProfileCompletion || needsPhoneNumber}
+          onClose={() => {}} // Profile completion modal can only be closed by completing or skipping
+        />
+      </main>
+    </>
   );
 };
 
