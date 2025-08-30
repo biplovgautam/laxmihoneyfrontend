@@ -137,7 +137,7 @@ const Navbar = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="fixed inset-0 top-[72px] z-[99998] bg-black/70 backdrop-blur-sm"
+            className="fixed inset-0 top-[72px] z-[99998] bg-gradient-to-br from-amber-900/60 via-orange-800/60 to-amber-800/60 backdrop-blur-sm"
             onClick={closeMenu}
             style={{
               backdropFilter: 'blur(8px)',
@@ -159,7 +159,7 @@ const Navbar = () => {
             className="fixed top-[72px] right-0 bottom-0 z-[99999] w-80 max-w-[90vw]"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="h-full bg-black/90 backdrop-blur-xl border-l border-white/10 shadow-2xl overflow-hidden">
+            <div className="h-full bg-gradient-to-br from-amber-600/95 via-orange-500/95 to-amber-500/95 backdrop-blur-xl border-l border-amber-300/20 shadow-2xl overflow-hidden">
               <div className="flex flex-col h-full">
                 
                 {/* User Profile Section - moved to top without header branding */}
@@ -168,7 +168,7 @@ const Navbar = () => {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.1 }}
-                    className="p-6 border-b border-white/10 bg-gradient-to-r from-amber-700/40 to-orange-700/40"
+                    className="p-6 border-b border-amber-200/20 glass-white"
                   >
                     <div className="flex items-center space-x-4 mb-4">
                       <div className="relative">
@@ -179,7 +179,7 @@ const Navbar = () => {
                             className="w-14 h-14 rounded-full object-cover ring-3 ring-amber-300/50"
                           />
                         ) : (
-                          <div className="w-14 h-14 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center text-white font-bold text-xl ring-3 ring-amber-300/50">
+                          <div className="w-14 h-14 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center text-white font-bold text-xl ring-3 ring-amber-200/50">
                             {getUserAvatar()}
                           </div>
                         )}
@@ -190,10 +190,10 @@ const Navbar = () => {
                         )}
                       </div>
                       <div className="flex-1">
-                        <p className="text-white font-semibold text-lg">{getUserDisplayName()}</p>
-                        <p className="text-amber-100/80 text-sm">{user.email}</p>
+                        <p className="text-white font-semibold text-lg drop-shadow-md">{getUserDisplayName()}</p>
+                        <p className="text-amber-100/90 text-sm drop-shadow-sm">{user.email}</p>
                         {isAdmin && (
-                          <span className="inline-flex items-center px-2 py-1 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 text-white text-xs font-medium mt-1">
+                          <span className="inline-flex items-center px-2 py-1 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 text-white text-xs font-medium mt-1 shadow-lg">
                             <HiSparkles className="w-3 h-3 mr-1" />
                             Admin
                           </span>
@@ -207,7 +207,7 @@ const Navbar = () => {
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => { handleUserClick(); closeMenu(); }}
-                        className="flex items-center justify-center space-x-2 p-3 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 text-white transition-all duration-300"
+                        className="flex items-center justify-center space-x-2 p-3 rounded-xl glass-white hover:bg-white/25 backdrop-blur-sm border border-amber-200/30 text-white transition-all duration-300 shadow-lg"
                       >
                         <FaUserCircle className="w-4 h-4" />
                         <span className="text-sm font-medium">Profile</span>
@@ -218,7 +218,7 @@ const Navbar = () => {
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
                           onClick={() => { navigate('/admin'); closeMenu(); }}
-                          className="flex items-center justify-center space-x-2 p-3 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 text-white transition-all duration-300"
+                          className="flex items-center justify-center space-x-2 p-3 rounded-xl glass-white hover:bg-white/25 backdrop-blur-sm border border-amber-200/30 text-white transition-all duration-300 shadow-lg"
                         >
                           <FaCog className="w-4 h-4" />
                           <span className="text-sm font-medium">Admin</span>
@@ -240,12 +240,12 @@ const Navbar = () => {
                       <Link
                         to={item.link}
                         onClick={closeMenu}
-                        className="flex items-center space-x-4 p-4 rounded-xl text-white/90 hover:text-white transition-all duration-300 group border border-transparent hover:border-white/20 hover:bg-white/10"
+                        className="flex items-center space-x-4 p-4 rounded-xl text-white/95 hover:text-white transition-all duration-300 group border border-transparent hover:border-amber-200/30 hover:glass-white drop-shadow-md"
                       >
-                        <item.icon className="w-5 h-5" />
-                        <span className="font-medium text-lg flex-1">{item.title}</span>
+                        <item.icon className="w-5 h-5 text-amber-200 group-hover:text-amber-100" />
+                        <span className="font-medium text-lg flex-1 drop-shadow-sm">{item.title}</span>
                         <motion.div
-                          className="opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                          className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-amber-200"
                           whileHover={{ x: 5 }}
                         >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -262,19 +262,19 @@ const Navbar = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.25 }}
-                  className="p-6 border-t border-white/10 bg-gradient-to-r from-amber-700/40 to-orange-700/40"
+                  className="p-6 border-t border-amber-200/20 glass-white"
                 >
                   {user ? (
                     <motion.button
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={handleLogout}
-                      className="w-full flex items-center justify-center space-x-3 p-4 rounded-xl bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-200 hover:text-red-100 transition-all duration-300"
+                      className="w-full flex items-center justify-center space-x-3 p-4 rounded-xl bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-200 hover:text-red-100 transition-all duration-300 shadow-lg"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                       </svg>
-                      <span className="font-medium">Sign Out</span>
+                      <span className="font-medium drop-shadow-sm">Sign Out</span>
                     </motion.button>
                   ) : (
                     <div className="space-y-3">
@@ -282,7 +282,7 @@ const Navbar = () => {
                         <Link
                           to="/login"
                           onClick={closeMenu}
-                          className="block w-full p-4 text-center bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 rounded-xl text-white font-medium transition-all duration-300"
+                          className="block w-full p-4 text-center glass-white hover:bg-white/25 backdrop-blur-sm border border-amber-200/30 rounded-xl text-white font-medium transition-all duration-300 shadow-lg drop-shadow-sm"
                         >
                           Login
                         </Link>
@@ -291,7 +291,7 @@ const Navbar = () => {
                         <Link
                           to="/signup"
                           onClick={closeMenu}
-                          className="block w-full p-4 text-center bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-medium rounded-xl transition-all duration-300 shadow-lg"
+                          className="block w-full p-4 text-center bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-medium rounded-xl transition-all duration-300 shadow-lg drop-shadow-md"
                         >
                           Sign Up
                         </Link>
