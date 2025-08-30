@@ -5,6 +5,8 @@ import {
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   signOut,
   updateProfile,
   fetchSignInMethodsForEmail
@@ -29,6 +31,35 @@ export const AuthProvider = ({ children }) => {
   const [lastProfilePrompt, setLastProfilePrompt] = useState(null);
 
   useEffect(() => {
+    // Handle redirect result first
+    const handleRedirectResult = async () => {
+      try {
+        const result = await getRedirectResult(auth);
+        if (result) {
+          const user = result.user;
+          // Check if user exists in Firestore
+          const userDocRef = doc(db, 'users', user.uid);
+          const userDoc = await getDoc(userDocRef);
+
+          if (!userDoc.exists()) {
+            // Create new user document
+            await setDoc(userDocRef, {
+              fullName: user.displayName,
+              email: user.email,
+              isAdmin: ADMIN_EMAILS.includes(user.email),
+              createdAt: new Date(),
+              provider: 'google',
+              photoURL: user.photoURL
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Redirect result error:', error);
+      }
+    };
+
+    handleRedirectResult();
+
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         // Get additional user data from Firestore
@@ -138,32 +169,48 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Google Sign In
-  const signInWithGoogle = async () => {
+  // Google Sign In with redirect fallback
+  const signInWithGoogle = async (useRedirect = false) => {
     try {
-      const result = await signInWithPopup(auth, googleProvider);
-      const user = result.user;
+      if (useRedirect) {
+        // Use redirect method to avoid COOP issues
+        await signInWithRedirect(auth, googleProvider);
+        return { success: true, message: 'Redirecting...' };
+      } else {
+        // Try popup first
+        const result = await signInWithPopup(auth, googleProvider);
+        const user = result.user;
 
-      // Check if user exists in Firestore
-      const userDocRef = doc(db, 'users', user.uid);
-      const userDoc = await getDoc(userDocRef);
+        // Check if user exists in Firestore
+        const userDocRef = doc(db, 'users', user.uid);
+        const userDoc = await getDoc(userDocRef);
 
-      if (!userDoc.exists()) {
-        // Create new user document
-        await setDoc(userDocRef, {
-          fullName: user.displayName,
-          email: user.email,
-          isAdmin: ADMIN_EMAILS.includes(user.email),
-          createdAt: new Date(),
-          provider: 'google',
-          photoURL: user.photoURL
-        });
-        // New Google users will be prompted for profile completion via the existing logic
+        if (!userDoc.exists()) {
+          // Create new user document
+          await setDoc(userDocRef, {
+            fullName: user.displayName,
+            email: user.email,
+            isAdmin: ADMIN_EMAILS.includes(user.email),
+            createdAt: new Date(),
+            provider: 'google',
+            photoURL: user.photoURL
+          });
+          // New Google users will be prompted for profile completion via the existing logic
+        }
+
+        return { success: true };
       }
-
-      return { success: true };
     } catch (error) {
       console.error('Google sign in error:', error);
+      
+      // If popup fails due to COOP or other popup-related issues, try redirect
+      if (error.code === 'auth/popup-blocked' || 
+          error.code === 'auth/popup-closed-by-user' ||
+          error.message.includes('Cross-Origin-Opener-Policy')) {
+        console.log('Popup blocked, trying redirect method...');
+        return await signInWithGoogle(true);
+      }
+      
       return { success: false, error: error.message };
     }
   };

@@ -29,4 +29,8 @@ googleProvider.setCustomParameters({
   prompt: 'select_account'
 });
 
+// Add scopes if needed
+googleProvider.addScope('email');
+googleProvider.addScope('profile');
+
 export default app;
