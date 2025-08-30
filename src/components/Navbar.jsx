@@ -131,13 +131,13 @@ const Navbar = () => {
     <AnimatePresence mode="wait">
       {menuOpen && (
         <div className="md:hidden">
-          {/* Backdrop */}
+          {/* Backdrop - starts below navbar to keep navbar visible */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="fixed inset-0 z-[99998] bg-black/70 backdrop-blur-sm"
+            className="fixed inset-0 top-[72px] z-[99998] bg-black/70 backdrop-blur-sm"
             onClick={closeMenu}
             style={{
               backdropFilter: 'blur(8px)',
@@ -162,28 +162,12 @@ const Navbar = () => {
             <div className="h-full bg-black/90 backdrop-blur-xl border-l border-white/10 shadow-2xl overflow-hidden">
               <div className="flex flex-col h-full">
                 
-                {/* Mobile Menu Header */}
-                <motion.div 
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 }}
-                  className="p-6 border-b border-white/10 bg-gradient-to-r from-amber-600/30 to-orange-600/30"
-                >
-                  <div className="flex items-center space-x-3">
-                    <img src={Logo} alt="Logo" className="w-12 h-12 rounded-full ring-2 ring-amber-300/50" />
-                    <div>
-                      <h2 className="text-white font-bold text-xl">Laxmi Honey</h2>
-                      <p className="text-amber-100/80 text-sm">Pure & Natural</p>
-                    </div>
-                  </div>
-                </motion.div>
-
-                {/* User Profile Section */}
+                {/* User Profile Section - moved to top without header branding */}
                 {user && (
                   <motion.div 
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.15 }}
+                    transition={{ delay: 0.1 }}
                     className="p-6 border-b border-white/10 bg-gradient-to-r from-amber-700/40 to-orange-700/40"
                   >
                     <div className="flex items-center space-x-4 mb-4">
@@ -251,7 +235,7 @@ const Navbar = () => {
                       key={item.id}
                       initial={{ opacity: 0, x: 30 }}
                       animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.2 + (index * 0.05) }}
+                      transition={{ delay: 0.15 + (index * 0.05) }}
                     >
                       <Link
                         to={item.link}
@@ -277,7 +261,7 @@ const Navbar = () => {
                 <motion.div 
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
+                  transition={{ delay: 0.25 }}
                   className="p-6 border-t border-white/10 bg-gradient-to-r from-amber-700/40 to-orange-700/40"
                 >
                   {user ? (
