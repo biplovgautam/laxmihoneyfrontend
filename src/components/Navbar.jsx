@@ -532,7 +532,7 @@ const Navbar = () => {
                 </div>
               )}
 
-              {/* Mobile Menu Button */}
+              {/* Mobile Menu Button / Profile */}
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -542,18 +542,55 @@ const Navbar = () => {
                 {/* Button background glow effect */}
                 <div className="absolute inset-0 bg-gradient-to-r from-amber-400/20 to-orange-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" />
                 
-                {/* Hamburger Icon */}
+                {/* Dynamic Icon/Profile Content */}
                 <div className="relative w-6 h-6 flex items-center justify-center">
-                  <motion.div
-                    animate={{ rotate: menuOpen ? 90 : 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    {menuOpen ? <MdClose className="w-6 h-6" /> : <MdMenu className="w-6 h-6" />}
-                  </motion.div>
+                  {menuOpen ? (
+                    // Always show close button when menu is open
+                    <motion.div
+                      animate={{ rotate: 90 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <MdClose className="w-6 h-6" />
+                    </motion.div>
+                  ) : user ? (
+                    // Show user profile when logged in and menu closed
+                    <motion.div
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ duration: 0.3 }}
+                      className="relative"
+                    >
+                      {user.photoURL ? (
+                        <img
+                          src={user.photoURL}
+                          alt="Profile"
+                          className="w-6 h-6 rounded-full object-cover border border-amber-300/50"
+                        />
+                      ) : (
+                        <div className="w-6 h-6 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center text-white font-bold text-xs">
+                          {getUserAvatar()}
+                        </div>
+                      )}
+                      {/* Profile indicator dot */}
+                      {isProfileIncomplete() && (
+                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full flex items-center justify-center">
+                          <FaExclamationTriangle className="w-1.5 h-1.5 text-white" />
+                        </div>
+                      )}
+                    </motion.div>
+                  ) : (
+                    // Show hamburger when not logged in and menu closed
+                    <motion.div
+                      animate={{ rotate: 0 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <MdMenu className="w-6 h-6" />
+                    </motion.div>
+                  )}
                 </div>
                 
-                {/* Menu indicator dot */}
-                {!menuOpen && (
+                {/* Menu indicator dot - only show for non-logged users when menu closed */}
+                {!menuOpen && !user && (
                   <div className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full shadow-lg animate-pulse" />
                 )}
               </motion.button>
