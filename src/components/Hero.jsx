@@ -119,6 +119,13 @@ const Hero = () => {
     setActiveData(data);
   };
 
+  const handleWhatsAppClick = () => {
+    const phoneNumber = "+9779819492581";
+    const message = `Hi! I'm interested in ${activeData.name || activeData.title}. Could you please provide more information?`;
+    const whatsappUrl = `https://wa.me/${phoneNumber.replace(/[+\s]/g, '')}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
   if (loading) {
     return (
       <main className="bg-gradient-to-br from-amber-600 via-orange-500 to-amber-500 min-h-screen relative overflow-hidden flex items-center justify-center">
@@ -251,6 +258,7 @@ const Hero = () => {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
+                    onClick={handleWhatsAppClick}
                     className="btn-secondary flex items-center gap-2"
                   >
                     <FaWhatsapp className="w-4 h-4" />
