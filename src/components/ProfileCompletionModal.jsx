@@ -198,28 +198,40 @@ const ProfileCompletionModal = ({ isOpen, onClose }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-2 sm:p-4"
           onClick={onClose}
         >
           <motion.div
             initial={{ scale: 0.95, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.95, opacity: 0, y: 20 }}
-            className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full mx-4 overflow-hidden"
+            className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl max-w-2xl w-full mx-2 sm:mx-4 max-h-[95vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 p-8 text-white relative overflow-hidden">
+            <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 p-4 sm:p-8 text-white relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
               <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-12 -translate-x-12"></div>
+              
+              {/* Close button for mobile */}
+              <button
+                onClick={onClose}
+                className="absolute top-3 right-3 sm:top-4 sm:right-4 w-8 h-8 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-colors"
+                aria-label="Close modal"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+              
               <div className="relative">
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                    <HiSparkles className="w-6 h-6" />
+                <div className="flex items-center space-x-3 mb-2 sm:mb-4">
+                  <div className="w-8 h-8 sm:w-12 sm:h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                    <HiSparkles className="w-4 h-4 sm:w-6 sm:h-6" />
                   </div>
                   <div>
-                    <h2 className="text-3xl font-bold">Complete Your Profile</h2>
-                    <p className="text-amber-100 text-lg">
+                    <h2 className="text-xl sm:text-3xl font-bold">Complete Your Profile</h2>
+                    <p className="text-amber-100 text-sm sm:text-lg">
                       Help us serve you better with complete information
                     </p>
                   </div>
@@ -231,25 +243,25 @@ const ProfileCompletionModal = ({ isOpen, onClose }) => {
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="m-6 p-4 bg-green-100 border border-green-200 rounded-xl flex items-center space-x-3"
+                className="m-3 sm:m-6 p-3 sm:p-4 bg-green-100 border border-green-200 rounded-xl flex items-center space-x-3"
               >
-                <FaCheck className="text-green-600 text-xl" />
-                <span className="text-green-800 font-medium">{successMessage}</span>
+                <FaCheck className="text-green-600 text-lg sm:text-xl flex-shrink-0" />
+                <span className="text-green-800 font-medium text-sm sm:text-base">{successMessage}</span>
               </motion.div>
             )}
 
-            <form onSubmit={handleSubmit} className="p-8 space-y-6">
+            <form onSubmit={handleSubmit} className="p-4 sm:p-8 space-y-4 sm:space-y-6">
               {errors.submit && (
-                <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl">
+                <div className="bg-red-50 border border-red-200 text-red-600 px-3 sm:px-4 py-2 sm:py-3 rounded-xl text-sm sm:text-base">
                   {errors.submit}
                 </div>
               )}
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                 {/* Full Name */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-3">
-                    <FaUser className="inline w-4 h-4 mr-2 text-amber-500" />
+                <div className="lg:col-span-2">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2 sm:mb-3">
+                    <FaUser className="inline w-3 h-3 sm:w-4 sm:h-4 mr-2 text-amber-500" />
                     Full Name *
                   </label>
                   <input
@@ -257,13 +269,13 @@ const ProfileCompletionModal = ({ isOpen, onClose }) => {
                     value={formData.displayName}
                     onChange={(e) => handleInputChange('displayName', e.target.value)}
                     placeholder="Enter your full name"
-                    className={`w-full px-4 py-4 border-2 rounded-xl focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 transition-all duration-200 ${
+                    className={`w-full px-3 sm:px-4 py-3 sm:py-4 border-2 rounded-xl focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 transition-all duration-200 text-sm sm:text-base ${
                       errors.displayName ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-gray-300'
                     }`}
                   />
                   {errors.displayName && (
-                    <p className="mt-2 text-sm text-red-600 flex items-center">
-                      <span className="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
+                    <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-red-600 flex items-center">
+                      <span className="w-2 h-2 bg-red-500 rounded-full mr-2 flex-shrink-0"></span>
                       {errors.displayName}
                     </p>
                   )}
@@ -283,34 +295,35 @@ const ProfileCompletionModal = ({ isOpen, onClose }) => {
 
                 {/* Phone Number */}
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-3">
-                    <FaPhone className="inline w-4 h-4 mr-2 text-amber-500" />
+                  <label className="block text-sm font-semibold text-gray-700 mb-2 sm:mb-3">
+                    <FaPhone className="inline w-3 h-3 sm:w-4 sm:h-4 mr-2 text-amber-500" />
                     Phone Number *
                   </label>
                   <div className="relative">
                     <input
-                      type="text"
+                      type="tel"
+                      inputMode="numeric"
                       value={formData.phoneNumber}
                       onChange={handlePhoneChange}
                       placeholder="9801234567"
-                      className={`w-full px-4 py-4 border-2 rounded-xl focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 transition-all duration-200 ${
+                      className={`w-full px-3 sm:px-4 py-3 sm:py-4 border-2 rounded-xl focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 transition-all duration-200 text-sm sm:text-base ${
                         errors.phoneNumber || phoneError ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-gray-300'
                       }`}
                       maxLength="10"
                     />
                     {checkingPhone && (
-                      <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-                        <FaSpinner className="animate-spin text-amber-500" />
+                      <div className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2">
+                        <FaSpinner className="animate-spin text-amber-500 text-sm sm:text-base" />
                       </div>
                     )}
                   </div>
                   {(errors.phoneNumber || phoneError) && (
-                    <p className="mt-2 text-sm text-red-600 flex items-center">
-                      <span className="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
+                    <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-red-600 flex items-center">
+                      <span className="w-2 h-2 bg-red-500 rounded-full mr-2 flex-shrink-0"></span>
                       {errors.phoneNumber || phoneError}
                     </p>
                   )}
-                  <p className="mt-2 text-xs text-gray-500">Enter 10-digit phone number without country code</p>
+                  <p className="mt-1 sm:mt-2 text-xs text-gray-500">Enter 10-digit phone number without country code</p>
                 </div>
 
                 {/* Secondary Phone */}
