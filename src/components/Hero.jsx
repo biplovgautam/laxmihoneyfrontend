@@ -6,7 +6,6 @@ import { FaWhatsapp, FaStar, FaLeaf, FaHeart, FaShoppingCart, FaChevronDown } fr
 import { HiSparkles, HiBadgeCheck } from "react-icons/hi";
 import { AnimatePresence, easeInOut, motion } from "framer-motion";
 import logoFallback from '../assets/logo4.png';
-import fallbackImage from '../assets/logo4.png';
 
 const SlideRight = (delay) => {
   return {
@@ -356,12 +355,9 @@ const Hero = () => {
                 >
                   <div className="w-80 h-80 md:w-96 md:h-96 lg:w-[450px] lg:h-[450px] rounded-full p-8 animate-float bg-gradient-to-br from-amber-200/30 to-orange-300/30 backdrop-blur-sm border border-white/20 shadow-2xl">
                     <img
-                      src={getOptimizedImageUrl(activeData.imageUrl || activeData.images?.[0]) || fallbackImage}
+                      src={activeData.images?.[0] ? getOptimizedImageUrl(activeData.images[0], { width: 800, height: 800 }) : logoFallback}
                       alt={activeData.name || activeData.title}
                       className="w-full h-full object-contain drop-shadow-2xl"
-                      onError={(e) => {
-                        e.target.src = fallbackImage;
-                      }}
                     />
                   </div>
                   
