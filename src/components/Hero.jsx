@@ -1,10 +1,18 @@
-import React from "react";
-import Product1 from "../assets/logo4.png";
-import Product2 from "../assets/logo2.png";
-import Product3 from "../assets/logo3.png";
+import React, { useState, useEffect } from "react";
+import { collection, query, where, orderBy, limit, getDocs } from 'firebase/firestore';
+import { db } from '../config/firebase';
 import { FaWhatsapp, FaStar, FaLeaf, FaHeart, FaShoppingCart, FaChevronDown } from "react-icons/fa";
 import { HiSparkles, HiBadgeCheck } from "react-icons/hi";
 import { AnimatePresence, easeInOut, motion } from "framer-motion";
+import { Cloudinary } from "@cloudinary/url-gen";
+import { auto } from "@cloudinary/url-gen/actions/resize";
+import { quality } from "@cloudinary/url-gen/actions/delivery";
+
+const cld = new Cloudinary({
+  cloud: {
+    cloudName: 'dudoazt5g'
+  }
+});
 
 const SlideRight = (delay) => {
   return {
@@ -50,48 +58,6 @@ const FadeIn = (delay) => {
   };
 };
 
-const topProducts = [
-  {
-    id: 1,
-    image: Product1,
-    title: "Premium Raw Honey",
-    subtitle: "Experience the pure essence of Nepali highlands with our raw, unprocessed honey. Harvested directly from pristine beehives in the mountains, preserving all natural enzymes and beneficial properties for your wellness journey.",
-    price: "Rs. 1,200",
-    originalPrice: "Rs. 1,500",
-    modal: "Raw",
-    bgColor: "#f3762350",
-    rating: 4.9,
-    reviews: 342,
-    badges: ["100% Natural", "Mountain Harvested", "Raw & Unprocessed"],
-  },
-  {
-    id: 2,
-    image: Product2,
-    title: "Organic Wildflower Honey",
-    subtitle: "A delightful blend of nature's finest nectar from diverse wildflowers across Nepal's valleys. Rich in antioxidants and natural minerals, perfect for daily health and wellness.",
-    price: "Rs. 950",
-    originalPrice: "Rs. 1,200",
-    modal: "Wildflower",
-    bgColor: "#f3c23d50",
-    rating: 4.8,
-    reviews: 287,
-    badges: ["Organic Certified", "Wildflower Blend", "Antioxidant Rich"],
-  },
-  {
-    id: 3,
-    image: Product3,
-    title: "Himalayan Forest Honey",
-    subtitle: "Rare and exotic honey collected from the pristine Himalayan forests. This dark, richly flavored honey offers unique medicinal properties and an unforgettable taste experience.",
-    price: "Rs. 1,800",
-    originalPrice: "Rs. 2,200",
-    modal: "Forest",
-    bgColor: "#bc7b1350",
-    rating: 5.0,
-    reviews: 156,
-    badges: ["Himalayan Source", "Limited Edition", "Medicinal Grade"],
-  },
-];
-
 const scrollDown = () => {
   window.scrollTo({
     top: window.innerHeight,
@@ -100,11 +66,96 @@ const scrollDown = () => {
 };
 
 const Hero = () => {
-  const [activeData, setActiveData] = React.useState(topProducts[0]);
+  const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [activeData, setActiveData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchFeaturedProducts = async () => {
+      try {
+        // First try to get featured products
+        const featuredQuery = query(
+          collection(db, 'products'),
+          where('isFeatured', '==', true),
+          limit(3)
+        );
+        
+        const featuredSnapshot = await getDocs(featuredQuery);
+        let products = featuredSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        })).filter(product => product.isActive); // Filter active products in client
+        
+        // If no featured products, get latest active products
+        if (products.length === 0) {
+          const allQuery = query(
+            collection(db, 'products'),
+            limit(10) // Get more to filter by isActive
+          );
+          
+          const allSnapshot = await getDocs(allQuery);
+          const allProducts = allSnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          }));
+          
+          // Filter active products and sort by creation date
+          products = allProducts
+            .filter(product => product.isActive)
+            .sort((a, b) => {
+              const aDate = a.createdAt?.toDate?.() || new Date(a.createdAt);
+              const bDate = b.createdAt?.toDate?.() || new Date(b.createdAt);
+              return bDate - aDate;
+            })
+            .slice(0, 3);
+        }
+        
+        setFeaturedProducts(products);
+        setActiveData(products[0] || null);
+      } catch (error) {
+        console.error('Error fetching featured products:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFeaturedProducts();
+  }, []);
 
   const handleActiveData = (data) => {
     setActiveData(data);
   };
+
+  const getOptimizedImageUrl = (imageUrl) => {
+    if (!imageUrl) return '';
+    
+    // Extract public ID from Cloudinary URL
+    const publicIdMatch = imageUrl.match(/\/v\d+\/(.+)\.(jpg|jpeg|png|webp)$/);
+    if (publicIdMatch) {
+      const publicId = publicIdMatch[1];
+      const optimizedImage = cld.image(publicId)
+        .resize(auto().width(800))
+        .delivery(quality('auto'));
+      return optimizedImage.toURL();
+    }
+    return imageUrl;
+  };
+
+  if (loading) {
+    return (
+      <main className="bg-gradient-to-br from-amber-600 via-orange-500 to-amber-500 min-h-screen relative overflow-hidden flex items-center justify-center">
+        <div className="text-white text-xl">Loading featured products...</div>
+      </main>
+    );
+  }
+
+  if (!activeData) {
+    return (
+      <main className="bg-gradient-to-br from-amber-600 via-orange-500 to-amber-500 min-h-screen relative overflow-hidden flex items-center justify-center">
+        <div className="text-white text-xl">No featured products available</div>
+      </main>
+    );
+  }
 
   return (
     <main className="bg-gradient-to-br from-amber-600 via-orange-500 to-amber-500 min-h-screen relative overflow-hidden">
@@ -147,7 +198,7 @@ const Hero = () => {
               >
                 <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white leading-tight">
                   <span className="bg-gradient-to-r from-white to-amber-100 bg-clip-text text-transparent">
-                    {activeData.title}
+                    {activeData.name || activeData.title}
                   </span>
                   <br />
                   <span className="text-2xl md:text-3xl lg:text-4xl font-medium text-amber-100/90 animate-glow">
@@ -167,7 +218,7 @@ const Hero = () => {
                 exit="exit"
                 className="text-base md:text-lg leading-relaxed text-white/90 max-w-xl mx-auto lg:mx-0"
               >
-                {activeData.subtitle}
+                {activeData.description || activeData.desc}
               </motion.p>
             </AnimatePresence>
 
@@ -188,7 +239,7 @@ const Hero = () => {
               </div>
               <div className="flex items-center gap-2">
                 <FaStar className="w-5 h-5 text-yellow-300" />
-                <span className="text-sm font-medium">{activeData.rating}/5 ({activeData.reviews} reviews)</span>
+                <span className="text-sm font-medium">Premium Quality</span>
               </div>
             </motion.div>
 
@@ -203,9 +254,11 @@ const Hero = () => {
                 className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4"
               >
                 <div className="flex items-center gap-3">
-                  <span className="text-3xl md:text-4xl font-bold text-white">{activeData.price}</span>
-                  {activeData.originalPrice && (
-                    <span className="text-lg text-white/60 line-through">{activeData.originalPrice}</span>
+                  <span className="text-3xl md:text-4xl font-bold text-white">
+                    Rs. {activeData.discountPrice || activeData.price}
+                  </span>
+                  {activeData.discountPrice && (
+                    <span className="text-lg text-white/60 line-through">Rs. {activeData.price}</span>
                   )}
                 </div>
                 <div className="flex gap-3">
@@ -239,12 +292,12 @@ const Hero = () => {
                 exit="exit"
                 className="flex flex-wrap justify-center lg:justify-start gap-2"
               >
-                {activeData.badges?.map((badge, index) => (
+                {(activeData.tags || activeData.badges || []).map((tag, index) => (
                   <span
                     key={index}
                     className="px-3 py-1 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full text-xs font-medium text-white"
                   >
-                    {badge}
+                    {tag}
                   </span>
                 ))}
               </motion.div>
@@ -266,7 +319,7 @@ const Hero = () => {
               </div>
 
               <div className="flex flex-wrap justify-center lg:justify-start gap-4">
-                {topProducts.map((item) => (
+                {featuredProducts.map((item) => (
                   <motion.div
                     key={item.id}
                     whileHover={{ scale: 1.05 }}
@@ -281,8 +334,8 @@ const Hero = () => {
                     <div className="flex items-center gap-3">
                       <div className="relative">
                         <img
-                          src={item.image}
-                          alt={item.title}
+                          src={getOptimizedImageUrl(item.imageUrl || item.images?.[0])}
+                          alt={item.name || item.title}
                           className="w-12 h-12 rounded-xl object-cover"
                         />
                         {activeData.id === item.id && (
@@ -292,8 +345,8 @@ const Hero = () => {
                         )}
                       </div>
                       <div>
-                        <h4 className="font-semibold text-white text-sm">{item.modal}</h4>
-                        <p className="text-xs text-white/70">{item.price}</p>
+                        <h4 className="font-semibold text-white text-sm">{item.category}</h4>
+                        <p className="text-xs text-white/70">Rs. {item.discountPrice || item.price}</p>
                       </div>
                     </div>
                   </motion.div>
@@ -322,16 +375,10 @@ const Hero = () => {
                   transition={{ duration: 0.6 }}
                   className="relative z-10"
                 >
-                  <div
-                    className="w-80 h-80 md:w-96 md:h-96 lg:w-[450px] lg:h-[450px] rounded-full p-8 animate-float"
-                    style={{
-                      background: `linear-gradient(135deg, ${activeData.bgColor}, ${activeData.bgColor}80)`,
-                      boxShadow: `0 25px 50px -12px ${activeData.bgColor}40`,
-                    }}
-                  >
+                  <div className="w-80 h-80 md:w-96 md:h-96 lg:w-[450px] lg:h-[450px] rounded-full p-8 animate-float bg-gradient-to-br from-amber-200/30 to-orange-300/30 backdrop-blur-sm border border-white/20 shadow-2xl">
                     <img
-                      src={activeData.image}
-                      alt={activeData.title}
+                      src={getOptimizedImageUrl(activeData.imageUrl || activeData.images?.[0])}
+                      alt={activeData.name || activeData.title}
                       className="w-full h-full object-contain drop-shadow-2xl"
                     />
                   </div>
@@ -346,14 +393,14 @@ const Hero = () => {
                     <div className="flex items-center gap-2">
                       <FaStar className="w-5 h-5 text-yellow-400" />
                       <div>
-                        <p className="font-bold text-white text-lg">{activeData.rating}</p>
-                        <p className="text-white/70 text-xs">{activeData.reviews} reviews</p>
+                        <p className="font-bold text-white text-lg">{activeData.rating || 4.9}</p>
+                        <p className="text-white/70 text-xs">Premium</p>
                       </div>
                     </div>
                   </motion.div>
                   
                   {/* Floating discount badge */}
-                  {activeData.originalPrice && (
+                  {activeData.discountPrice && (
                     <motion.div
                       initial={{ opacity: 0, x: -50 }}
                       animate={{ opacity: 1, x: 0 }}
@@ -361,7 +408,7 @@ const Hero = () => {
                       className="absolute bottom-8 -left-4 bg-gradient-to-r from-red-500 to-pink-500 p-3 rounded-2xl shadow-xl"
                     >
                       <p className="text-white font-bold text-sm">
-                        {Math.round(((parseFloat(activeData.originalPrice.replace(/[^0-9]/g, '')) - parseFloat(activeData.price.replace(/[^0-9]/g, ''))) / parseFloat(activeData.originalPrice.replace(/[^0-9]/g, ''))) * 100)}% OFF
+                        {Math.round(((activeData.price - activeData.discountPrice) / activeData.price) * 100)}% OFF
                       </p>
                     </motion.div>
                   )}
