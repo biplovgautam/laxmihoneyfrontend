@@ -1,18 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { collection, query, where, orderBy, limit, getDocs } from 'firebase/firestore';
+import { collection, query, where, limit, getDocs } from 'firebase/firestore';
 import { db } from '../config/firebase';
+import { getOptimizedImageUrl } from '../config/cloudinary';
 import { FaWhatsapp, FaStar, FaLeaf, FaHeart, FaShoppingCart, FaChevronDown } from "react-icons/fa";
 import { HiSparkles, HiBadgeCheck } from "react-icons/hi";
 import { AnimatePresence, easeInOut, motion } from "framer-motion";
-import { Cloudinary } from "@cloudinary/url-gen";
-import { auto } from "@cloudinary/url-gen/actions/resize";
-import { quality } from "@cloudinary/url-gen/actions/delivery";
-
-const cld = new Cloudinary({
-  cloud: {
-    cloudName: 'dudoazt5g'
-  }
-});
+import logoFallback from '../assets/logo4.png';
+import fallbackImage from '../assets/logo4.png';
 
 const SlideRight = (delay) => {
   return {
@@ -124,21 +118,6 @@ const Hero = () => {
 
   const handleActiveData = (data) => {
     setActiveData(data);
-  };
-
-  const getOptimizedImageUrl = (imageUrl) => {
-    if (!imageUrl) return '';
-    
-    // Extract public ID from Cloudinary URL
-    const publicIdMatch = imageUrl.match(/\/v\d+\/(.+)\.(jpg|jpeg|png|webp)$/);
-    if (publicIdMatch) {
-      const publicId = publicIdMatch[1];
-      const optimizedImage = cld.image(publicId)
-        .resize(auto().width(800))
-        .delivery(quality('auto'));
-      return optimizedImage.toURL();
-    }
-    return imageUrl;
   };
 
   if (loading) {
@@ -255,10 +234,10 @@ const Hero = () => {
               >
                 <div className="flex items-center gap-3">
                   <span className="text-3xl md:text-4xl font-bold text-white">
-                    Rs. {activeData.discountPrice || activeData.price}
+                    Rs. {activeData.price}
                   </span>
-                  {activeData.discountPrice && (
-                    <span className="text-lg text-white/60 line-through">Rs. {activeData.price}</span>
+                  {activeData.originalPrice && activeData.originalPrice > activeData.price && (
+                    <span className="text-lg text-white/60 line-through">Rs. {activeData.originalPrice}</span>
                   )}
                 </div>
                 <div className="flex gap-3">
@@ -334,7 +313,7 @@ const Hero = () => {
                     <div className="flex items-center gap-3">
                       <div className="relative">
                         <img
-                          src={getOptimizedImageUrl(item.imageUrl || item.images?.[0])}
+                          src={item.images?.[0] ? getOptimizedImageUrl(item.images[0], { width: 300, height: 300 }) : logoFallback}
                           alt={item.name || item.title}
                           className="w-12 h-12 rounded-xl object-cover"
                         />
@@ -346,7 +325,7 @@ const Hero = () => {
                       </div>
                       <div>
                         <h4 className="font-semibold text-white text-sm">{item.category}</h4>
-                        <p className="text-xs text-white/70">Rs. {item.discountPrice || item.price}</p>
+                        <p className="text-xs text-white/70">Rs. {item.price}</p>
                       </div>
                     </div>
                   </motion.div>
@@ -377,9 +356,12 @@ const Hero = () => {
                 >
                   <div className="w-80 h-80 md:w-96 md:h-96 lg:w-[450px] lg:h-[450px] rounded-full p-8 animate-float bg-gradient-to-br from-amber-200/30 to-orange-300/30 backdrop-blur-sm border border-white/20 shadow-2xl">
                     <img
-                      src={getOptimizedImageUrl(activeData.imageUrl || activeData.images?.[0])}
+                      src={getOptimizedImageUrl(activeData.imageUrl || activeData.images?.[0]) || fallbackImage}
                       alt={activeData.name || activeData.title}
                       className="w-full h-full object-contain drop-shadow-2xl"
+                      onError={(e) => {
+                        e.target.src = fallbackImage;
+                      }}
                     />
                   </div>
                   
@@ -400,7 +382,7 @@ const Hero = () => {
                   </motion.div>
                   
                   {/* Floating discount badge */}
-                  {activeData.discountPrice && (
+                  {activeData.originalPrice && activeData.originalPrice > activeData.price && (
                     <motion.div
                       initial={{ opacity: 0, x: -50 }}
                       animate={{ opacity: 1, x: 0 }}
@@ -408,7 +390,7 @@ const Hero = () => {
                       className="absolute bottom-8 -left-4 bg-gradient-to-r from-red-500 to-pink-500 p-3 rounded-2xl shadow-xl"
                     >
                       <p className="text-white font-bold text-sm">
-                        {Math.round(((activeData.price - activeData.discountPrice) / activeData.price) * 100)}% OFF
+                        {Math.round(((activeData.originalPrice - activeData.price) / activeData.originalPrice) * 100)}% OFF
                       </p>
                     </motion.div>
                   )}
