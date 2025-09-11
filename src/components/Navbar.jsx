@@ -18,16 +18,22 @@ const Navbar = () => {
   const userMenuRef = useRef(null);
   const navigate = useNavigate();
 
-  const NavbarMenu = useMemo(
-    () => [
+  const NavbarMenu = useMemo(() => {
+    const baseMenu = [
       { id: 1, title: "Home", link: "/", icon: FaHome },
       { id: 2, title: "Products", link: "/products", icon: FaBox },
       { id: 3, title: "Contact", link: "/contact", icon: FaPhone },
       { id: 4, title: "About", link: "/about", icon: FaInfoCircle },
       { id: 5, title: "Blogs", link: "/blogs", icon: FaBlog },
-    ],
-    []
-  );
+    ];
+
+    // Add admin link for admin users
+    if (user?.isAdmin) {
+      baseMenu.push({ id: 6, title: "Admin", link: "/admin", icon: FaCog });
+    }
+
+    return baseMenu;
+  }, [user?.isAdmin]);
 
   useEffect(() => {
     const handleResize = () => {

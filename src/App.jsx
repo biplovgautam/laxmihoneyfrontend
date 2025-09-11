@@ -10,6 +10,7 @@ import Blogs from "./Pages/Blogs";
 import Login from "./Pages/Login";
 import Signup from "./Pages/Signup";
 import Account from "./Pages/Account";
+import AdminPanel from "./components/AdminPanel";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import ProfileCompletionModal from "./components/ProfileCompletionModal";
 
@@ -17,8 +18,8 @@ const AppContent = () => {
   const { needsPhoneNumber, setNeedsPhoneNumber, needsProfileCompletion } = useAuth();
   const location = useLocation();
   
-  // Don't show navbar on login/signup pages
-  const hideNavbar = ['/login', '/signup'].includes(location.pathname);
+  // Don't show navbar on login/signup pages and admin page
+  const hideNavbar = ['/login', '/signup', '/admin'].includes(location.pathname);
 
   return (
     <>
@@ -37,6 +38,14 @@ const AppContent = () => {
             element={
               <ProtectedRoute>
                 <Account />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin" 
+            element={
+              <ProtectedRoute>
+                <AdminPanel />
               </ProtectedRoute>
             } 
           />

@@ -5,7 +5,6 @@ import {
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword,
   signInWithPopup,
-  signInWithRedirect,
   getRedirectResult,
   signOut,
   updateProfile,
