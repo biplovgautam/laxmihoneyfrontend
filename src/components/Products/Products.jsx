@@ -15,7 +15,30 @@ const rangeSliderStyles = `
     appearance: none;
     height: 8px;
     background: transparent;
-    outline: none;
+    outline:                    </d                                  </motion.button>
+                    </div>
+                  </div>
+                </div>
+                </motion.div>
+              );
+            })}          <FaHeart className="w-5 h-5" />
+                      </motion.button>
+                    </div>
+                  </div>
+                </div>
+                </motion.div>
+              );
+            })}           </motion.button>
+                    </div>
+                  </div>
+                </div>
+                </motion.div>
+              );
+            })}                </div>
+                </div>
+              </motion.div>
+              );
+            })};
     opacity: 0.7;
     transition: opacity 0.2s;
   }
@@ -116,6 +139,25 @@ const Products = () => {
         id: doc.id,
         ...doc.data()
       }));
+      
+      // Add test product if no products found
+      if (allProducts.length === 0) {
+        allProducts.push({
+          id: 'test-1',
+          title: 'Pure Himalayan Honey',
+          shortDescription: 'Raw, unprocessed honey from the Himalayas',
+          price: 999,
+          originalPrice: 1299,
+          category: 'pure honey',
+          images: ['/placeholder-product.jpg'],
+          stock: 10,
+          weight: '500g',
+          rating: 4.5,
+          reviews: 25,
+          badges: ['Organic', 'Premium'],
+          isActive: true
+        });
+      }
       
       console.log('All products fetched:', allProducts.length);
       
@@ -489,25 +531,32 @@ const Products = () => {
           </motion.div>
         ) : (
           <motion.div
-            variants={staggerContainer}
-            initial="hidden"
-            animate="show"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
           >
-            {filteredProducts.map((item, index) => (
-              <motion.div
-                key={item.id}
-                variants={fadeUp(0)}
-                whileHover={{ y: -8, scale: 1.02 }}
-                className="group"
-              >
-                <div className="bg-white/20 backdrop-blur-md border-2 border-white/30 rounded-3xl p-6 shadow-xl hover:shadow-2xl transition-all duration-500 relative overflow-hidden h-full flex flex-col hover:bg-white/25 hover:border-white/40"
+            {filteredProducts.map((item, index) => {
+              console.log('Rendering product card:', item.title, 'Index:', index);
+              return (
+                <motion.div
+                  key={item.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  whileHover={{ y: -8, scale: 1.02 }}
+                  className="group"
+                >
+                <div className="bg-white/30 backdrop-blur-md border-2 border-white/40 rounded-3xl p-6 shadow-xl hover:shadow-2xl transition-all duration-500 relative overflow-hidden h-full flex flex-col hover:bg-white/35 hover:border-white/50"
                   style={{ minHeight: '500px' }}
                 >
                   
                   {/* Visible Background Pattern */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-white/10 rounded-3xl"></div>
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.1),transparent_50%)] rounded-3xl"></div>
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-white/5 rounded-3xl"></div>
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.15),transparent_50%)] rounded-3xl"></div>
+                  
+                  {/* Additional visibility enhancement */}
+                  <div className="absolute inset-0 border border-white/20 rounded-3xl"></div>
                   
                   {/* Background Glow Effect */}
                   <div className="absolute inset-0 bg-gradient-to-br from-amber-400/5 to-orange-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl"></div>
@@ -540,7 +589,7 @@ const Products = () => {
                   {/* Product Image */}
                   <div className="relative mb-6 flex-shrink-0 mt-4">
                     <Link to={`/product/${item.id}`}>
-                      <div className="aspect-square bg-white/20 backdrop-blur-sm border-2 border-white/30 rounded-2xl flex items-center justify-center overflow-hidden group-hover:bg-white/30 transition-all duration-500 relative">
+                      <div className="aspect-square bg-white/30 backdrop-blur-sm border-2 border-white/40 rounded-2xl flex items-center justify-center overflow-hidden group-hover:bg-white/40 transition-all duration-500 relative">
                         {/* Image glow effect */}
                         <div className="absolute inset-0 bg-gradient-to-br from-amber-300/20 to-orange-300/20 rounded-2xl blur-xl scale-110 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                         
@@ -690,8 +739,9 @@ const Products = () => {
                     </div>
                   </div>
                 </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              );
+            })}
           </motion.div>
         )}
       </AnimatePresence>
