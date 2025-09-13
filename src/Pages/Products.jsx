@@ -13,64 +13,43 @@ const Product = () => {
       {/* Hero Section */}
       <motion.section 
         className="pt-32 pb-16 px-4 relative z-10"
-        initial={{ opacity: 0, y: 50 }}
+        initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
       >
-        <div className="max-w-4xl mx-auto text-center">
+        <div className="max-w-6xl mx-auto text-center relative z-10">
           <motion.h1 
-            className="text-5xl md:text-7xl font-bold text-white mb-6"
-            initial={{ opacity: 0, y: 30 }}
+            className="text-4xl md:text-6xl font-bold text-white mb-4"
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            Our{" "}
+            Premium{" "}
             <span className="bg-gradient-to-r from-white to-amber-100 bg-clip-text text-transparent">
-              Premium Products
+              Honey Products
             </span>
           </motion.h1>
           
           <motion.p 
-            className="text-xl md:text-2xl text-white/90 mb-8 leading-relaxed"
-            initial={{ opacity: 0, y: 30 }}
+            className="text-lg md:text-xl text-white/90 mb-6 max-w-2xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
             Discover our collection of pure, natural honey products crafted with love and dedication to quality.
           </motion.p>
-          
-          {/* Decorative lines */}
-          <motion.div 
-            className="flex items-center justify-center gap-4 mb-12"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-          >
-            <div className="w-16 md:w-20 h-[1px] bg-white/40"></div>
-            <div className="w-3 h-3 bg-amber-300 rounded-full"></div>
-            <div className="w-2 h-2 bg-white rounded-full"></div>
-            <div className="w-16 md:w-20 h-[1px] bg-white/40"></div>
-          </motion.div>
         </div>
       </motion.section>
 
-      {/* Products Content Section */}
+      {/* Products Content */}
       <motion.section 
-        className="relative z-10 bg-gradient-to-b from-transparent to-amber-50/10 backdrop-blur-sm"
-        initial={{ opacity: 0, y: 50 }}
+        className="relative z-10"
+        initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.8 }}
+        transition={{ duration: 0.8, delay: 0.6 }}
       >
-        <div className="container mx-auto px-4 py-8">
-          {/* Glass morphism container for products */}
-          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-8 shadow-2xl">
-            <Products/>
-          </div>
-        </div>
+        <Products/>
       </motion.section>
-      
-      {/* Bottom decorative glow */}
-      <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-96 h-96 bg-gradient-to-t from-amber-300/20 to-transparent rounded-full blur-3xl"></div>
     </div>
   );
 };

@@ -15,7 +15,7 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import ProfileCompletionModal from "./components/ProfileCompletionModal";
 
 const AppContent = () => {
-  const { needsPhoneNumber, setNeedsPhoneNumber, needsProfileCompletion } = useAuth();
+  const { needsPhoneNumber, setNeedsPhoneNumber, needsProfileCompletion, skipProfileCompletion } = useAuth();
   const location = useLocation();
   
   // Don't show navbar on login/signup pages and admin page
@@ -55,7 +55,7 @@ const AppContent = () => {
         {/* Modals - Only show ProfileCompletionModal (handles both phone and address) */}
         <ProfileCompletionModal 
           isOpen={needsProfileCompletion || needsPhoneNumber}
-          onClose={() => {}} // Profile completion modal can only be closed by completing or skipping
+          onClose={() => skipProfileCompletion()} // Allow closing by skipping profile completion
         />
       </main>
     </>

@@ -53,10 +53,13 @@ const ProductManagement = () => {
 
   const categories = [
     'Pure Honey',
-    'Flavored Honey',
-    'Honey Products',
+    'Raw Honey',
+    'Flavoured Honey',
+    'Mad Honey',
     'Gift Sets',
-    'Seasonal'
+    'Honey Bee Products',
+    'Seasonal',
+    'Other'
   ];
 
   const badgeOptions = [

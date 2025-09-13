@@ -331,7 +331,7 @@ const Hero = () => {
                         )}
                       </div>
                       <div>
-                        <h4 className="font-semibold text-white text-sm">{item.category}</h4>
+                        <h4 className="font-semibold text-white text-sm">{item.title}</h4>
                         <p className="text-xs text-white/70">Rs. {item.price}</p>
                       </div>
                     </div>

@@ -198,14 +198,14 @@ const ProfileCompletionModal = ({ isOpen, onClose }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-2 sm:p-4"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-2 sm:p-4 pt-20 sm:pt-20"
           onClick={onClose}
         >
           <motion.div
             initial={{ scale: 0.95, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.95, opacity: 0, y: 20 }}
-            className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl max-w-2xl w-full mx-2 sm:mx-4 max-h-[95vh] overflow-y-auto"
+            className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl max-w-md sm:max-w-lg lg:max-w-2xl w-full mx-2 sm:mx-4 max-h-[80vh] sm:max-h-[85vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
@@ -216,10 +216,10 @@ const ProfileCompletionModal = ({ isOpen, onClose }) => {
               {/* Close button for mobile */}
               <button
                 onClick={onClose}
-                className="absolute top-3 right-3 sm:top-4 sm:right-4 w-8 h-8 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-colors"
+                className="absolute top-3 right-3 sm:top-4 sm:right-4 w-9 h-9 sm:w-8 sm:h-8 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-colors touch-manipulation"
                 aria-label="Close modal"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
@@ -380,8 +380,8 @@ const ProfileCompletionModal = ({ isOpen, onClose }) => {
 
                 {/* Address */}
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-semibold text-gray-700 mb-3">
-                    <FaMapMarkerAlt className="inline w-4 h-4 mr-2 text-amber-500" />
+                  <label className="block text-sm font-semibold text-gray-700 mb-2 sm:mb-3">
+                    <FaMapMarkerAlt className="inline w-3 h-3 sm:w-4 sm:h-4 mr-2 text-amber-500" />
                     Complete Address *
                   </label>
                   <textarea
@@ -389,33 +389,33 @@ const ProfileCompletionModal = ({ isOpen, onClose }) => {
                     onChange={(e) => handleInputChange('address', e.target.value)}
                     placeholder="Enter your complete address including street, city, and postal code"
                     rows="4"
-                    className={`w-full px-4 py-4 border-2 rounded-xl focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 transition-all duration-200 resize-none ${
+                    className={`w-full px-3 sm:px-4 py-3 sm:py-4 border-2 rounded-xl focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 transition-all duration-200 resize-none text-sm sm:text-base ${
                       errors.address ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-gray-300'
                     }`}
                   />
                   {errors.address && (
-                    <p className="mt-2 text-sm text-red-600 flex items-center">
-                      <span className="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
+                    <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-red-600 flex items-center">
+                      <span className="w-2 h-2 bg-red-500 rounded-full mr-2 flex-shrink-0"></span>
                       {errors.address}
                     </p>
                   )}
-                  <p className="mt-2 text-xs text-gray-500">This address will be used for delivery purposes</p>
+                  <p className="mt-1 sm:mt-2 text-xs text-gray-500">This address will be used for delivery purposes</p>
                 </div>
               </div>
 
               {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 pt-6">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4 sm:pt-6">
                 <button
                   type="button"
                   onClick={handleSkip}
-                  className="flex-1 px-6 py-4 border-2 border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 font-medium"
+                  className="flex-1 px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 font-medium text-sm sm:text-base min-h-[48px] touch-manipulation"
                 >
                   Skip for now
                 </button>
                 <button
                   type="submit"
                   disabled={loading || checkingPhone || phoneError}
-                  className="flex-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-6 py-4 rounded-xl hover:from-amber-600 hover:to-orange-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-medium shadow-lg flex items-center justify-center space-x-2"
+                  className="flex-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 sm:px-6 py-3 sm:py-4 rounded-xl hover:from-amber-600 hover:to-orange-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-medium shadow-lg flex items-center justify-center space-x-2 text-sm sm:text-base min-h-[48px] touch-manipulation"
                 >
                   {loading ? (
                     <>
@@ -431,25 +431,6 @@ const ProfileCompletionModal = ({ isOpen, onClose }) => {
                 </button>
               </div>
             </form>
-
-            {/* Footer Info */}
-            <div className="bg-amber-50 p-6 border-t border-amber-100">
-              <div className="flex items-start space-x-3">
-                <div className="text-amber-600 mt-1">
-                  <HiSparkles className="w-5 h-5" />
-                </div>
-                <div className="text-sm text-amber-800">
-                  <p className="font-semibold mb-2">Why complete your profile?</p>
-                  <ul className="space-y-1 text-xs">
-                    <li>• Required to place orders and receive deliveries</li>
-                    <li>• Faster checkout process for future orders</li>
-                    <li>• Better customer support with accurate contact information</li>
-                    <li>• Secure account with backup contact options</li>
-                    <li>• You can always update this information later in your account settings</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
           </motion.div>
         </motion.div>
       )}
