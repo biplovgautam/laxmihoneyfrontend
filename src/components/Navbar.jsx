@@ -7,9 +7,11 @@ import { FaRegUser, FaShoppingCart, FaCog, FaUserCircle, FaExclamationTriangle, 
 import { HiSparkles } from "react-icons/hi";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from '../context/AuthContext';
+import { useCart } from '../context/CartContext';
 
 const Navbar = () => {
   const { user, isAdmin, logout } = useAuth();
+  const { getCartTotal } = useCart();
   const [menuOpen, setMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
@@ -17,6 +19,8 @@ const Navbar = () => {
   const menuRef = useRef(null);
   const userMenuRef = useRef(null);
   const navigate = useNavigate();
+
+  const cartTotal = getCartTotal();
 
   const NavbarMenu = useMemo(() => {
     const baseMenu = [
@@ -396,11 +400,14 @@ const Navbar = () => {
                 whileHover={{ scale: 1.1, y: -2 }}
                 whileTap={{ scale: 0.9 }}
                 className="relative p-2.5 rounded-xl bg-black/20 hover:bg-black/30 backdrop-blur-sm border border-white/10 hover:border-amber-300/40 transition-all duration-300 text-white shadow-lg hover:shadow-xl"
+                onClick={() => navigate('/cart')}
               >
                 <FaShoppingCart className="w-5 h-5" />
-                <span className="absolute -top-1 -right-1 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold shadow-lg animate-pulse-soft">
-                  3
-                </span>
+                {cartTotal > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold shadow-lg animate-pulse-soft">
+                    {cartTotal > 99 ? '99+' : cartTotal}
+                  </span>
+                )}
               </motion.button>
 
               {/* Desktop User Section */}

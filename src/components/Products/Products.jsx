@@ -6,7 +6,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { collection, getDocs, query } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { getOptimizedImageUrl } from '../../config/cloudinary';
+import { useCart } from '../../context/CartContext';
+import { useAuth } from '../../context/AuthContext';
 import OrderButton from "../OrderButton";
+import Toast from "../Toast";
 
 // Custom CSS for range sliders
 const rangeSliderStyles = `
@@ -115,10 +118,22 @@ const Products = () => {
   const [priceRange, setPriceRange] = useState([0, 10000]); // Changed to array for slider
   const [sortBy, setSortBy] = useState("newest");
   const [showFilterSidebar, setShowFilterSidebar] = useState(false);
+  const [toast, setToast] = useState(null);
   
   // Temporary filter states for sidebar (don't apply until user clicks apply or closes sidebar)
   const [tempSelectedCategory, setTempSelectedCategory] = useState("all");
   const [tempPriceRange, setTempPriceRange] = useState([0, 10000]);
+
+  // Cart and favorites functionality
+  const { user } = useAuth();
+  const { 
+    addToCart, 
+    removeFromCart, 
+    toggleFavorite, 
+    isInCart, 
+    isFavorite, 
+    getCartItemQuantity 
+  } = useCart();
 
   useEffect(() => {
     fetchProducts();
@@ -273,6 +288,67 @@ const Products = () => {
   };
 
   const categories = ["all", "pure honey", "raw honey", "flavoured honey", "mad honey", "gift sets", "honey bee products", "seasonal", "other"];
+
+  // Toast functionality
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  // Cart functionality
+  const handleAddToCart = async (product) => {
+    if (!user) {
+      showToast('Please login to add items to cart', 'error');
+      return;
+    }
+
+    if (product.stock === 0) {
+      showToast('This item is out of stock', 'error');
+      return;
+    }
+
+    try {
+      await addToCart(product.id, 1);
+      showToast(`${product.title} added to cart!`, 'success');
+    } catch (error) {
+      showToast(error.message, 'error');
+    }
+  };
+
+  const handleRemoveFromCart = async (product) => {
+    if (!user) {
+      showToast('Please login to manage cart', 'error');
+      return;
+    }
+
+    try {
+      await removeFromCart(product.id);
+      showToast(`${product.title} removed from cart`, 'success');
+    } catch (error) {
+      showToast(error.message, 'error');
+    }
+  };
+
+  // Favorites functionality
+  const handleToggleFavorite = async (product) => {
+    if (!user) {
+      showToast('Please login to manage favorites', 'error');
+      return;
+    }
+
+    try {
+      await toggleFavorite(product.id);
+      const isFav = isFavorite(product.id);
+      showToast(
+        isFav 
+          ? `${product.title} removed from favorites` 
+          : `${product.title} added to favorites!`, 
+        'success'
+      );
+    } catch (error) {
+      showToast(error.message, 'error');
+    }
+  };
 
   if (loading) {
     return (
@@ -723,8 +799,19 @@ const Products = () => {
                       <motion.button 
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.95 }}
-                        className="p-3 border-2 border-amber-400/60 hover:border-amber-400 text-amber-300 hover:text-amber-200 rounded-xl transition-all duration-300 hover:bg-amber-400/10"
-                        onClick={() => console.log('Add to cart:', item.title)}
+                        className={`p-3 rounded-xl transition-all duration-300 ${
+                          isInCart(item.id)
+                            ? 'bg-amber-500/80 text-white hover:bg-amber-600/80'
+                            : 'bg-white/80 text-amber-600 hover:bg-white hover:text-amber-700'
+                        }`}
+                        onClick={() => {
+                          if (isInCart(item.id)) {
+                            handleRemoveFromCart(item);
+                          } else {
+                            handleAddToCart(item);
+                          }
+                        }}
+                        disabled={item.stock === 0}
                       >
                         <FaShoppingCart className="w-5 h-5" />
                       </motion.button>
@@ -732,7 +819,12 @@ const Products = () => {
                       <motion.button 
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.95 }}
-                        className="p-3 border-2 border-red-400/60 hover:border-red-400 text-red-300 hover:text-red-200 rounded-xl transition-all duration-300 hover:bg-red-400/10"
+                        className={`p-3 rounded-xl transition-all duration-300 ${
+                          isFavorite(item.id)
+                            ? 'bg-red-500/80 text-white hover:bg-red-600/80'
+                            : 'bg-white/80 text-red-600 hover:bg-white hover:text-red-700'
+                        }`}
+                        onClick={() => handleToggleFavorite(item)}
                       >
                         <FaHeart className="w-5 h-5" />
                       </motion.button>
@@ -745,6 +837,15 @@ const Products = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Toast Notifications */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   );
 };

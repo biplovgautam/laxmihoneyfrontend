@@ -1,6 +1,7 @@
 import React from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
+import { CartProvider } from "./context/CartContext";
 import Navbar from "./components/Navbar";
 import Home from "./Pages/Home";
 import Products from "./Pages/Products";
@@ -10,6 +11,7 @@ import Blogs from "./Pages/Blogs";
 import Login from "./Pages/Login";
 import Signup from "./Pages/Signup";
 import Account from "./Pages/Account";
+import Cart from "./Pages/Cart";
 import AdminPanel from "./components/AdminPanel";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import ProfileCompletionModal from "./components/ProfileCompletionModal";
@@ -33,6 +35,14 @@ const AppContent = () => {
           <Route path="/contact" element={<Contact />} />
           <Route path="/about" element={<About />} />
           <Route path="/blogs" element={<Blogs />} />
+          <Route 
+            path="/cart" 
+            element={
+              <ProtectedRoute>
+                <Cart />
+              </ProtectedRoute>
+            } 
+          />
           <Route 
             path="/account" 
             element={
@@ -65,7 +75,11 @@ const AppContent = () => {
 const App = () => {
   return (
     <AuthProvider>
-      <AppContent />
+      <CartProvider>
+        <AppContent />
+      </CartProvider>
     </AuthProvider>
   );
-};export default App;
+};
+
+export default App;
