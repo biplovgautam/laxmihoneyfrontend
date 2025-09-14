@@ -17,37 +17,42 @@ const Toast = ({ type = 'success', message, show, onClose, duration = 4000 }) =>
       case 'success':
         return {
           icon: FaCheck,
-          bgColor: 'bg-green-500',
-          borderColor: 'border-green-400',
-          textColor: 'text-green-50'
+          bgColor: 'bg-white/15 backdrop-blur-md',
+          borderColor: 'border-blue-300/50',
+          textColor: 'text-white',
+          iconColor: 'text-blue-300'
         };
       case 'error':
         return {
           icon: FaTimes,
-          bgColor: 'bg-red-500',
-          borderColor: 'border-red-400',
-          textColor: 'text-red-50'
+          bgColor: 'bg-white/15 backdrop-blur-md',
+          borderColor: 'border-red-300/50',
+          textColor: 'text-white',
+          iconColor: 'text-red-300'
         };
       case 'warning':
         return {
           icon: FaExclamationTriangle,
-          bgColor: 'bg-yellow-500',
-          borderColor: 'border-yellow-400',
-          textColor: 'text-yellow-50'
+          bgColor: 'bg-white/15 backdrop-blur-md',
+          borderColor: 'border-yellow-300/50',
+          textColor: 'text-white',
+          iconColor: 'text-yellow-300'
         };
       case 'info':
         return {
           icon: FaInfo,
-          bgColor: 'bg-blue-500',
-          borderColor: 'border-blue-400',
-          textColor: 'text-blue-50'
+          bgColor: 'bg-white/15 backdrop-blur-md',
+          borderColor: 'border-purple-300/50',
+          textColor: 'text-white',
+          iconColor: 'text-purple-300'
         };
       default:
         return {
           icon: FaInfo,
-          bgColor: 'bg-gray-500',
-          borderColor: 'border-gray-400',
-          textColor: 'text-gray-50'
+          bgColor: 'bg-white/15 backdrop-blur-md',
+          borderColor: 'border-gray-300/50',
+          textColor: 'text-white',
+          iconColor: 'text-gray-300'
         };
     }
   };
@@ -63,23 +68,23 @@ const Toast = ({ type = 'success', message, show, onClose, duration = 4000 }) =>
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -100, scale: 0.3 }}
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          className={`fixed top-4 right-4 z-50 ${config.bgColor} ${config.borderColor} ${config.textColor} px-6 py-4 rounded-xl shadow-2xl border backdrop-blur-lg max-w-md`}
+          className={`fixed top-24 right-4 z-50 ${config.bgColor} ${config.borderColor} ${config.textColor} px-6 py-4 rounded-xl shadow-2xl border max-w-md`}
         >
           <div className="flex items-center space-x-3">
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ delay: 0.2 }}
-              className="flex-shrink-0"
+              className={`flex-shrink-0 ${config.iconColor}`}
             >
-              <Icon className="text-lg" />
+              <Icon className="text-lg drop-shadow-sm" />
             </motion.div>
             <div className="flex-1">
-              <p className="font-medium text-sm">{message}</p>
+              <p className="font-medium text-sm drop-shadow-sm">{message}</p>
             </div>
             <button
               onClick={onClose}
-              className="flex-shrink-0 hover:bg-white/20 rounded-full p-1 transition-colors duration-200"
+              className="flex-shrink-0 hover:bg-white/20 rounded-full p-1 transition-colors duration-200 text-white/80 hover:text-white"
             >
               <FaTimes className="text-sm" />
             </button>
@@ -111,7 +116,7 @@ export const useToast = () => {
   };
 
   const ToastContainer = () => (
-    <div className="fixed top-4 right-4 z-50 space-y-2">
+    <div className="fixed top-24 right-4 z-50 space-y-2">
       {toasts.map((toast) => (
         <Toast
           key={toast.id}

@@ -11,6 +11,7 @@ import { useAuth } from '../../context/AuthContext';
 import OrderButton from "../OrderButton";
 import Toast from "../Toast";
 
+
 // Custom CSS for range sliders
 const rangeSliderStyles = `
   .slider {
@@ -308,8 +309,12 @@ const Products = () => {
     }
 
     try {
-      await addToCart(product.id, 1);
-      showToast(`${product.title} added to cart!`, 'success');
+      const result = await addToCart(product.id, 1);
+      if (result.action === 'added') {
+        showToast(`${product.title} added to cart!`, 'success');
+      } else if (result.action === 'updated') {
+        showToast(`${product.title} quantity updated in cart (${result.newQuantity})`, 'success');
+      }
     } catch (error) {
       showToast(error.message, 'error');
     }
@@ -337,14 +342,12 @@ const Products = () => {
     }
 
     try {
-      await toggleFavorite(product.id);
-      const isFav = isFavorite(product.id);
-      showToast(
-        isFav 
-          ? `${product.title} removed from favorites` 
-          : `${product.title} added to favorites!`, 
-        'success'
-      );
+      const result = await toggleFavorite(product.id);
+      if (result.action === 'added') {
+        showToast(`${product.title} added to favorites!`, 'success');
+      } else if (result.action === 'removed') {
+        showToast(`${product.title} removed from favorites`, 'success');
+      }
     } catch (error) {
       showToast(error.message, 'error');
     }
@@ -623,19 +626,19 @@ const Products = () => {
                   whileHover={{ y: -8, scale: 1.02 }}
                   className="group"
                 >
-                <div className="bg-white/30 backdrop-blur-md border-2 border-white/40 rounded-3xl p-6 shadow-xl hover:shadow-2xl transition-all duration-500 relative overflow-hidden h-full flex flex-col hover:bg-white/35 hover:border-white/50"
+                <div className="bg-black/15 backdrop-blur-md border-2 border-white/25 rounded-3xl p-6 shadow-xl hover:shadow-2xl transition-all duration-500 relative overflow-hidden h-full flex flex-col hover:bg-black/20 hover:border-white/35"
                   style={{ minHeight: '500px' }}
                 >
                   
-                  {/* Visible Background Pattern */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-white/5 rounded-3xl"></div>
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.15),transparent_50%)] rounded-3xl"></div>
+                  {/* Blackish glassmorphism background pattern */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-black/10 to-black/5 rounded-3xl"></div>
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(0,0,0,0.08),transparent_50%)] rounded-3xl"></div>
                   
-                  {/* Additional visibility enhancement */}
-                  <div className="absolute inset-0 border border-white/20 rounded-3xl"></div>
+                  {/* Subtle edge highlight for visibility */}
+                  <div className="absolute inset-0 border border-white/15 rounded-3xl"></div>
                   
-                  {/* Background Glow Effect */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-amber-400/5 to-orange-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl"></div>
+                  {/* Background Glow Effect - softer amber glow on hover */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-amber-400/10 to-orange-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl"></div>
                   
                   {/* Top badges row */}
                   <div className="absolute top-4 left-4 right-4 flex justify-between items-start z-10">
@@ -665,7 +668,7 @@ const Products = () => {
                   {/* Product Image */}
                   <div className="relative mb-6 flex-shrink-0 mt-4">
                     <Link to={`/product/${item.id}`}>
-                      <div className="aspect-square bg-white/30 backdrop-blur-sm border-2 border-white/40 rounded-2xl flex items-center justify-center overflow-hidden group-hover:bg-white/40 transition-all duration-500 relative">
+                      <div className="aspect-square bg-black/15 backdrop-blur-sm border-2 border-white/25 rounded-2xl flex items-center justify-center overflow-hidden group-hover:bg-black/20 transition-all duration-500 relative">
                         {/* Image glow effect */}
                         <div className="absolute inset-0 bg-gradient-to-br from-amber-300/20 to-orange-300/20 rounded-2xl blur-xl scale-110 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                         
@@ -678,7 +681,7 @@ const Products = () => {
                         {/* Weight/Volume Badge - Bottom Right */}
                         {item.weight && (
                           <div className="absolute bottom-3 right-3 z-20">
-                            <span className="inline-flex items-center px-2 py-1 bg-black/60 backdrop-blur-sm text-white text-xs font-medium rounded-lg">
+                            <span className="inline-flex items-center px-2 py-1 bg-black/70 backdrop-blur-sm text-white text-xs font-medium rounded-lg border border-white/20">
                               {item.weight}
                             </span>
                           </div>
@@ -693,11 +696,11 @@ const Products = () => {
                   <div className="flex-1 flex flex-col relative z-10">
                     {/* Category and Featured Badge */}
                     <div className="flex items-center justify-between mb-3">
-                      <span className="px-3 py-1 bg-white/20 backdrop-blur-sm border border-white/30 text-white text-xs font-medium rounded-full">
+                      <span className="px-3 py-1 bg-white/95 backdrop-blur-sm border border-white/50 text-gray-800 text-xs font-medium rounded-full shadow-sm">
                         {item.category}
                       </span>
                       {item.isFeatured && (
-                        <div className="flex items-center gap-1 px-2 py-1 bg-amber-400/20 backdrop-blur-sm border border-amber-300/30 text-amber-200 text-xs font-medium rounded-full">
+                        <div className="flex items-center gap-1 px-2 py-1 bg-amber-400/90 backdrop-blur-sm border border-amber-300/50 text-amber-900 text-xs font-medium rounded-full">
                           <HiSparkles className="w-3 h-3" />
                           <span>Featured</span>
                         </div>
@@ -706,13 +709,13 @@ const Products = () => {
                     
                     {/* Product Title */}
                     <Link to={`/product/${item.id}`}>
-                      <h3 className="text-xl font-bold text-white mb-3 group-hover:text-amber-100 transition-colors duration-300 line-clamp-2 leading-tight">
+                      <h3 className="text-xl font-bold text-white mb-3 group-hover:text-amber-100 transition-colors duration-300 line-clamp-2 leading-tight drop-shadow-sm">
                         {item.title}
                       </h3>
                     </Link>
                     
                     {/* Short Description */}
-                    <p className="text-white/80 text-sm mb-4 line-clamp-3 leading-relaxed">
+                    <p className="text-white/90 text-sm mb-4 line-clamp-3 leading-relaxed drop-shadow-sm">
                       {item.shortDescription || item.description || "Premium quality honey product crafted with care and dedication."}
                     </p>
                     
@@ -722,13 +725,13 @@ const Products = () => {
                         {item.badges.slice(0, 2).map((badge, badgeIndex) => (
                           <span
                             key={badgeIndex}
-                            className="px-2 py-1 bg-green-400/20 backdrop-blur-sm border border-green-300/30 text-green-200 text-xs font-medium rounded-md"
+                            className="px-2 py-1 bg-blue-400/90 backdrop-blur-sm border border-blue-300/50 text-blue-900 text-xs font-medium rounded-md shadow-sm"
                           >
                             {badge}
                           </span>
                         ))}
                         {item.badges.length > 2 && (
-                          <span className="px-2 py-1 bg-white/10 backdrop-blur-sm border border-white/20 text-white/70 text-xs rounded-md">
+                          <span className="px-2 py-1 bg-white/95 backdrop-blur-sm border border-white/50 text-gray-700 text-xs rounded-md shadow-sm">
                             +{item.badges.length - 2}
                           </span>
                         )}
@@ -741,16 +744,16 @@ const Products = () => {
                         {[...Array(5)].map((_, i) => (
                           <FaStar
                             key={i}
-                            className={`w-4 h-4 ${
-                              i < Math.floor(item.rating || 4.5) ? 'text-yellow-400' : 'text-white/30'
+                            className={`w-4 h-4 drop-shadow-sm ${
+                              i < Math.floor(item.rating || 4.5) ? 'text-yellow-400' : 'text-white/40'
                             }`}
                           />
                         ))}
                       </div>
-                      <span className="text-sm text-white/80 font-medium">
+                      <span className="text-sm text-white/90 font-medium drop-shadow-sm">
                         {(item.rating || 4.5).toFixed(1)}
                       </span>
-                      <span className="text-sm text-white/60">
+                      <span className="text-sm text-white/70 drop-shadow-sm">
                         ({item.reviews || 0} reviews)
                       </span>
                     </div>
@@ -758,17 +761,17 @@ const Products = () => {
                     {/* Price Section */}
                     <div className="mb-6 mt-auto">
                       <div className="flex items-baseline gap-2 mb-1">
-                        <span className="text-2xl font-bold text-white">
+                        <span className="text-2xl font-bold text-white drop-shadow-sm">
                           ₹{formatPrice(item.price)}
                         </span>
                         {item.originalPrice && item.originalPrice > item.price && (
-                          <span className="text-lg text-white/50 line-through">
+                          <span className="text-lg text-white/60 line-through drop-shadow-sm">
                             ₹{formatPrice(item.originalPrice)}
                           </span>
                         )}
                       </div>
                       {item.originalPrice && item.originalPrice > item.price && (
-                        <div className="text-sm text-green-300 font-medium">
+                        <div className="text-sm text-green-300 font-medium drop-shadow-sm">
                           You save ₹{formatPrice(item.originalPrice - item.price)}
                         </div>
                       )}
@@ -843,6 +846,7 @@ const Products = () => {
         <Toast
           message={toast.message}
           type={toast.type}
+          show={true}
           onClose={() => setToast(null)}
         />
       )}

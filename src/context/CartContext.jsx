@@ -82,12 +82,14 @@ export const CartProvider = ({ children }) => {
       const existingItem = cartItems.find(item => item.productId === productId);
       
       if (existingItem) {
-        // Update quantity
+        // Update quantity - increment by the specified amount
         const cartItemRef = doc(db, 'cart', existingItem.id);
+        const newQuantity = existingItem.quantity + quantity;
         await updateDoc(cartItemRef, {
-          quantity: increment(quantity),
+          quantity: newQuantity,
           updatedAt: new Date()
         });
+        return { success: true, action: 'updated', newQuantity };
       } else {
         // Add new item
         const cartItemRef = doc(collection(db, 'cart'));
@@ -98,9 +100,8 @@ export const CartProvider = ({ children }) => {
           createdAt: new Date(),
           updatedAt: new Date()
         });
+        return { success: true, action: 'added', newQuantity: quantity };
       }
-      
-      return { success: true };
     } catch (error) {
       console.error('Error adding to cart:', error);
       throw new Error('Failed to add item to cart');
@@ -163,6 +164,7 @@ export const CartProvider = ({ children }) => {
       if (existingFavorite) {
         // Remove from favorites
         await deleteDoc(doc(db, 'favorites', existingFavorite.id));
+        return { success: true, action: 'removed' };
       } else {
         // Add to favorites
         const favoriteRef = doc(collection(db, 'favorites'));
@@ -171,9 +173,8 @@ export const CartProvider = ({ children }) => {
           productId,
           createdAt: new Date()
         });
+        return { success: true, action: 'added' };
       }
-      
-      return { success: true };
     } catch (error) {
       console.error('Error toggling favorite:', error);
       throw new Error('Failed to update favorites');
