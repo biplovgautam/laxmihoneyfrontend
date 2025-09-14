@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { collection, query, where, limit, getDocs } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { getOptimizedImageUrl } from '../config/cloudinary';
@@ -247,14 +248,16 @@ const Hero = () => {
                   )}
                 </div>
                 <div className="flex gap-3">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="btn-primary flex items-center gap-2"
-                  >
-                    <FaShoppingCart className="w-4 h-4" />
-                    Order Now
-                  </motion.button>
+                  <Link to={`/product/${activeData.id}`}>
+                    <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="btn-primary flex items-center gap-2 cursor-pointer"
+                    >
+                      <FaShoppingCart className="w-4 h-4" />
+                      Order Now
+                    </motion.div>
+                  </Link>
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
