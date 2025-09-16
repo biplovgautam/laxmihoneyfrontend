@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import loginposter from '@assets/loginposter2.png';
 import { FcGoogle } from 'react-icons/fc';
 import { Link, useNavigate } from 'react-router-dom';
+import { LottieLoader } from '../LoadingSpinner';
 import { useAuth } from '../../context/AuthContext';
 
 const Login = () => {
@@ -122,7 +123,7 @@ const Login = () => {
               />
               {checkingEmail && (
                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                  <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                  <LottieLoader size="small" showText={false} className="w-4 h-4" />
                 </div>
               )}
               {emailExists === false && email.includes('@') && (

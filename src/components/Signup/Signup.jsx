@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FcGoogle } from 'react-icons/fc';
-import { FaSpinner } from 'react-icons/fa';
+import { LottieLoader } from '../LoadingSpinner';
 import { useAuth } from '../../context/AuthContext';
 import signupPoster from '../../assets/loginposter2.png';
 import EmailExistsModal from '../EmailExistsModal';
@@ -193,7 +193,7 @@ const Signup = () => {
                   />
                   {checkingEmail && (
                     <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                      <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                      <LottieLoader size="small" showText={false} className="w-4 h-4" />
                     </div>
                   )}
                   {emailExists === true && email.includes('@') && (
@@ -283,7 +283,7 @@ const Signup = () => {
                   >
                     {loading ? (
                       <div className="flex items-center justify-center">
-                        <FaSpinner className="animate-spin mr-2" />
+                        <LottieLoader size="small" showText={false} className="mr-2 w-5 h-5" />
                         Creating Account...
                       </div>
                     ) : (
@@ -308,7 +308,7 @@ const Signup = () => {
             >
               {loading ? (
                 <div className="flex items-center justify-center">
-                  <FaSpinner className="animate-spin mr-3 text-[#f37623]" />
+                  <LottieLoader size="small" showText={false} className="mr-3 w-5 h-5" />
                   Creating Account...
                 </div>
               ) : (

@@ -298,7 +298,7 @@ const Contact = () => {
                         : 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 shadow-lg hover:shadow-xl'
                     } text-white`}
                   >
-                    {isSubmitting ? (
+                                        {isSubmitting ? (
                       <>
                         <LottieLoader size="small" showText={false} className="w-5 h-5" />
                         <span>Sending...</span>

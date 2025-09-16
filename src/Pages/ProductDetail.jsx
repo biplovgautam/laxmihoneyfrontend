@@ -25,6 +25,7 @@ import { getOptimizedImageUrl } from '../config/cloudinary';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { LottieLoader } from '../components/LoadingSpinner';
+import dataPreloader from '../services/dataPreloader';
 import Toast from '../components/Toast';
 
 const ProductDetail = () => {
@@ -53,7 +54,21 @@ const ProductDetail = () => {
   const fetchProductDetail = async () => {
     try {
       setLoading(true);
-      console.log('Fetching product with ID:', productId);
+      
+      // First try to get from preloaded data
+      const preloadedProducts = dataPreloader.getProducts();
+      if (preloadedProducts && preloadedProducts.length > 0) {
+        const cachedProduct = preloadedProducts.find(p => p.id === productId);
+        if (cachedProduct) {
+          console.log('✅ Using cached product data');
+          setProduct(cachedProduct);
+          setLoading(false);
+          return;
+        }
+      }
+
+      // Fallback to API
+      console.log('🔄 Fetching product with ID:', productId);
       const productDoc = await getDoc(doc(db, 'products', productId));
       
       if (productDoc.exists()) {
