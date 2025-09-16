@@ -8,6 +8,7 @@ import { db } from '../config/firebase';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { getOptimizedImageUrl } from '../config/cloudinary';
+import { LottieLoader } from '../components/LoadingSpinner';
 import Toast from '../components/Toast';
 
 const Cart = () => {
@@ -131,10 +132,18 @@ const Cart = () => {
   if (loading || loadingProducts) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-orange-100 via-amber-50 to-yellow-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-amber-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading your cart...</p>
-        </div>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+          className="text-center"
+        >
+          <LottieLoader 
+            size="large" 
+            text="Preparing your shopping cart..." 
+            className="text-gray-600"
+          />
+        </motion.div>
       </div>
     );
   }

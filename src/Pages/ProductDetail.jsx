@@ -24,6 +24,7 @@ import { db } from '../config/firebase';
 import { getOptimizedImageUrl } from '../config/cloudinary';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import { LottieLoader } from '../components/LoadingSpinner';
 import Toast from '../components/Toast';
 
 const ProductDetail = () => {
@@ -181,10 +182,18 @@ const ProductDetail = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-amber-600 via-orange-500 to-amber-500 flex items-center justify-center pt-16">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-white/80 mx-auto mb-3"></div>
-          <p className="text-white/80 text-base">Loading product details...</p>
-        </div>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+          className="text-center"
+        >
+          <LottieLoader 
+            size="large" 
+            text="Loading product details..." 
+            className="text-white"
+          />
+        </motion.div>
       </div>
     );
   }

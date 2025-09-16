@@ -6,6 +6,7 @@ import { getOptimizedImageUrl } from '../config/cloudinary';
 import { FaWhatsapp, FaStar, FaLeaf, FaHeart, FaShoppingCart, FaChevronDown } from "react-icons/fa";
 import { HiSparkles, HiBadgeCheck } from "react-icons/hi";
 import { AnimatePresence, easeInOut, motion } from "framer-motion";
+import { LottieLoader } from './LoadingSpinner';
 import logoFallback from '../assets/logo4.png';
 
 const SlideRight = (delay) => {
@@ -130,7 +131,18 @@ const Hero = () => {
   if (loading) {
     return (
       <main className="bg-gradient-to-br from-amber-600 via-orange-500 to-amber-500 min-h-screen relative overflow-hidden flex items-center justify-center">
-        <div className="text-white text-xl">Loading featured products...</div>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="text-center"
+        >
+          <LottieLoader 
+            size="xlarge" 
+            text="Discovering our finest honey products..." 
+            className="text-white"
+          />
+        </motion.div>
       </main>
     );
   }

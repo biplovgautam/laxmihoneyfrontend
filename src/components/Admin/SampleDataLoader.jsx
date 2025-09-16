@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { collection, addDoc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { PlusIcon } from '@heroicons/react/24/outline';
+import { LottieLoader } from '../LoadingSpinner';
 import Toast from '../Toast';
 
 const SampleDataLoader = () => {
@@ -171,7 +172,16 @@ const SampleDataLoader = () => {
         className="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 disabled:opacity-50"
       >
         <PlusIcon className="h-5 w-5" />
-        <span>{loading ? 'Adding Sample Data...' : 'Add Sample Data'}</span>
+        <span>
+          {loading ? (
+            <div className="flex items-center space-x-2">
+              <LottieLoader size="small" showText={false} className="w-4 h-4" />
+              <span>Adding Sample Data...</span>
+            </div>
+          ) : (
+            'Add Sample Data'
+          )}
+        </span>
       </motion.button>
 
       {toast && (

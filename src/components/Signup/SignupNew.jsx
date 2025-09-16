@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FcGoogle } from 'react-icons/fc';
-import { FaEye, FaEyeSlash, FaCheck, FaSpinner } from 'react-icons/fa';
+import { FaEye, FaEyeSlash, FaCheck } from 'react-icons/fa';
+import { LottieLoader } from '../LoadingSpinner';
 import { useAuth } from '../../context/AuthContext';
 import signupPoster from '@assets/loginposter2.png';
 
@@ -255,7 +256,7 @@ const Signup = () => {
                       />
                       <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
                         {emailValidation.checking ? (
-                          <FaSpinner className="animate-spin text-gray-400" />
+                          <LottieLoader size="small" showText={false} className="w-4 h-4" />
                         ) : emailValidation.valid ? (
                           <FaCheck className="text-green-500" />
                         ) : null}
@@ -301,7 +302,7 @@ const Signup = () => {
                         />
                         <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
                           {phoneValidation.checking ? (
-                            <FaSpinner className="animate-spin text-gray-400" />
+                            <LottieLoader size="small" showText={false} className="w-4 h-4" />
                           ) : phoneValidation.valid ? (
                             <FaCheck className="text-green-500" />
                           ) : null}
@@ -370,7 +371,7 @@ const Signup = () => {
                     >
                       {loading ? (
                         <div className="flex items-center justify-center">
-                          <FaSpinner className="animate-spin mr-2" />
+                          <LottieLoader size="small" showText={false} className="mr-2 w-5 h-5" />
                           Creating Account...
                         </div>
                       ) : (

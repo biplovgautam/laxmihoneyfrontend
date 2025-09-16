@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FaPhone, FaEnvelope, FaMapMarkerAlt, FaWhatsapp, FaFacebook, FaInstagram, FaPaperPlane } from 'react-icons/fa';
 import { HiSparkles } from 'react-icons/hi';
+import { LottieLoader } from '../components/LoadingSpinner';
 
 const Contact = () => {
   const [formData, setFormData] = useState({

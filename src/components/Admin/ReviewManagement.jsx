@@ -21,6 +21,7 @@ import {
   ChatBubbleLeftEllipsisIcon
 } from '@heroicons/react/24/outline';
 import { StarIcon as StarSolid } from '@heroicons/react/24/solid';
+import { LottieLoader } from '../LoadingSpinner';
 import Toast from '../Toast';
 
 const ReviewManagement = ({ productId }) => {
@@ -163,7 +164,7 @@ const ReviewManagement = ({ productId }) => {
       {/* Reviews List */}
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500"></div>
+          <LottieLoader size="medium" text="Loading reviews..." />
         </div>
       ) : reviews.length === 0 ? (
         <div className="text-center py-12">

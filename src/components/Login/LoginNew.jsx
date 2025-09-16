@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FcGoogle } from 'react-icons/fc';
-import { FaEye, FaEyeSlash, FaSpinner } from 'react-icons/fa';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { LottieLoader } from '../LoadingSpinner';
 import { useAuth } from '../../context/AuthContext';
 import loginposter from '../../assets/loginposter2.png';
 
@@ -194,7 +195,7 @@ const Login = () => {
               >
                 {loading ? (
                   <div className="flex items-center justify-center">
-                    <FaSpinner className="animate-spin mr-2" />
+                    <LottieLoader size="small" showText={false} className="mr-2 w-5 h-5" />
                     Signing In...
                   </div>
                 ) : (

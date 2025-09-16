@@ -20,6 +20,7 @@ import {
   XMarkIcon,
   CloudArrowUpIcon
 } from '@heroicons/react/24/outline';
+import { LottieLoader } from '../LoadingSpinner';
 import Toast from '../Toast';
 
 const ProductManagement = () => {
@@ -272,7 +273,7 @@ const ProductManagement = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500"></div>
+        <LottieLoader size="medium" text="Loading products..." />
       </div>
     );
   }

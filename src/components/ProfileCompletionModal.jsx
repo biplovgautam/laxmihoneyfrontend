@@ -3,9 +3,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { doc, collection, query, where, getDocs, updateDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
-import { FaUser, FaPhone, FaMapMarkerAlt, FaCity, FaCheck, FaSpinner } from 'react-icons/fa';
+import { FaUser, FaPhone, FaMapMarkerAlt, FaCity, FaCheck } from 'react-icons/fa';
 import { MdPhone } from 'react-icons/md';
 import { HiSparkles } from 'react-icons/hi';
+import { LottieLoader } from './LoadingSpinner';
 
 const ProfileCompletionModal = ({ isOpen, onClose }) => {
   const { user, markProfileComplete, skipProfileCompletion } = useAuth();
@@ -313,7 +314,7 @@ const ProfileCompletionModal = ({ isOpen, onClose }) => {
                     />
                     {checkingPhone && (
                       <div className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2">
-                        <FaSpinner className="animate-spin text-amber-500 text-sm sm:text-base" />
+                        <LottieLoader size="small" showText={false} className="w-4 h-4" />
                       </div>
                     )}
                   </div>
@@ -419,7 +420,7 @@ const ProfileCompletionModal = ({ isOpen, onClose }) => {
                 >
                   {loading ? (
                     <>
-                      <FaSpinner className="animate-spin" />
+                      <LottieLoader size="small" showText={false} className="w-4 h-4" />
                       <span>Saving...</span>
                     </>
                   ) : (

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaSpinner, FaCheck } from 'react-icons/fa';
+import { FaCheck } from 'react-icons/fa';
+import { LottieLoader } from './LoadingSpinner';
 import { useAuth } from '../context/AuthContext';
 
 const PhoneNumberModal = ({ isOpen, onClose }) => {
@@ -107,7 +108,7 @@ const PhoneNumberModal = ({ isOpen, onClose }) => {
                   >
                     {loading ? (
                       <div className="flex items-center justify-center">
-                        <FaSpinner className="animate-spin mr-2" />
+                        <LottieLoader size="small" text="" showText={false} className="mr-2" />
                         Saving...
                       </div>
                     ) : (

@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
 import Navbar from "./components/Navbar";
+import SplashScreen from "./components/SplashScreen";
 import Home from "./Pages/Home";
 import Products from "./Pages/Products";
 import ProductDetail from "./Pages/ProductDetail";
@@ -18,11 +19,39 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import ProfileCompletionModal from "./components/ProfileCompletionModal";
 
 const AppContent = () => {
-  const { needsPhoneNumber, setNeedsPhoneNumber, needsProfileCompletion, skipProfileCompletion } = useAuth();
+  const { needsPhoneNumber, setNeedsPhoneNumber, needsProfileCompletion, skipProfileCompletion, loading } = useAuth();
   const location = useLocation();
+  const [showSplash, setShowSplash] = useState(true);
+  const [appReady, setAppReady] = useState(false);
   
   // Don't show navbar on login/signup pages and admin page
   const hideNavbar = ['/login', '/signup', '/admin'].includes(location.pathname);
+
+  // Handle splash screen completion
+  const handleSplashComplete = () => {
+    setShowSplash(false);
+    setAppReady(true);
+  };
+
+  // Show splash screen for first-time visitors or when auth is loading
+  useEffect(() => {
+    const hasVisited = localStorage.getItem('hasVisitedLaxmiHoney');
+    if (hasVisited && !loading) {
+      // If user has visited before and auth is not loading, skip splash
+      setShowSplash(false);
+      setAppReady(true);
+    } else if (!hasVisited) {
+      // Mark as visited after splash screen
+      setTimeout(() => {
+        localStorage.setItem('hasVisitedLaxmiHoney', 'true');
+      }, 3000);
+    }
+  }, [loading]);
+
+  // Show splash screen during initial load
+  if (showSplash || !appReady) {
+    return <SplashScreen onComplete={handleSplashComplete} />;
+  }
 
   return (
     <>
