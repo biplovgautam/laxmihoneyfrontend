@@ -300,7 +300,7 @@ const Contact = () => {
                   >
                     {isSubmitting ? (
                       <>
-                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <LottieLoader size="small" showText={false} className="w-5 h-5" />
                         <span>Sending...</span>
                       </>
                     ) : (

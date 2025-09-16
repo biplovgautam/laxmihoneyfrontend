@@ -5,7 +5,6 @@ import {
   FaShoppingBag, 
   FaCog, 
   FaEdit, 
-  FaSpinner, 
   FaStar, 
   FaEye,
   FaPhone,
@@ -24,6 +23,7 @@ import { MdAlternateEmail, MdPhone, MdLocationCity } from 'react-icons/md';
 import { HiSparkles, HiLocationMarker } from 'react-icons/hi';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { LottieLoader } from '../components/LoadingSpinner';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import Navbar from '../components/Navbar';
@@ -552,7 +552,7 @@ const Account = () => {
                         className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
                       >
                         {saveLoading ? (
-                          <FaSpinner className="w-4 h-4 animate-spin" />
+                          <LottieLoader size="small" showText={false} className="w-4 h-4" />
                         ) : (
                           <FaSave className="w-4 h-4" />
                         )}

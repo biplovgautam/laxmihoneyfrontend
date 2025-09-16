@@ -7,6 +7,7 @@ import { FaWhatsapp, FaStar, FaLeaf, FaHeart, FaShoppingCart, FaChevronDown } fr
 import { HiSparkles, HiBadgeCheck } from "react-icons/hi";
 import { AnimatePresence, easeInOut, motion } from "framer-motion";
 import { LottieLoader } from './LoadingSpinner';
+import dataPreloader from '../services/dataPreloader';
 import logoFallback from '../assets/logo4.png';
 
 const SlideRight = (delay) => {
@@ -68,6 +69,20 @@ const Hero = () => {
   useEffect(() => {
     const fetchFeaturedProducts = async () => {
       try {
+        // First try to get preloaded data
+        const preloadedFeatured = dataPreloader.getFeaturedProducts();
+        
+        if (preloadedFeatured && preloadedFeatured.length > 0) {
+          console.log('✅ Using preloaded featured products');
+          const products = preloadedFeatured.slice(0, 3); // Take first 3
+          setFeaturedProducts(products);
+          setActiveData(products[0]);
+          setLoading(false);
+          return;
+        }
+
+        // Fallback to API if no preloaded data
+        console.log('🔄 Fetching featured products from API...');
         // First try to get featured products
         const featuredQuery = query(
           collection(db, 'products'),

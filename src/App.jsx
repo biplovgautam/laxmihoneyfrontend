@@ -36,15 +36,26 @@ const AppContent = () => {
   // Show splash screen for first-time visitors or when auth is loading
   useEffect(() => {
     const hasVisited = localStorage.getItem('hasVisitedLaxmiHoney');
-    if (hasVisited && !loading) {
-      // If user has visited before and auth is not loading, skip splash
-      setShowSplash(false);
-      setAppReady(true);
-    } else if (!hasVisited) {
+    const sessionStartTime = sessionStorage.getItem('sessionStartTime');
+    const now = Date.now();
+    
+    // Show splash if:
+    // 1. First-time visitor
+    // 2. New session (session storage cleared)
+    // 3. Auth is still loading
+    if (!hasVisited || !sessionStartTime || loading) {
+      if (!sessionStartTime) {
+        sessionStorage.setItem('sessionStartTime', now.toString());
+      }
+      
       // Mark as visited after splash screen
       setTimeout(() => {
         localStorage.setItem('hasVisitedLaxmiHoney', 'true');
       }, 3000);
+    } else {
+      // If user has visited before and auth is not loading, skip splash
+      setShowSplash(false);
+      setAppReady(true);
     }
   }, [loading]);
 

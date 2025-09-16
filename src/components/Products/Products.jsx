@@ -9,6 +9,7 @@ import { getOptimizedImageUrl } from '../../config/cloudinary';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import { LottieLoader } from '../LoadingSpinner';
+import dataPreloader from '../../services/dataPreloader';
 import OrderButton from "../OrderButton";
 import Toast from "../Toast";
 
@@ -148,7 +149,20 @@ const Products = () => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      console.log('Fetching products...');
+      
+      // First try to get preloaded data
+      const preloadedProducts = dataPreloader.getProducts();
+      
+      if (preloadedProducts && preloadedProducts.length > 0) {
+        console.log('✅ Using preloaded products');
+        setProducts(preloadedProducts);
+        setFilteredProducts(preloadedProducts);
+        setLoading(false);
+        return;
+      }
+
+      // Fallback to API if no preloaded data
+      console.log('🔄 Fetching products from API...');
       const q = query(collection(db, 'products'));
       const querySnapshot = await getDocs(q);
       

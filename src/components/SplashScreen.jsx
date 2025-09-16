@@ -2,34 +2,86 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { HiSparkles } from 'react-icons/hi';
+import dataPreloader from '../services/dataPreloader';
 
 const SplashScreen = ({ onComplete }) => {
   const [showSplash, setShowSplash] = useState(true);
   const [progress, setProgress] = useState(0);
+  const [loadingText, setLoadingText] = useState('Initializing...');
+  const [dataPreloaded, setDataPreloaded] = useState(false);
 
   useEffect(() => {
-    // Simulate loading progress
-    const progressInterval = setInterval(() => {
+    let progressInterval;
+    let textUpdateInterval;
+    
+    const loadingTexts = [
+      'Initializing...',
+      'Loading honey products...',
+      'Fetching featured items...',
+      'Optimizing your experience...',
+      'Almost ready...'
+    ];
+
+    // Start data preloading immediately
+    const preloadData = async () => {
+      try {
+        await dataPreloader.preloadEssentialData();
+        setDataPreloaded(true);
+        setLoadingText('Data loaded successfully!');
+      } catch (error) {
+        console.error('Preloading failed:', error);
+        setDataPreloaded(true); // Continue anyway
+        setLoadingText('Ready to explore!');
+      }
+    };
+
+    preloadData();
+
+    // Update loading text periodically
+    let textIndex = 0;
+    textUpdateInterval = setInterval(() => {
+      textIndex = (textIndex + 1) % loadingTexts.length;
+      setLoadingText(loadingTexts[textIndex]);
+    }, 600);
+
+    // Simulate realistic progress
+    progressInterval = setInterval(() => {
       setProgress(prev => {
         if (prev >= 100) {
           clearInterval(progressInterval);
           return 100;
         }
-        return prev + Math.random() * 15 + 5; // Random progress increments
+        
+        // Faster progress if data is already loaded
+        const increment = dataPreloaded ? 20 : Math.random() * 15 + 5;
+        return Math.min(prev + increment, 100);
       });
     }, 200);
 
-    // Show splash for exactly 3 seconds
+    // Ensure minimum 3-second display
+    const minDisplayTime = 3000;
     const timer = setTimeout(() => {
-      setShowSplash(false);
-      setTimeout(onComplete, 500); // Wait for exit animation
-    }, 3000);
+      // Only complete if data is loaded and progress is 100%
+      if (dataPreloaded && progress >= 95) {
+        setShowSplash(false);
+        setTimeout(onComplete, 500); // Wait for exit animation
+      } else {
+        // Wait a bit more if needed
+        const extraWait = setTimeout(() => {
+          setShowSplash(false);
+          setTimeout(onComplete, 500);
+        }, 1000);
+        
+        return () => clearTimeout(extraWait);
+      }
+    }, minDisplayTime);
 
     return () => {
       clearTimeout(timer);
       clearInterval(progressInterval);
+      clearInterval(textUpdateInterval);
     };
-  }, [onComplete]);
+  }, [onComplete, dataPreloaded, progress]);
 
   return (
     <AnimatePresence>
@@ -92,9 +144,16 @@ const SplashScreen = ({ onComplete }) => {
               transition={{ duration: 0.6, delay: 0.8 }}
               className="mb-6"
             >
-              <p className="text-white/90 text-lg font-medium mb-3">
-                Preparing your honey experience...
-              </p>
+              <motion.p
+                key={loadingText}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
+                className="text-white/90 text-lg font-medium mb-3"
+              >
+                {loadingText}
+              </motion.p>
               
               {/* Progress bar */}
               <div className="w-64 mx-auto bg-white/20 rounded-full h-2 overflow-hidden">
@@ -114,6 +173,19 @@ const SplashScreen = ({ onComplete }) => {
               >
                 {Math.round(Math.min(progress, 100))}% Complete
               </motion.p>
+              
+              {/* Loading status indicator */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.5 }}
+                className="flex items-center justify-center mt-3 space-x-2"
+              >
+                <div className={`w-2 h-2 rounded-full ${dataPreloaded ? 'bg-green-400' : 'bg-yellow-400'} animate-pulse`} />
+                <span className="text-white/60 text-xs">
+                  {dataPreloaded ? 'Data Ready' : 'Loading Data'}
+                </span>
+              </motion.div>
             </motion.div>
 
             {/* Floating honey drops */}
