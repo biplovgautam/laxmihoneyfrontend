@@ -15,6 +15,7 @@ import Signup from "./Pages/Signup";
 import Account from "./Pages/Account";
 import Cart from "./Pages/Cart";
 import AdminPanel from "./components/AdminPanel";
+import NotFound from "./Pages/NotFound";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import ProfileCompletionModal from "./components/ProfileCompletionModal";
 
@@ -24,8 +25,14 @@ const AppContent = () => {
   const [showSplash, setShowSplash] = useState(true);
   const [appReady, setAppReady] = useState(false);
   
-  // Don't show navbar on login/signup pages and admin page
-  const hideNavbar = ['/login', '/signup', '/admin'].includes(location.pathname);
+  // Define valid routes
+  const validRoutes = ['/', '/login', '/signup', '/products', '/contact', '/about', '/blogs', '/cart', '/account', '/admin'];
+  
+  // Check if current path is a valid route or starts with /product/ (for product detail pages)
+  const isValidRoute = validRoutes.includes(location.pathname) || location.pathname.startsWith('/product/');
+  
+  // Don't show navbar on login/signup pages, admin page, and 404 page
+  const hideNavbar = ['/login', '/signup', '/admin'].includes(location.pathname) || !isValidRoute;
 
   // Handle splash screen completion
   const handleSplashComplete = () => {
@@ -101,7 +108,7 @@ const AppContent = () => {
               </ProtectedRoute>
             } 
           />
-          <Route path="*" element={<div className="p-8 text-center">404 - Page Not Found</div>} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
 
         {/* Modals - Only show ProfileCompletionModal (handles both phone and address) */}
