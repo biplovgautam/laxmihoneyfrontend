@@ -104,7 +104,7 @@ const HoneyBenefits = () => {
       </div>
 
       {/* Content */}
-      <div className="container-modern relative z-10 py-16 md:py-24">
+      <div className="container-modern relative z-10 py-20 md:py-32">
         
         {/* Header Section */}
         <motion.div
@@ -112,118 +112,116 @@ const HoneyBenefits = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="text-center mb-12 md:mb-16"
+          className="text-center mb-16 md:mb-20"
         >
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <GiHoneypot className="w-8 h-8 md:w-10 md:h-10 text-amber-400 animate-bounce-gentle drop-shadow-lg" />
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white drop-shadow-2xl">
-              Nature's Golden Elixir
-            </h2>
-            <GiBee className="w-8 h-8 md:w-10 md:h-10 text-amber-400 animate-bounce-gentle drop-shadow-lg" />
-          </div>
-          <p className="text-base md:text-lg text-white/95 max-w-3xl mx-auto leading-relaxed px-4 drop-shadow-lg">
-            Discover the incredible health benefits of pure honey and the vital role bees play in our ecosystem. 
-            Every jar supports sustainable beekeeping and environmental conservation.
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white drop-shadow-2xl mb-6">
+            The Power of Pure Honey
+          </h2>
+          <p className="text-lg md:text-xl text-white/95 max-w-3xl mx-auto leading-relaxed px-4 drop-shadow-lg">
+            Nature's perfect food - packed with nutrients, energy, and healing properties that have sustained humanity for thousands of years.
           </p>
         </motion.div>
 
-        {/* Health Benefits Section */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="mb-16 md:mb-20"
-        >
-          <div className="flex items-center justify-center gap-3 mb-8">
-            <div className="h-[2px] w-12 md:w-20 bg-gradient-to-r from-transparent to-white"></div>
-            <h3 className="text-2xl md:text-3xl font-bold text-white drop-shadow-xl flex items-center gap-2">
-              <FaHeart className="w-6 h-6 text-red-400 drop-shadow-lg" />
-              Health Benefits
-            </h3>
-            <div className="h-[2px] w-12 md:w-20 bg-gradient-to-l from-transparent to-white"></div>
-          </div>
+        {/* Two Column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
+          
+          {/* Health Benefits */}
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+          >
+            <div className="mb-8">
+              <h3 className="text-2xl md:text-3xl font-bold text-white drop-shadow-xl mb-3 flex items-center gap-3">
+                <GiHoneypot className="w-7 h-7 text-amber-400" />
+                Health Benefits
+              </h3>
+              <div className="h-[2px] w-20 bg-amber-400"></div>
+            </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
-            {healthBenefits.map((benefit, index) => (
-              <motion.div
-                key={index}
-                variants={itemVariants}
-                whileHover={{ scale: 1.05, y: -5 }}
-                className="bg-white/90 backdrop-blur-md rounded-2xl p-6 shadow-2xl hover:shadow-3xl transition-all duration-300 border border-white/30 group"
-              >
-                <div className="flex flex-col items-center text-center space-y-4">
-                  <div className="p-4 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl text-white group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                    {benefit.icon}
+            <div className="space-y-6">
+              {healthBenefits.map((benefit, index) => (
+                <motion.div
+                  key={index}
+                  variants={itemVariants}
+                  whileHover={{ x: 10 }}
+                  className="bg-white/95 backdrop-blur-sm rounded-xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-white/40"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg flex items-center justify-center text-white">
+                      {benefit.icon}
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="text-lg font-bold text-gray-900 mb-2">
+                        {benefit.title}
+                      </h4>
+                      <p className="text-sm text-gray-700 leading-relaxed">
+                        {benefit.description}
+                      </p>
+                    </div>
                   </div>
-                  <h4 className="text-lg font-bold text-gray-900">
-                    {benefit.title}
-                  </h4>
-                  <p className="text-sm text-gray-700 leading-relaxed">
-                    {benefit.description}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
 
-        {/* Divider with Honey Jar Icon */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="flex items-center justify-center my-12 md:my-16"
-        >
-          <div className="h-[2px] flex-1 bg-gradient-to-r from-transparent via-amber-400 to-transparent max-w-xs"></div>
-          <div className="mx-6 p-4 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full shadow-xl">
-            <GiHoneyJar className="w-8 h-8 text-white animate-pulse" />
-          </div>
-          <div className="h-[2px] flex-1 bg-gradient-to-r from-transparent via-amber-400 to-transparent max-w-xs"></div>
-        </motion.div>
+          {/* Environmental Impact */}
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+          >
+            <div className="mb-8">
+              <h3 className="text-2xl md:text-3xl font-bold text-white drop-shadow-xl mb-3 flex items-center gap-3">
+                <GiBee className="w-7 h-7 text-amber-400" />
+                Environmental Impact
+              </h3>
+              <div className="h-[2px] w-20 bg-green-400"></div>
+            </div>
 
-        {/* Environment Benefits Section */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="mb-12"
-        >
-          <div className="flex items-center justify-center gap-3 mb-8">
-            <div className="h-[2px] w-12 md:w-20 bg-gradient-to-r from-transparent to-white"></div>
-            <h3 className="text-2xl md:text-3xl font-bold text-white drop-shadow-xl flex items-center gap-2">
-              <FaLeaf className="w-6 h-6 text-green-400 drop-shadow-lg" />
-              Bees & Environment
-            </h3>
-            <div className="h-[2px] w-12 md:w-20 bg-gradient-to-l from-transparent to-white"></div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 mb-8">
-            {environmentBenefits.map((benefit, index) => (
-              <motion.div
-                key={index}
-                variants={itemVariants}
-                whileHover={{ scale: 1.05, y: -5 }}
-                className="bg-white/90 backdrop-blur-md rounded-2xl p-6 shadow-2xl hover:shadow-3xl transition-all duration-300 border border-white/30 group"
-              >
-                <div className="flex flex-col items-center text-center space-y-4">
-                  <div className="p-4 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl text-white group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                    {benefit.icon}
+            <div className="space-y-6">
+              {environmentBenefits.map((benefit, index) => (
+                <motion.div
+                  key={index}
+                  variants={itemVariants}
+                  whileHover={{ x: 10 }}
+                  className="bg-white/95 backdrop-blur-sm rounded-xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-white/40"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center text-white">
+                      {benefit.icon}
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="text-lg font-bold text-gray-900 mb-2">
+                        {benefit.title}
+                      </h4>
+                      <p className="text-sm text-gray-700 leading-relaxed">
+                        {benefit.description}
+                      </p>
+                    </div>
                   </div>
-                  <h4 className="text-lg font-bold text-gray-900">
-                    {benefit.title}
-                  </h4>
-                  <p className="text-sm text-gray-700 leading-relaxed">
-                    {benefit.description}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+
+        </div>
+
+        {/* Bottom Message */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="mt-16 text-center"
+        >
+          <div className="inline-flex items-center gap-3 px-8 py-4 bg-white/20 backdrop-blur-md rounded-full border border-white/30">
+            <FaCheckCircle className="w-5 h-5 text-green-400" />
+            <span className="text-white font-medium text-sm md:text-base">Every jar supports sustainable beekeeping & environmental conservation</span>
           </div>
         </motion.div>
-
 
       </div>
 

@@ -13,5 +13,6 @@ export default defineConfig({
       '@assets': '/src/assets', // Alias for assets folder
     },
   },
+  assetsInclude: ['**/*.JPG', '**/*.JPEG', '**/*.PNG', '**/*.GIF', '**/*.SVG'],
   plugins: [react()],
 });

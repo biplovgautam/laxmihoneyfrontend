@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FaPhone, FaEnvelope, FaMapMarkerAlt, FaWhatsapp, FaFacebook, FaInstagram, FaPaperPlane } from 'react-icons/fa';
-import { HiSparkles } from 'react-icons/hi';
-import { LottieLoader } from '../components/LoadingSpinner';
+import { GiHoneypot } from 'react-icons/gi';
+import galleryImage from '../assets/gallery/SAM_1383.JPG';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -14,9 +14,10 @@ const Contact = () => {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value} = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -29,7 +30,7 @@ const Contact = () => {
     
     // Simulate form submission
     setTimeout(() => {
-      alert('Thank you for your message! We will get back to you soon.');
+      setSubmitSuccess(true);
       setFormData({
         name: '',
         email: '',
@@ -38,191 +39,215 @@ const Contact = () => {
         message: ''
       });
       setIsSubmitting(false);
-    }, 2000);
+      
+      setTimeout(() => setSubmitSuccess(false), 3000);
+    }, 1500);
   };
 
-  const fadeInUp = {
-    hidden: { opacity: 0, y: 60 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: { duration: 0.6, ease: "easeOut" }
-    }
+  const handleWhatsAppClick = () => {
+    const phoneNumber = "+9779819492581";
+    const message = "Hi! I have a question about Laxmi Honey products.";
+    const whatsappUrl = `https://wa.me/${phoneNumber.replace(/[+\s]/g, '')}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
   };
 
-  const staggerChildren = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2
-      }
+  const contactInfo = [
+    {
+      icon: <FaPhone className="w-5 h-5" />,
+      title: "Phone",
+      content: "+977 98-19492581",
+      link: "tel:+9779819492581"
+    },
+    {
+      icon: <FaEnvelope className="w-5 h-5" />,
+      title: "Email",
+      content: "info@laxmihoney.com",
+      link: "mailto:info@laxmihoney.com"
+    },
+    {
+      icon: <FaMapMarkerAlt className="w-5 h-5" />,
+      title: "Location",
+      content: "Kathmandu, Nepal",
+      link: null
     }
-  };
+  ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-600 via-orange-500 to-amber-500 relative overflow-hidden">
-      {/* Animated Background Elements */}
-      <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-white/5 rounded-full animate-pulse"></div>
-      <div className="absolute bottom-1/3 right-1/4 w-24 h-24 bg-white/5 rounded-full animate-pulse delay-1000"></div>
-      <div className="absolute top-1/2 right-1/3 w-16 h-16 bg-white/5 rounded-full animate-pulse delay-2000"></div>
-      
-      {/* Hero Section */}
-      <section className="pt-32 pb-16 relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-amber-300/20 to-orange-400/20 rounded-full blur-3xl -translate-x-48 -translate-y-48"></div>
-        <div className="absolute bottom-0 right-0 w-80 h-80 bg-gradient-to-br from-orange-300/20 to-amber-400/20 rounded-full blur-3xl translate-x-40 translate-y-40"></div>
+    <div className="min-h-screen bg-[#fffef8]">
+      {/* Hero Section with Background Image */}
+      <section className="relative min-h-[60vh] flex items-center overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0 z-0">
+          <img 
+            src={galleryImage} 
+            alt="Contact Laxmi Honey" 
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-amber-900/85 via-orange-800/90 to-amber-900/85"></div>
+        </div>
         
-        <div className="container-modern relative z-10">
+        <div className="container-modern pt-32 pb-16 relative z-10">
           <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={fadeInUp}
-            className="text-center mb-16"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-center max-w-3xl mx-auto"
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 rounded-full text-white text-sm font-medium mb-6">
               <FaEnvelope className="w-4 h-4" />
               <span>Get in Touch</span>
-              <HiSparkles className="w-4 h-4" />
             </div>
             
-            <h1 className="text-4xl lg:text-6xl font-bold text-white mb-6">
-              <span className="bg-gradient-to-r from-white to-amber-100 bg-clip-text text-transparent">
-                Contact Us
-              </span>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 drop-shadow-2xl">
+              Contact Us
             </h1>
             
-            <p className="text-lg text-white/90 max-w-2xl mx-auto mb-8">
-              Have questions about our honey products or need assistance with your order? 
-              We'd love to hear from you. Reach out and let's start a conversation!
+            <p className="text-lg md:text-xl text-white/95 leading-relaxed drop-shadow-lg">
+              Have questions about our honey products or need assistance? We'd love to hear from you.
             </p>
-            
-            {/* Decorative lines */}
-            <div className="flex items-center justify-center gap-4">
-              <div className="w-16 md:w-20 h-[1px] bg-white/40"></div>
-              <div className="w-3 h-3 bg-amber-300 rounded-full"></div>
-              <div className="w-2 h-2 bg-white rounded-full"></div>
-              <div className="w-16 md:w-20 h-[1px] bg-white/40"></div>
-            </div>
           </motion.div>
         </div>
       </section>
 
       {/* Contact Content */}
-      <section className="pb-16 relative z-10">
+      <section className="py-20 md:py-28">
         <div className="container-modern">
-          {/* Glass morphism container */}
-          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-8 shadow-2xl">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-              
-              {/* Contact Information */}
-              <motion.div
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                variants={staggerChildren}
-                className="lg:col-span-1 space-y-8"
-              >
-                <div>
-                  <h2 className="text-2xl font-bold text-white mb-6">Let's Connect</h2>
-                  <p className="text-white/80 mb-8">
-                    Reach out to us through any of these channels. We're here to help you discover the perfect honey for your needs.
-                  </p>
-                </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            
+            {/* Contact Information */}
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="lg:col-span-1 space-y-8"
+            >
+              <div>
+                <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+                  Let's Talk
+                </h2>
+                <p className="text-gray-600 leading-relaxed">
+                  Reach out to us through any of these channels. We're here to help you discover the perfect honey for your needs.
+                </p>
+              </div>
 
-                {/* Contact Cards */}
-                <motion.div variants={fadeInUp} className="space-y-6">
-                <div className="bg-white/70 backdrop-blur-lg rounded-2xl p-6 shadow-lg border border-white/50">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl flex items-center justify-center">
-                      <FaPhone className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-800">Phone</h3>
-                      <p className="text-gray-600">+977 98-XXXXXXX</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-white/70 backdrop-blur-lg rounded-2xl p-6 shadow-lg border border-white/50">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl flex items-center justify-center">
-                      <FaEnvelope className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-800">Email</h3>
-                      <p className="text-gray-600">info@laxmihoney.com</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-white/70 backdrop-blur-lg rounded-2xl p-6 shadow-lg border border-white/50">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl flex items-center justify-center">
-                      <FaMapMarkerAlt className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-800">Location</h3>
-                      <p className="text-gray-600">Kathmandu, Nepal</p>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-
-              {/* Social Links */}
-              <motion.div variants={fadeInUp}>
-                <h3 className="font-semibold text-gray-800 mb-4">Follow Us</h3>
-                <div className="flex gap-4">
-                  <a
-                    href="#"
-                    className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center text-white hover:bg-green-600 transition-colors duration-300"
+              {/* Contact Cards */}
+              <div className="space-y-4">
+                {contactInfo.map((info, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-6 border border-amber-100 hover:shadow-lg transition-shadow duration-300"
                   >
-                    <FaWhatsapp className="w-5 h-5" />
-                  </a>
-                  <a
-                    href="#"
-                    className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white hover:bg-blue-700 transition-colors duration-300"
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg flex items-center justify-center text-white flex-shrink-0">
+                        {info.icon}
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-gray-900 mb-1">{info.title}</h3>
+                        {info.link ? (
+                          <a 
+                            href={info.link}
+                            className="text-gray-600 hover:text-amber-600 transition-colors"
+                          >
+                            {info.content}
+                          </a>
+                        ) : (
+                          <p className="text-gray-600">{info.content}</p>
+                        )}
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Social Media & WhatsApp */}
+              <div className="pt-6 border-t border-gray-200">
+                <h3 className="font-semibold text-gray-900 mb-4">Connect With Us</h3>
+                <div className="flex gap-3">
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={handleWhatsAppClick}
+                    className="w-12 h-12 bg-green-500 hover:bg-green-600 rounded-lg flex items-center justify-center text-white transition-colors"
                   >
-                    <FaFacebook className="w-5 h-5" />
-                  </a>
-                  <a
+                    <FaWhatsapp className="w-6 h-6" />
+                  </motion.button>
+                  <motion.a
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
                     href="#"
-                    className="w-12 h-12 bg-pink-500 rounded-xl flex items-center justify-center text-white hover:bg-pink-600 transition-colors duration-300"
+                    className="w-12 h-12 bg-blue-600 hover:bg-blue-700 rounded-lg flex items-center justify-center text-white transition-colors"
                   >
-                    <FaInstagram className="w-5 h-5" />
-                  </a>
+                    <FaFacebook className="w-6 h-6" />
+                  </motion.a>
+                  <motion.a
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    href="#"
+                    className="w-12 h-12 bg-gradient-to-br from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-lg flex items-center justify-center text-white transition-colors"
+                  >
+                    <FaInstagram className="w-6 h-6" />
+                  </motion.a>
                 </div>
-              </motion.div>
+              </div>
             </motion.div>
 
             {/* Contact Form */}
             <motion.div
-              initial="hidden"
-              whileInView="visible"
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              variants={fadeInUp}
+              transition={{ duration: 0.6 }}
               className="lg:col-span-2"
             >
-              <div className="bg-white/70 backdrop-blur-lg rounded-3xl p-8 shadow-xl border border-white/50">
-                <h2 className="text-2xl font-bold text-gray-800 mb-6">Send us a Message</h2>
+              <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center">
+                    <GiHoneypot className="w-6 h-6 text-white" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-gray-900">Send us a Message</h2>
+                </div>
                 
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                        Full Name *
+                        Your Name *
                       </label>
                       <input
                         type="text"
                         id="name"
                         name="name"
+                        required
                         value={formData.name}
                         onChange={handleInputChange}
-                        required
-                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-300"
-                        placeholder="Your full name"
+                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+                        placeholder="John Doe"
                       />
                     </div>
-                    
+
+                    <div>
+                      <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                        Email Address *
+                      </label>
+                      <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        required
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+                        placeholder="john@example.com"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
                         Phone Number
@@ -233,93 +258,80 @@ const Contact = () => {
                         name="phone"
                         value={formData.phone}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-300"
-                        placeholder="Your phone number"
+                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+                        placeholder="+977 98-XXXXXXX"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
+                        Subject *
+                      </label>
+                      <input
+                        type="text"
+                        id="subject"
+                        name="subject"
+                        required
+                        value={formData.subject}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+                        placeholder="Product Inquiry"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                      Email Address *
-                    </label>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-300"
-                      placeholder="your.email@example.com"
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
-                      Subject *
-                    </label>
-                    <input
-                      type="text"
-                      id="subject"
-                      name="subject"
-                      value={formData.subject}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-300"
-                      placeholder="What's this about?"
-                    />
-                  </div>
-
-                  <div>
                     <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
-                      Message *
+                      Your Message *
                     </label>
                     <textarea
                       id="message"
                       name="message"
-                      value={formData.message}
-                      onChange={handleInputChange}
                       required
                       rows={6}
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-300 resize-none"
-                      placeholder="Tell us more about your inquiry..."
+                      value={formData.message}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all resize-none"
+                      placeholder="Tell us how we can help you..."
                     />
                   </div>
+
+                  {submitSuccess && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="p-4 bg-green-50 border border-green-200 rounded-lg text-green-700"
+                    >
+                      Thank you! We'll get back to you soon.
+                    </motion.div>
+                  )}
 
                   <motion.button
                     type="submit"
                     disabled={isSubmitting}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className={`w-full flex items-center justify-center gap-3 py-4 px-6 rounded-xl font-semibold transition-all duration-300 ${
-                      isSubmitting
-                        ? 'bg-gray-400 cursor-not-allowed'
-                        : 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 shadow-lg hover:shadow-xl'
-                    } text-white`}
+                    className="w-full md:w-auto px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                                        {isSubmitting ? (
+                    {isSubmitting ? (
                       <>
-                        <LottieLoader size="small" showText={false} className="w-5 h-5" />
-                        <span>Sending...</span>
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        Sending...
                       </>
                     ) : (
                       <>
                         <FaPaperPlane className="w-4 h-4" />
-                        <span>Send Message</span>
+                        Send Message
                       </>
                     )}
                   </motion.button>
                 </form>
               </div>
             </motion.div>
-            </div>
+
           </div>
         </div>
       </section>
-      
-      {/* Bottom decorative glow */}
-      <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-96 h-96 bg-gradient-to-t from-amber-300/20 to-transparent rounded-full blur-3xl"></div>
     </div>
   );
 };
