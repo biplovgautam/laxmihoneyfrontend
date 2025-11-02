@@ -118,6 +118,9 @@ const AppContent = () => {
           onClose={() => skipProfileCompletion()} // Allow closing by skipping profile completion
         />
       </main>
+      
+      {/* Chatbot Widget - Globally available on all pages */}
+      <ChatbotWidget />
     </>
   );
 };

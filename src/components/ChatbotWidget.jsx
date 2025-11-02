@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaPaperPlane, FaTimes } from 'react-icons/fa';
-import { GiHoneypot } from 'react-icons/gi';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 const ChatbotWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -16,6 +16,7 @@ const ChatbotWidget = () => {
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
+  const chatWindowRef = useRef(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -24,6 +25,27 @@ const ChatbotWidget = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Click outside to close
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (chatWindowRef.current && !chatWindowRef.current.contains(event.target) && isOpen) {
+        // Check if click is not on the floating button
+        const floatingButton = document.getElementById('chatbot-floating-button');
+        if (floatingButton && !floatingButton.contains(event.target)) {
+          setIsOpen(false);
+        }
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]);
 
   const quickReplies = [
     "Show me honey products",
@@ -96,15 +118,17 @@ const ChatbotWidget = () => {
 
   return (
     <>
-      {/* Floating Chat Button */}
+      {/* Floating Chat Button with Lottie Animation */}
       <motion.button
+        id="chatbot-floating-button"
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 z-50 w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-transform duration-300"
+        className="fixed bottom-6 right-6 z-50 flex items-center justify-center"
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
         transition={{ type: "spring", stiffness: 260, damping: 20 }}
+        style={{ background: 'transparent', border: 'none', padding: 0 }}
       >
         <AnimatePresence mode="wait">
           {isOpen ? (
@@ -114,21 +138,28 @@ const ChatbotWidget = () => {
               animate={{ rotate: 0, opacity: 1 }}
               exit={{ rotate: 180, opacity: 0 }}
               transition={{ duration: 0.3 }}
+              className="flex items-center justify-center"
+              style={{ 
+                filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2))'
+              }}
             >
-              <FaTimes className="w-6 h-6 text-white" />
+              <FaTimes className="w-8 h-8 text-amber-600" />
             </motion.div>
           ) : (
             <motion.div
-              key="honeypot"
-              initial={{ rotate: 180, opacity: 0 }}
-              animate={{ rotate: 0, opacity: 1 }}
-              exit={{ rotate: -180, opacity: 0 }}
+              key="lottie"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="relative"
+              className="w-24 h-24"
             >
-              <GiHoneypot className="w-8 h-8 text-white" />
-              {/* Pulse animation */}
-              <span className="absolute top-0 right-0 w-3 h-3 bg-green-400 rounded-full animate-pulse"></span>
+              <DotLottieReact
+                src="https://lottie.host/e5551b86-c2f2-4f2e-80f1-a55d7640f385/VS5zzBIn9D.lottie"
+                loop
+                autoplay
+                style={{ width: '100%', height: '100%' }}
+              />
             </motion.div>
           )}
         </AnimatePresence>
@@ -138,6 +169,7 @@ const ChatbotWidget = () => {
       <AnimatePresence>
         {isOpen && (
           <motion.div
+            ref={chatWindowRef}
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -147,7 +179,14 @@ const ChatbotWidget = () => {
             {/* Header */}
             <div className="bg-gradient-to-r from-amber-500 to-orange-500 p-4 flex items-center gap-3">
               <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-                <GiHoneypot className="w-6 h-6 text-white" />
+                <div className="w-8 h-8">
+                  <DotLottieReact
+                    src="https://lottie.host/e5551b86-c2f2-4f2e-80f1-a55d7640f385/VS5zzBIn9D.lottie"
+                    loop
+                    autoplay
+                    style={{ width: '100%', height: '100%' }}
+                  />
+                </div>
               </div>
               <div className="flex-1">
                 <h3 className="text-white font-bold text-lg">Laxmi Honey</h3>
