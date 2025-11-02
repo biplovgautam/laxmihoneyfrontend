@@ -51,7 +51,7 @@ const About = () => {
               className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 rounded-full text-white text-sm font-medium mb-4"
             >
               <GiBee className="w-4 h-4" />
-              <span>Since 2010</span>
+              <span>Since 2008</span>
             </motion.div>
 
             <motion.h1

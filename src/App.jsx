@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
 import Navbar from "./components/Navbar";
 import SplashScreen from "./components/SplashScreen";
+import ChatbotWidget from "./components/ChatbotWidget";
 import Home from "./Pages/Home";
 import Products from "./Pages/Products";
 import ProductDetail from "./Pages/ProductDetail";

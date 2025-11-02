@@ -8,7 +8,7 @@ import { HiSparkles, HiBadgeCheck } from "react-icons/hi";
 import { AnimatePresence, easeInOut, motion } from "framer-motion";
 import { LottieLoader } from './LoadingSpinner';
 import dataPreloader from '../services/dataPreloader';
-import logoFallback from '../assets/logo4.png';
+import honeybackImg from '../assets/honeyback2.jpg';
 
 const SlideRight = (delay) => {
   return {
@@ -145,12 +145,22 @@ const Hero = () => {
 
   if (loading) {
     return (
-      <main className="bg-gradient-to-br from-amber-600 via-orange-500 to-amber-500 min-h-screen relative overflow-hidden flex items-center justify-center">
+      <main className="min-h-screen relative overflow-hidden flex items-center justify-center">
+        {/* Background Image */}
+        <div className="absolute inset-0 z-0">
+          <img 
+            src={honeybackImg} 
+            alt="Laxmi Honey Background" 
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-amber-900/80 via-orange-800/85 to-amber-900/80"></div>
+        </div>
+        
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5, ease: "easeOut" }}
-          className="text-center"
+          className="text-center relative z-10"
         >
           <LottieLoader 
             size="xlarge" 
@@ -164,19 +174,31 @@ const Hero = () => {
 
   if (!activeData) {
     return (
-      <main className="bg-gradient-to-br from-amber-600 via-orange-500 to-amber-500 min-h-screen relative overflow-hidden flex items-center justify-center">
-        <div className="text-white text-xl">No featured products available</div>
+      <main className="min-h-screen relative overflow-hidden flex items-center justify-center">
+        {/* Background Image */}
+        <div className="absolute inset-0 z-0">
+          <img 
+            src={honeybackImg} 
+            alt="Laxmi Honey Background" 
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-amber-900/80 via-orange-800/85 to-amber-900/80"></div>
+        </div>
+        <div className="text-white text-xl relative z-10">No featured products available</div>
       </main>
     );
   }
 
   return (
-    <main className="bg-gradient-to-br from-amber-600 via-orange-500 to-amber-500 min-h-screen relative overflow-hidden">
-      {/* Background decorative elements */}
-      <div className="absolute inset-0 opacity-30">
-        <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-white/5 rounded-full animate-pulse"></div>
-        <div className="absolute bottom-1/3 right-1/4 w-24 h-24 bg-white/5 rounded-full animate-pulse delay-1000"></div>
-        <div className="absolute top-1/2 right-1/3 w-16 h-16 bg-white/5 rounded-full animate-pulse delay-2000"></div>
+    <main className="min-h-screen relative overflow-hidden">
+      {/* Background Image with Overlay */}
+      <div className="absolute inset-0 z-0">
+        <img 
+          src={honeybackImg} 
+          alt="Laxmi Honey Background" 
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-amber-900/80 via-orange-800/85 to-amber-900/80"></div>
       </div>
       
       <div className="container-modern relative z-10">
