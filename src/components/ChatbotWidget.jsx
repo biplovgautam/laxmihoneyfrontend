@@ -18,6 +18,9 @@ const ChatbotWidget = () => {
   const messagesEndRef = useRef(null);
   const chatWindowRef = useRef(null);
 
+  // API Base URL from environment
+  const API_BASE_URL = import.meta.env.VITE_BACKEND_API_URL;
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -48,37 +51,64 @@ const ChatbotWidget = () => {
   }, [isOpen]);
 
   const quickReplies = [
-    "Show me honey products",
-    "What are the health benefits?",
-    "Delivery information",
-    "Contact details"
+    "What honey products do you offer?",
+    "Tell me about health benefits of honey",
+    "What's your delivery policy?",
+    "How can I contact you?"
   ];
 
-  const getBotResponse = (userMessage) => {
-    const message = userMessage.toLowerCase();
-    
-    if (message.includes('product') || message.includes('honey') || message.includes('buy')) {
-      return "We offer various types of pure honey! You can browse our products on the Products page. Would you like me to guide you there? 🍯";
-    } else if (message.includes('health') || message.includes('benefit')) {
-      return "Honey has amazing health benefits! It boosts immunity, provides natural energy, supports heart health, and aids digestion. Check out our Benefits section for more details! 💚";
-    } else if (message.includes('delivery') || message.includes('shipping')) {
-      return "We offer free delivery on orders above Rs. 1000 across Nepal! Standard delivery takes 2-3 business days. 🚚";
-    } else if (message.includes('contact') || message.includes('phone') || message.includes('email')) {
-      return "You can reach us at:\n📞 +977 98-19492581\n📧 info@laxmihoney.com\nOr visit our Contact page for more options!";
-    } else if (message.includes('price') || message.includes('cost')) {
-      return "Our honey prices vary based on type and quantity. Visit our Products page to see detailed pricing. We offer great value for 100% pure honey! 💰";
-    } else if (message.includes('pure') || message.includes('natural') || message.includes('quality')) {
-      return "All our honey is 100% pure, natural, and unprocessed! We work directly with local beekeepers and maintain the highest quality standards. No additives, no preservatives! ✓";
-    } else if (message.includes('thank') || message.includes('thanks')) {
-      return "You're welcome! Feel free to ask if you have any other questions. Happy to help! 😊";
-    } else if (message.includes('hello') || message.includes('hi') || message.includes('hey')) {
-      return "Hello! How can I assist you with our honey products today? 🍯";
-    } else {
-      return "I'd be happy to help! You can ask me about our products, health benefits, delivery, or contact information. What would you like to know? 🤔";
+  // Context about Laxmi Honey Industry for the LLM
+  const getContextualPrompt = (userMessage) => {
+    return `You are a friendly customer service assistant for Laxmi Honey Industry, a premium honey company in Nepal. 
+
+Company Information:
+- We sell 100% pure, natural, and unprocessed honey
+- We work directly with local beekeepers
+- Free delivery on orders above Rs. 1000 across Nepal
+- Standard delivery takes 2-3 business days
+- Contact: +977 98-19492581, info@laxmihoney.com
+- We offer various types of honey products
+- All products are of highest quality with no additives or preservatives
+
+User Question: ${userMessage}
+
+Please provide a helpful, friendly, and concise response (2-3 sentences max). Use emojis appropriately. If the question is about products, delivery, contact info, or honey benefits, provide specific details from the company information above.`;
+  };
+
+  const getBotResponseFromLLM = async (userMessage) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/llm`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt: getContextualPrompt(userMessage)
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get response from LLM');
+      }
+
+      const data = await response.json();
+      
+      // Extract the response field from the returned object
+      if (typeof data === 'object' && data.response) {
+        return data.response;
+      } else if (typeof data === 'string') {
+        return data;
+      } else {
+        return "I apologize, but I received an unexpected response. Please try again! 🙏";
+      }
+    } catch (error) {
+      console.error('Chatbot error:', error.message);
+      // Fallback response if API fails
+      return "I apologize, but I'm having trouble processing your request right now. Please try again or contact us directly at +977 98-19492581. 🙏";
     }
   };
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (inputMessage.trim() === '') return;
 
     const userMessage = {
@@ -89,20 +119,34 @@ const ChatbotWidget = () => {
     };
 
     setMessages(prev => [...prev, userMessage]);
+    const currentMessage = inputMessage;
     setInputMessage('');
     setIsTyping(true);
 
-    // Simulate bot typing and response
-    setTimeout(() => {
+    try {
+      // Get response from LLM API
+      const botResponseText = await getBotResponseFromLLM(currentMessage);
+      
       const botResponse = {
         id: messages.length + 2,
-        text: getBotResponse(inputMessage),
+        text: botResponseText,
         sender: 'bot',
         timestamp: new Date()
       };
+      
       setMessages(prev => [...prev, botResponse]);
+    } catch (error) {
+      console.error('Error getting bot response:', error);
+      const errorResponse = {
+        id: messages.length + 2,
+        text: "I apologize, but I'm having trouble right now. Please try again or contact us at +977 98-19492581. 🙏",
+        sender: 'bot',
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorResponse]);
+    } finally {
       setIsTyping(false);
-    }, 1000 + Math.random() * 1000);
+    }
   };
 
   const handleQuickReply = (reply) => {
