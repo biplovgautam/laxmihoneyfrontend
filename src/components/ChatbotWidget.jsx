@@ -162,52 +162,30 @@ Please provide a helpful, friendly, and concise response (2-3 sentences max). Us
 
   return (
     <>
-      {/* Floating Chat Button with Lottie Animation */}
-      <motion.button
-        id="chatbot-floating-button"
-        onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 z-50 flex items-center justify-center"
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.95 }}
-        initial={{ scale: 0, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ type: "spring", stiffness: 260, damping: 20 }}
-        style={{ background: 'transparent', border: 'none', padding: 0 }}
-      >
-        <AnimatePresence mode="wait">
-          {isOpen ? (
-            <motion.div
-              key="close"
-              initial={{ rotate: -180, opacity: 0 }}
-              animate={{ rotate: 0, opacity: 1 }}
-              exit={{ rotate: 180, opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className="flex items-center justify-center"
-              style={{ 
-                filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2))'
-              }}
-            >
-              <FaTimes className="w-8 h-8 text-amber-600" />
-            </motion.div>
-          ) : (
-            <motion.div
-              key="lottie"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className="w-24 h-24"
-            >
-              <DotLottieReact
-                src="https://lottie.host/e5551b86-c2f2-4f2e-80f1-a55d7640f385/VS5zzBIn9D.lottie"
-                loop
-                autoplay
-                style={{ width: '100%', height: '100%' }}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.button>
+      {/* Floating Chat Button with Lottie Animation - Only shows when chat is closed */}
+      {!isOpen && (
+        <motion.button
+          id="chatbot-floating-button"
+          onClick={() => setIsOpen(true)}
+          className="fixed bottom-6 right-6 z-50 flex items-center justify-center"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0, opacity: 0 }}
+          transition={{ type: "spring", stiffness: 260, damping: 20 }}
+          style={{ background: 'transparent', border: 'none', padding: 0 }}
+        >
+          <div className="w-20 h-20">
+            <DotLottieReact
+              src="https://lottie.host/e5551b86-c2f2-4f2e-80f1-a55d7640f385/VS5zzBIn9D.lottie"
+              loop
+              autoplay
+              style={{ width: '100%', height: '100%' }}
+            />
+          </div>
+        </motion.button>
+      )}
 
       {/* Chat Window */}
       <AnimatePresence>
@@ -218,31 +196,44 @@ Please provide a helpful, friendly, and concise response (2-3 sentences max). Us
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.3 }}
-            className="fixed bottom-24 right-6 z-50 w-[380px] max-w-[calc(100vw-3rem)] h-[600px] max-h-[calc(100vh-10rem)] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden"
+            className="fixed bottom-6 right-6 z-50 w-[400px] max-w-[calc(100vw-2rem)] h-[650px] max-h-[calc(100vh-5rem)] bg-white rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-amber-100"
           >
-            {/* Header */}
-            <div className="bg-gradient-to-r from-amber-500 to-orange-500 p-4 flex items-center gap-3">
-              <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-                <div className="w-8 h-8">
-                  <DotLottieReact
-                    src="https://lottie.host/e5551b86-c2f2-4f2e-80f1-a55d7640f385/VS5zzBIn9D.lottie"
-                    loop
-                    autoplay
-                    style={{ width: '100%', height: '100%' }}
-                  />
+            {/* Header - Modern & Minimal */}
+            <div className="bg-gradient-to-br from-amber-500 via-orange-500 to-amber-600 p-5 relative">
+              {/* Close Button - Top Right */}
+              <motion.button
+                onClick={() => setIsOpen(false)}
+                whileHover={{ scale: 1.1, rotate: 90 }}
+                whileTap={{ scale: 0.9 }}
+                className="absolute top-4 right-4 w-9 h-9 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center transition-colors duration-200"
+              >
+                <FaTimes className="w-4 h-4 text-white" />
+              </motion.button>
+
+              {/* Header Content */}
+              <div className="flex items-center gap-3 pr-10">
+                <div className="w-14 h-14 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-lg">
+                  <div className="w-10 h-10">
+                    <DotLottieReact
+                      src="https://lottie.host/e5551b86-c2f2-4f2e-80f1-a55d7640f385/VS5zzBIn9D.lottie"
+                      loop
+                      autoplay
+                      style={{ width: '100%', height: '100%' }}
+                    />
+                  </div>
                 </div>
-              </div>
-              <div className="flex-1">
-                <h3 className="text-white font-bold text-lg">Laxmi Honey</h3>
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                  <span className="text-white/90 text-sm">Online</span>
+                <div>
+                  <h3 className="text-white font-bold text-xl">Laxmi Honey</h3>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="w-2 h-2 bg-green-300 rounded-full animate-pulse shadow-sm"></span>
+                    <span className="text-white/95 text-sm font-medium">Always here to help</span>
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* Messages Container */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+            <div className="flex-1 overflow-y-auto p-5 space-y-3 bg-gradient-to-b from-amber-50/30 to-orange-50/20">
               {messages.map((message) => (
                 <motion.div
                   key={message.id}
@@ -252,14 +243,14 @@ Please provide a helpful, friendly, and concise response (2-3 sentences max). Us
                   className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
-                    className={`max-w-[75%] rounded-2xl px-4 py-3 ${
+                    className={`max-w-[80%] rounded-2xl px-4 py-3 ${
                       message.sender === 'user'
-                        ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-br-none'
-                        : 'bg-white text-gray-800 rounded-bl-none shadow-sm border border-gray-100'
+                        ? 'bg-gradient-to-br from-amber-500 to-orange-500 text-white shadow-md rounded-br-sm'
+                        : 'bg-white text-gray-800 rounded-bl-sm shadow-sm'
                     }`}
                   >
                     <p className="text-sm leading-relaxed whitespace-pre-line">{message.text}</p>
-                    <p className={`text-xs mt-1 ${message.sender === 'user' ? 'text-white/70' : 'text-gray-400'}`}>
+                    <p className={`text-xs mt-1.5 ${message.sender === 'user' ? 'text-white/80' : 'text-gray-400'}`}>
                       {message.timestamp.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                     </p>
                   </div>
@@ -273,11 +264,11 @@ Please provide a helpful, friendly, and concise response (2-3 sentences max). Us
                   animate={{ opacity: 1, y: 0 }}
                   className="flex justify-start"
                 >
-                  <div className="bg-white rounded-2xl rounded-bl-none px-4 py-3 shadow-sm border border-gray-100">
-                    <div className="flex gap-1">
-                      <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></span>
-                      <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></span>
-                      <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></span>
+                  <div className="bg-white rounded-2xl rounded-bl-sm px-5 py-3 shadow-sm">
+                    <div className="flex gap-1.5">
+                      <span className="w-2.5 h-2.5 bg-amber-400 rounded-full animate-bounce"></span>
+                      <span className="w-2.5 h-2.5 bg-orange-400 rounded-full animate-bounce" style={{ animationDelay: '0.15s' }}></span>
+                      <span className="w-2.5 h-2.5 bg-amber-500 rounded-full animate-bounce" style={{ animationDelay: '0.3s' }}></span>
                     </div>
                   </div>
                 </motion.div>
@@ -288,38 +279,45 @@ Please provide a helpful, friendly, and concise response (2-3 sentences max). Us
 
             {/* Quick Replies */}
             {messages.length <= 2 && (
-              <div className="px-4 py-2 bg-white border-t border-gray-100">
-                <p className="text-xs text-gray-500 mb-2">Quick questions:</p>
+              <div className="px-5 py-3 bg-white/80 backdrop-blur-sm border-t border-amber-100/50">
+                <p className="text-xs text-gray-500 mb-2.5 font-medium">Suggested questions:</p>
                 <div className="flex flex-wrap gap-2">
                   {quickReplies.map((reply, index) => (
-                    <button
+                    <motion.button
                       key={index}
                       onClick={() => handleQuickReply(reply)}
-                      className="px-3 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 text-xs rounded-full border border-amber-200 transition-colors duration-200"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="px-3.5 py-2 bg-gradient-to-r from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 text-amber-700 text-xs font-medium rounded-xl border border-amber-200/50 transition-all duration-200 shadow-sm"
                     >
                       {reply}
-                    </button>
+                    </motion.button>
                   ))}
                 </div>
               </div>
             )}
 
             {/* Input Area */}
-            <div className="p-4 bg-white border-t border-gray-100">
-              <div className="flex gap-2">
+            <div className="p-5 bg-white border-t border-amber-100/50">
+              <div className="flex gap-3">
                 <input
                   type="text"
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder="Type your message..."
-                  className="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent text-sm"
+                  placeholder="Ask me anything..."
+                  className="flex-1 px-5 py-3.5 bg-amber-50/50 border border-amber-200/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent text-sm placeholder:text-gray-400 transition-all duration-200"
                 />
                 <motion.button
                   onClick={handleSendMessage}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="w-12 h-12 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full flex items-center justify-center text-white hover:shadow-lg transition-shadow duration-200"
+                  disabled={!inputMessage.trim()}
+                  className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-lg transition-all duration-200 ${
+                    inputMessage.trim() 
+                      ? 'bg-gradient-to-br from-amber-500 to-orange-500 hover:shadow-xl' 
+                      : 'bg-gray-300 cursor-not-allowed'
+                  }`}
                 >
                   <FaPaperPlane className="w-4 h-4" />
                 </motion.button>
