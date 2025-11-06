@@ -66,7 +66,8 @@ Company Information:
 - We work directly with local beekeepers
 - Free delivery on orders above Rs. 1000 across Nepal
 - Standard delivery takes 2-3 business days
-- Contact: +977 98-19492581, info@laxmihoney.com
+- Contact: +977 981-9492581, info@laxmibeekeeping.com.np
+- CTO & MD: Biplov Gautam - cto@laxmibeekeeping.com.np
 - We offer various types of honey products
 - All products are of highest quality with no additives or preservatives
 
@@ -104,7 +105,7 @@ Please provide a helpful, friendly, and concise response (2-3 sentences max). Us
     } catch (error) {
       console.error('Chatbot error:', error.message);
       // Fallback response if API fails
-      return "I apologize, but I'm having trouble processing your request right now. Please try again or contact us directly at +977 98-19492581. 🙏";
+      return "I apologize, but I'm having trouble processing your request right now. Please try again or contact us directly at +977 981-9492581. 🙏";
     }
   };
 
@@ -139,7 +140,7 @@ Please provide a helpful, friendly, and concise response (2-3 sentences max). Us
       console.error('Error getting bot response:', error);
       const errorResponse = {
         id: messages.length + 2,
-        text: "I apologize, but I'm having trouble right now. Please try again or contact us at +977 98-19492581. 🙏",
+        text: "I apologize, but I'm having trouble right now. Please try again or contact us at +977 981-9492581. 🙏",
         sender: 'bot',
         timestamp: new Date()
       };

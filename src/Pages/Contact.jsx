@@ -55,14 +55,14 @@ const Contact = () => {
     {
       icon: <FaPhone className="w-5 h-5" />,
       title: "Phone",
-      content: "+977 98-19492581",
+      content: "+977 981-9492581",
       link: "tel:+9779819492581"
     },
     {
       icon: <FaEnvelope className="w-5 h-5" />,
       title: "Email",
-      content: "info@laxmihoney.com",
-      link: "mailto:info@laxmihoney.com"
+      content: "info@laxmibeekeeping.com.np",
+      link: "mailto:info@laxmibeekeeping.com.np"
     },
     {
       icon: <FaMapMarkerAlt className="w-5 h-5" />,

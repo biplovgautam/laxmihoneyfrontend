@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { GiHoneypot, GiBee } from 'react-icons/gi';
-import { FaLeaf, FaAward, FaHeart, FaUsers } from 'react-icons/fa';
+import { FaLeaf, FaAward, FaHeart, FaUsers, FaLinkedin } from 'react-icons/fa';
 import galleryImage from '../assets/gallery/SAM_1380.JPG';
 
 const About = () => {
@@ -25,6 +25,40 @@ const About = () => {
       icon: <FaUsers className="w-8 h-8" />,
       title: "Community",
       description: "Supporting local bee farmers and fair trade practices"
+    }
+  ];
+
+  const teamMembers = [
+    {
+      name: "Laxmi Dhakal",
+      role: "CEO & Founder",
+      linkedin: "https://www.linkedin.com/in/laxmidhakalgautam/",
+      description: "Visionary leader with a passion for sustainable beekeeping"
+    },
+    {
+      name: "Biplov Gautam",
+      role: "CTO & Managing Director",
+      email: "cto@laxmibeekeeping.com.np",
+      linkedin: "https://www.linkedin.com/in/biplovgautam/",
+      description: "Technology expert driving innovation in honey production"
+    },
+    {
+      name: "Bipin Gautam",
+      role: "Operations Manager",
+      linkedin: "https://www.linkedin.com/company/105054989/",
+      description: "Ensuring smooth operations and quality control"
+    },
+    {
+      name: "Om Prakash Gautam",
+      role: "Production Manager",
+      linkedin: "https://www.linkedin.com/company/105054989/",
+      description: "Expert in traditional beekeeping methods"
+    },
+    {
+      name: "Barsha Gautam",
+      role: "Quality Assurance",
+      linkedin: "https://www.linkedin.com/company/105054989/",
+      description: "Maintaining the highest quality standards"
     }
   ];
 
@@ -193,6 +227,90 @@ const About = () => {
                 <p className="text-gray-600 text-sm leading-relaxed">
                   {value.description}
                 </p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Team Section */}
+      <section className="py-20 md:py-28 bg-gradient-to-b from-white to-amber-50">
+        <div className="container-modern">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-16"
+          >
+            <div className="inline-flex items-center gap-2 text-amber-600 font-semibold mb-4">
+              <div className="h-[2px] w-8 bg-amber-600"></div>
+              <span>MEET OUR TEAM</span>
+              <div className="h-[2px] w-8 bg-amber-600"></div>
+            </div>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+              The People Behind <span className="text-amber-600">Laxmi Honey</span>
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto text-lg">
+              Dedicated professionals committed to bringing you the finest honey
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {teamMembers.map((member, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="group"
+              >
+                <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-amber-100">
+                  {/* Image Placeholder */}
+                  <div className="relative h-72 bg-gradient-to-br from-amber-100 via-orange-100 to-amber-200 overflow-hidden">
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-32 h-32 bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center border-4 border-white/50">
+                        <FaUsers className="w-16 h-16 text-amber-600/70" />
+                      </div>
+                    </div>
+                    {/* Decorative elements */}
+                    <div className="absolute top-4 right-4 w-20 h-20 bg-white/20 rounded-full blur-2xl"></div>
+                    <div className="absolute bottom-4 left-4 w-24 h-24 bg-orange-300/20 rounded-full blur-2xl"></div>
+                  </div>
+
+                  {/* Content */}
+                  <div className="p-6">
+                    <h3 className="text-xl font-bold text-gray-900 mb-1">
+                      {member.name}
+                    </h3>
+                    <p className="text-amber-600 font-semibold mb-3">
+                      {member.role}
+                    </p>
+                    {member.email && (
+                      <a 
+                        href={`mailto:${member.email}`}
+                        className="text-sm text-gray-500 hover:text-amber-600 transition-colors block mb-3"
+                      >
+                        {member.email}
+                      </a>
+                    )}
+                    <p className="text-gray-600 text-sm mb-4 leading-relaxed">
+                      {member.description}
+                    </p>
+
+                    {/* LinkedIn Button */}
+                    <a
+                      href={member.linkedin}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-lg transition-all duration-300 text-sm font-medium group-hover:shadow-lg"
+                    >
+                      <FaLinkedin className="w-4 h-4" />
+                      <span>Connect on LinkedIn</span>
+                    </a>
+                  </div>
+                </div>
               </motion.div>
             ))}
           </div>
