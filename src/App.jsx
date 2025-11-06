@@ -119,8 +119,8 @@ const AppContent = () => {
         />
       </main>
       
-      {/* Chatbot Widget - Globally available on all pages */}
-      <ChatbotWidget />
+      {/* Chatbot Widget - Only on home page */}
+      {location.pathname === '/' && <ChatbotWidget />}
     </>
   );
 };
