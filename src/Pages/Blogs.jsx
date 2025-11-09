@@ -8,6 +8,14 @@ import Blog3 from "../assets/Blogs/3.jpg";
 import Blog4 from "../assets/Blogs/4.jpg";
 
 const Blogs = () => {
+  const [stories, setStories] = useState([
+    { id: 1, author: "Laxmi Dhakal", avatar: null, image: Blog1, viewed: false },
+    { id: 2, author: "Biplov Gautam", avatar: null, image: Blog2, viewed: false },
+    { id: 3, author: "Bipin Gautam", avatar: null, image: Blog3, viewed: true },
+    { id: 4, author: "Om Prakash", avatar: null, image: Blog4, viewed: false },
+    { id: 5, author: "Barsha Gautam", avatar: null, image: Blog1, viewed: false },
+  ]);
+
   const [posts, setPosts] = useState([
     {
       id: 1,
@@ -72,20 +80,65 @@ const Blogs = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50/30 via-orange-50/20 to-amber-50/30">
+    <div className="min-h-screen bg-gradient-to-br from-amber-900/95 via-orange-800/90 to-amber-900/95">
       <div className="max-w-2xl mx-auto px-4 pt-24 pb-12">
-        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Community Feed</h1>
-              <p className="text-gray-600">Stories and updates from our beekeeping journey</p>
-            </div>
-            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="hidden md:flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
-              <FaPlus className="w-4 h-4" />
-              <span>Create Post</span>
-            </motion.button>
+        {/* Stories Section */}
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }} 
+          animate={{ opacity: 1, y: 0 }} 
+          transition={{ duration: 0.5 }} 
+          className="mb-6"
+        >
+          <div className="flex items-center gap-4 overflow-x-auto pb-4 scrollbar-hide">
+            {/* Your Story / Create Post Button */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3 }}
+              className="flex flex-col items-center gap-2 flex-shrink-0"
+            >
+              <button
+                className="relative w-20 h-20 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center cursor-pointer transform hover:scale-105 transition-transform duration-200 shadow-lg"
+              >
+                <FaPlus className="w-8 h-8 text-white" />
+              </button>
+              <span className="text-xs text-white font-medium truncate max-w-[80px]">
+                Your Story
+              </span>
+            </motion.div>
+
+            {/* Other Stories */}
+            {stories.map((story, index) => (
+              <motion.div
+                key={story.id}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3, delay: (index + 1) * 0.05 }}
+                className="flex flex-col items-center gap-2 flex-shrink-0"
+              >
+                <div 
+                  className={`w-20 h-20 rounded-full p-1 ${
+                    story.viewed 
+                      ? 'bg-gray-300' 
+                      : 'bg-gradient-to-br from-amber-400 via-orange-500 to-pink-500'
+                  } cursor-pointer transform hover:scale-105 transition-transform duration-200`}
+                >
+                  <div className="w-full h-full rounded-full bg-white p-0.5">
+                    <div className="w-full h-full rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center overflow-hidden">
+                      {story.avatar ? (
+                        <img src={story.avatar} alt={story.author} className="w-full h-full object-cover" />
+                      ) : (
+                        <GiBee className="w-8 h-8 text-white" />
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <span className="text-xs text-white font-medium truncate max-w-[80px]">
+                  {story.author}
+                </span>
+              </motion.div>
+            ))}
           </div>
-          <div className="h-[2px] bg-gradient-to-r from-transparent via-amber-200 to-transparent"></div>
         </motion.div>
 
         <div className="space-y-6">
@@ -141,15 +194,11 @@ const Blogs = () => {
         </div>
 
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }} className="text-center mt-8">
-          <button className="px-8 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300">
+          <button className="px-8 py-3 bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 text-white font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300">
             Load More Posts
           </button>
         </motion.div>
       </div>
-
-      <motion.button initial={{ scale: 0 }} animate={{ scale: 1 }} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="md:hidden fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full shadow-2xl flex items-center justify-center text-white z-40">
-        <FaPlus className="w-6 h-6" />
-      </motion.button>
     </div>
   );
 };

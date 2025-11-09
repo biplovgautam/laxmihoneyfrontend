@@ -25,10 +25,10 @@ const Navbar = () => {
   const NavbarMenu = useMemo(() => {
     const baseMenu = [
       { id: 1, title: "Home", link: "/", icon: FaHome },
-      { id: 2, title: "Products", link: "/products", icon: FaBox },
-      { id: 3, title: "Contact", link: "/contact", icon: FaPhone },
-      { id: 4, title: "About", link: "/about", icon: FaInfoCircle },
-      { id: 5, title: "Blogs", link: "/blogs", icon: FaBlog },
+      { id: 2, title: "Blogs", link: "/blogs", icon: FaBlog },
+      { id: 3, title: "Products", link: "/products", icon: FaBox },
+      { id: 4, title: "Contact", link: "/contact", icon: FaPhone },
+      { id: 5, title: "About", link: "/about", icon: FaInfoCircle },
     ];
 
     // Add admin link for admin users
