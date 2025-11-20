@@ -19,7 +19,7 @@ const ChatbotWidget = () => {
   const chatWindowRef = useRef(null);
 
   // API Base URL from environment
-  const API_BASE_URL = import.meta.env.VITE_BACKEND_API_URL;
+  const API_BASE_URL = (import.meta.env.VITE_BACKEND_API_URL || '').replace(/\/$/, '');
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -78,6 +78,10 @@ Please provide a helpful, friendly, and concise response (2-3 sentences max). Us
 
   const getBotResponseFromLLM = async (userMessage) => {
     try {
+      if (!API_BASE_URL) {
+        throw new Error('Backend API base URL is not configured');
+      }
+
       const response = await fetch(`${API_BASE_URL}/llm`, {
         method: 'POST',
         headers: {
