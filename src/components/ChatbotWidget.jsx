@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaPaperPlane, FaTimes, FaTrash, FaHistory } from 'react-icons/fa';
+import { FaPaperPlane, FaTimes, FaTrash, FaHistory, FaComments } from 'react-icons/fa';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { v4 as uuidv4 } from 'uuid';
 import { useAuth } from '../context/AuthContext';
@@ -41,6 +41,13 @@ const ChatbotWidget = () => {
   // API Base URL from environment
   const API_BASE_URL = (import.meta.env.VITE_BACKEND_API_URL || '').replace(/\/$/, '');
 
+  // Debug helper - only logs in development
+  const devLog = (message, data) => {
+    if (import.meta.env.DEV) {
+      console.log(message, data);
+    }
+  };
+
   // Helper: Get or create anonymous ID
   const getOrCreateAnonymousId = () => {
     let anonId = localStorage.getItem('chatbot_anonymous_id');
@@ -62,7 +69,7 @@ const ChatbotWidget = () => {
       // Force refresh to get a fresh token (Firebase tokens expire after 1 hour)
       const token = await firebaseUser.getIdToken(true);
       localStorage.setItem('authToken', token);
-      console.log('✅ Token refreshed successfully');
+      devLog('✅ Token refreshed successfully');
       return token;
     } catch (error) {
       console.error('❌ Token refresh failed:', error);
@@ -85,7 +92,7 @@ const ChatbotWidget = () => {
   // Update auth status whenever user changes
   useEffect(() => {
     const newStatus = isUserAuthenticated() ? 'authenticated' : 'anonymous';
-    console.log('🔐 Auth status update:', {
+    devLog('🔐 Auth status update:', {
       firebaseUser: !!user,
       userEmail: user?.email,
       newStatus: newStatus
@@ -96,7 +103,7 @@ const ChatbotWidget = () => {
   // Fetch chat history on mount and when user logs in
   useEffect(() => {
     if (anonymousId) {
-      console.log('🔄 Triggering history fetch:', {
+      devLog('🔄 Triggering history fetch:', {
         anonymousId,
         hasUser: !!user,
         userEmail: user?.email
@@ -121,12 +128,12 @@ const ChatbotWidget = () => {
       if (isAuthenticated) {
         // ✅ AUTHENTICATED: Send ONLY Authorization header (NO anonymousId)
         headers['Authorization'] = `Bearer ${authToken}`;
-        console.log('📤 Fetching authenticated history');
+        devLog('📤 Fetching authenticated history');
       } else {
         // ✅ ANONYMOUS: Send ONLY anonymousId (NO Authorization header)
         const anonId = getOrCreateAnonymousId();
         url += `?anonymousId=${anonId}`;
-        console.log('📤 Fetching anonymous history with ID:', anonId);
+        devLog('📤 Fetching anonymous history with ID:', anonId);
       }
 
       const response = await fetch(url, {
@@ -137,7 +144,7 @@ const ChatbotWidget = () => {
       if (response.ok) {
         const data = await response.json();
         
-        console.log('📥 History response:', {
+        devLog('📥 History response:', {
           user_type: data.user_type,
           message_count: data.message_count,
           expected: isAuthenticated ? 'authenticated' : 'anonymous'
@@ -304,11 +311,11 @@ const ChatbotWidget = () => {
       if (isAuthenticated) {
         // ✅ AUTHENTICATED: Send ONLY Authorization header (NO anonymousId)
         headers['Authorization'] = `Bearer ${authToken}`;
-        console.log('📤 Sending authenticated message');
+        devLog('📤 Sending authenticated message');
       } else {
         // ✅ ANONYMOUS: Add anonymousId to body (NO Authorization header)
         requestBody.anonymousId = anonymousId;
-        console.log('📤 Sending anonymous message with ID:', anonymousId);
+        devLog('📤 Sending anonymous message with ID:', anonymousId);
       }
 
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
@@ -331,7 +338,7 @@ const ChatbotWidget = () => {
 
       const data = await response.json();
       
-      console.log('📥 Message response:', {
+      devLog('📥 Message response:', {
         user_type: data.user_type,
         expected: isAuthenticated ? 'authenticated' : 'anonymous'
       });
@@ -424,7 +431,7 @@ const ChatbotWidget = () => {
         <motion.button
           id="chatbot-floating-button"
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 z-50 flex items-center justify-center"
+          className="fixed bottom-6 right-6 z-50"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
           initial={{ scale: 0, opacity: 0 }}
@@ -433,13 +440,16 @@ const ChatbotWidget = () => {
           transition={{ type: "spring", stiffness: 260, damping: 20 }}
           style={{ background: 'transparent', border: 'none', padding: 0 }}
         >
-          <div className="w-20 h-20">
-            <DotLottieReact
-              src="https://lottie.host/e5551b86-c2f2-4f2e-80f1-a55d7640f385/VS5zzBIn9D.lottie"
-              loop
-              autoplay
-              style={{ width: '100%', height: '100%' }}
-            />
+          <div className="relative w-20 h-20 flex items-center justify-center">
+            {/* Always render Lottie */}
+            <div className="w-full h-full">
+              <DotLottieReact
+                src="https://lottie.host/e5551b86-c2f2-4f2e-80f1-a55d7640f385/VS5zzBIn9D.lottie"
+                loop
+                autoplay
+                style={{ width: '100%', height: '100%' }}
+              />
+            </div>
           </div>
         </motion.button>
       )}
@@ -482,7 +492,8 @@ const ChatbotWidget = () => {
 
               {/* Header Content */}
               <div className="flex items-center gap-3 pr-24">
-                <div className="w-14 h-14 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-lg">
+                <div className="relative w-14 h-14 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-lg overflow-hidden">
+                  {/* Lottie Animation */}
                   <div className="w-10 h-10">
                     <DotLottieReact
                       src="https://lottie.host/e5551b86-c2f2-4f2e-80f1-a55d7640f385/VS5zzBIn9D.lottie"
