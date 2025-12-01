@@ -19,7 +19,7 @@ import {
   FaTimes
 } from 'react-icons/fa';
 import { HiSparkles, HiBadgeCheck } from 'react-icons/hi';
-import { doc, getDoc, collection, query, limit, getDocs } from 'firebase/firestore';
+import { doc, getDoc, collection, query, limit, getDocs, where, orderBy } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { getOptimizedImageUrl } from '../config/cloudinary';
 import { useCart } from '../context/CartContext';
@@ -73,6 +73,15 @@ const ProductDetail = () => {
       
       if (productDoc.exists()) {
         const productData = { id: productDoc.id, ...productDoc.data() };
+        
+        // Check if product is deleted/inactive
+        if (productData.isActive === false) {
+          console.log('Product is deleted/inactive, redirecting...');
+          showToast('This product is no longer available', 'error');
+          navigate('/products');
+          return;
+        }
+        
         console.log('Product found:', productData);
         setProduct(productData);
       } else {
@@ -90,9 +99,12 @@ const ProductDetail = () => {
 
   const fetchRecommendedProducts = async () => {
     try {
-      // For now, get random products (later will be algorithm-based)
+      // Get active products, excluding current product
       const q = query(
         collection(db, 'products'),
+        where('isActive', '!=', false),
+        orderBy('isActive'),
+        orderBy('createdAt', 'desc'),
         limit(4)
       );
       

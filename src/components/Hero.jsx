@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { collection, query, where, limit, getDocs } from 'firebase/firestore';
+import { collection, query, where, limit, getDocs, orderBy } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { getOptimizedImageUrl } from '../config/cloudinary';
 import { FaWhatsapp, FaStar, FaLeaf, FaHeart, FaShoppingCart, FaChevronDown } from "react-icons/fa";
@@ -83,40 +83,45 @@ const Hero = () => {
 
         // Fallback to API if no preloaded data
         console.log('🔄 Fetching featured products from API...');
-        // First try to get featured products
-        const featuredQuery = query(
-          collection(db, 'products'),
-          where('isFeatured', '==', true),
-          limit(3)
-        );
         
-        const featuredSnapshot = await getDocs(featuredQuery);
-        let products = featuredSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        })).filter(product => product.isActive); // Filter active products in client
+        let products = [];
+        
+        // Try to get featured products first
+        try {
+          const featuredQuery = query(
+            collection(db, 'products'),
+            where('isFeatured', '==', true),
+            orderBy('createdAt', 'desc'),
+            limit(10)
+          );
+          
+          const featuredSnapshot = await getDocs(featuredQuery);
+          products = featuredSnapshot.docs
+            .map(doc => ({
+              id: doc.id,
+              ...doc.data()
+            }))
+            .filter(product => product.isActive !== false)
+            .slice(0, 3);
+        } catch (indexError) {
+          console.log('Featured query needs index, using fallback');
+        }
         
         // If no featured products, get latest active products
         if (products.length === 0) {
           const allQuery = query(
             collection(db, 'products'),
-            limit(10) // Get more to filter by isActive
+            orderBy('createdAt', 'desc'),
+            limit(10)
           );
           
           const allSnapshot = await getDocs(allQuery);
-          const allProducts = allSnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-          }));
-          
-          // Filter active products and sort by creation date
-          products = allProducts
-            .filter(product => product.isActive)
-            .sort((a, b) => {
-              const aDate = a.createdAt?.toDate?.() || new Date(a.createdAt);
-              const bDate = b.createdAt?.toDate?.() || new Date(b.createdAt);
-              return bDate - aDate;
-            })
+          products = allSnapshot.docs
+            .map(doc => ({
+              id: doc.id,
+              ...doc.data()
+            }))
+            .filter(product => product.isActive !== false)
             .slice(0, 3);
         }
         

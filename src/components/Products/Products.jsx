@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { FaStar, FaShoppingCart, FaHeart, FaSearch, FaFilter, FaSort, FaTimes } from "react-icons/fa";
 import { HiSparkles } from "react-icons/hi";
 import { motion, AnimatePresence } from "framer-motion";
-import { collection, getDocs, query } from 'firebase/firestore';
+import { collection, getDocs, query, where, orderBy } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { getOptimizedImageUrl } from '../../config/cloudinary';
 import { useCart } from '../../context/CartContext';
@@ -163,13 +163,19 @@ const Products = () => {
 
       // Fallback to API if no preloaded data
       console.log('🔄 Fetching products from API...');
-      const q = query(collection(db, 'products'));
+      const q = query(
+        collection(db, 'products'),
+        orderBy('createdAt', 'desc')
+      );
       const querySnapshot = await getDocs(q);
       
-      const allProducts = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
+      // Filter out deleted products on client side
+      const allProducts = querySnapshot.docs
+        .map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }))
+        .filter(product => product.isActive !== false);
       
       // Add test product if no products found
       if (allProducts.length === 0) {

@@ -71,10 +71,13 @@ class DataPreloader {
       const q = query(productsRef, orderBy('createdAt', 'desc'));
       const snapshot = await getDocs(q);
       
-      return snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
+      // Filter out deleted products (isActive === false) on client side
+      return snapshot.docs
+        .map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }))
+        .filter(product => product.isActive !== false);
     } catch (error) {
       console.error('Error fetching products:', error);
       return [];
@@ -85,37 +88,69 @@ class DataPreloader {
   async fetchFeaturedProducts() {
     try {
       const productsRef = collection(db, 'products');
+      
+      // Try to get featured products (using isFeatured field)
       const q = query(
         productsRef, 
-        where('featured', '==', true),
+        where('isFeatured', '==', true),
         orderBy('createdAt', 'desc'),
-        limit(6)
+        limit(10)
       );
-      const snapshot = await getDocs(q);
       
-      const featured = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-
-      // If no featured products found, get the first 6 products
-      if (featured.length === 0) {
+      let snapshot;
+      try {
+        snapshot = await getDocs(q);
+      } catch (indexError) {
+        console.log('Featured query needs index, falling back to all products');
+        // Fallback: get all products and filter client-side
         const fallbackQuery = query(
           productsRef,
           orderBy('createdAt', 'desc'),
-          limit(6)
+          limit(20)
         );
-        const fallbackSnapshot = await getDocs(fallbackQuery);
-        return fallbackSnapshot.docs.map(doc => ({
+        snapshot = await getDocs(fallbackQuery);
+      }
+      
+      // Filter out deleted products and get featured ones on client side
+      const allProducts = snapshot.docs
+        .map(doc => ({
           id: doc.id,
           ...doc.data()
-        }));
+        }))
+        .filter(product => product.isActive !== false);
+      
+      // Try to find featured products
+      let featured = allProducts.filter(product => 
+        product.isFeatured === true || product.featured === true
+      ).slice(0, 6);
+
+      // If no featured products found, get the first 6 active products
+      if (featured.length === 0) {
+        featured = allProducts.slice(0, 6);
       }
 
       return featured;
     } catch (error) {
       console.error('Error fetching featured products:', error);
-      return [];
+      // Last resort: try without any where clause
+      try {
+        const fallbackQuery = query(
+          collection(db, 'products'),
+          orderBy('createdAt', 'desc'),
+          limit(10)
+        );
+        const fallbackSnapshot = await getDocs(fallbackQuery);
+        return fallbackSnapshot.docs
+          .map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          }))
+          .filter(product => product.isActive !== false)
+          .slice(0, 6);
+      } catch (fallbackError) {
+        console.error('Fallback query also failed:', fallbackError);
+        return [];
+      }
     }
   }
 

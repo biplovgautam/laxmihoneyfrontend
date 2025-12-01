@@ -41,14 +41,24 @@ const Cart = () => {
       const productPromises = cartItems.map(async (cartItem) => {
         const productDoc = await getDoc(doc(db, 'products', cartItem.productId));
         if (productDoc.exists()) {
+          const productData = productDoc.data();
+          // Filter out deleted products (isActive === false)
+          if (productData.isActive === false) {
+            // Remove from cart if product is deleted
+            await removeFromCart(cartItem.productId);
+            return null;
+          }
           return {
-            ...productDoc.data(),
+            ...productData,
             id: productDoc.id,
             cartQuantity: cartItem.quantity,
             cartId: cartItem.id
           };
+        } else {
+          // Product doesn't exist, remove from cart
+          await removeFromCart(cartItem.productId);
+          return null;
         }
-        return null;
       });
 
       const products = (await Promise.all(productPromises)).filter(Boolean);

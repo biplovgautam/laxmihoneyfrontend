@@ -7,8 +7,11 @@ import {
   doc, 
   updateDoc, 
   deleteDoc,
+  getDoc,
+  setDoc,
   orderBy,
-  query
+  query,
+  where
 } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { uploadToCloudinary, getOptimizedImageUrl } from '../../config/cloudinary';
@@ -29,6 +32,7 @@ const ProductManagement = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [toast, setToast] = useState(null);
+  const [viewMode, setViewMode] = useState('active'); // 'active' or 'deleted'
 
   const [formData, setFormData] = useState({
     title: '',
@@ -74,11 +78,12 @@ const ProductManagement = () => {
 
   useEffect(() => {
     fetchProducts();
-  }, []);
+  }, [viewMode]); // Refetch when viewMode changes
 
   const fetchProducts = async () => {
     try {
-      const q = query(collection(db, 'products'), orderBy('createdAt', 'desc'));
+      const collectionName = viewMode === 'active' ? 'products' : 'del_products';
+      const q = query(collection(db, collectionName), orderBy('createdAt', 'desc'));
       const querySnapshot = await getDocs(q);
       const productsData = querySnapshot.docs.map(doc => ({
         id: doc.id,
@@ -208,23 +213,110 @@ const ProductManagement = () => {
     setShowModal(true);
   };
 
-  const handleDelete = async (productId, images = []) => {
-    if (!confirm('Are you sure you want to delete this product?')) return;
+  const handleDelete = async (productId) => {
+    if (!confirm('Are you sure you want to delete this product? It will be moved to deleted products.')) return;
 
     try {
-      // Delete images from storage
-      const deletePromises = images.map(imageUrl => {
-        const imageRef = ref(storage, imageUrl);
-        return deleteObject(imageRef).catch(console.error);
-      });
-      await Promise.all(deletePromises);
+      // Get the product document
+      const productDoc = await getDoc(doc(db, 'products', productId));
+      
+      if (!productDoc.exists()) {
+        showToast('Product not found', 'error');
+        return;
+      }
 
-      // Delete product document
+      const productData = productDoc.data();
+      
+      // Prepare deleted product data with isActive and isFeatured set to false
+      const deletedProductData = {
+        ...productData,
+        isActive: false,
+        isFeatured: false,
+        deletedAt: new Date(),
+        originalId: productId
+      };
+
+      // Add to del_products collection
+      await addDoc(collection(db, 'del_products'), deletedProductData);
+
+      // Remove from products collection
       await deleteDoc(doc(db, 'products', productId));
-      showToast('Product deleted successfully');
+
+      // Clean up cart items containing this deleted product
+      const cartQuery = query(
+        collection(db, 'cart'),
+        where('productId', '==', productId)
+      );
+      const cartSnapshot = await getDocs(cartQuery);
+      const deleteCartPromises = cartSnapshot.docs.map(cartDoc => 
+        deleteDoc(doc(db, 'cart', cartDoc.id))
+      );
+      await Promise.all(deleteCartPromises);
+
+      showToast('Product deleted successfully and removed from all carts');
       fetchProducts();
     } catch (error) {
       console.error('Error deleting product:', error);
+      showToast('Error deleting product', 'error');
+    }
+  };
+
+  const handleRestore = async (productId) => {
+    if (!confirm('Are you sure you want to restore this product?')) return;
+
+    try {
+      // Get the deleted product document
+      const deletedProductDoc = await getDoc(doc(db, 'del_products', productId));
+      
+      if (!deletedProductDoc.exists()) {
+        showToast('Deleted product not found', 'error');
+        return;
+      }
+
+      const productData = deletedProductDoc.data();
+      
+      // Prepare restored product data with isActive set to true
+      const restoredProductData = {
+        ...productData,
+        isActive: true,
+        restoredAt: new Date(),
+      };
+      
+      // Remove deletion-related fields
+      delete restoredProductData.deletedAt;
+      const originalProductId = restoredProductData.originalId;
+      delete restoredProductData.originalId;
+
+      // Restore with original ID if available, otherwise create new one
+      if (originalProductId) {
+        // Use the original product ID to maintain references
+        await setDoc(doc(db, 'products', originalProductId), restoredProductData);
+      } else {
+        // Fallback: create with new ID
+        await addDoc(collection(db, 'products'), restoredProductData);
+      }
+
+      // Remove from del_products collection
+      await deleteDoc(doc(db, 'del_products', productId));
+
+      showToast('Product restored successfully');
+      fetchProducts();
+    } catch (error) {
+      console.error('Error restoring product:', error);
+      showToast('Error restoring product', 'error');
+    }
+  };
+
+  const handlePermanentDelete = async (productId) => {
+    if (!confirm('Are you sure you want to permanently delete this product? This action cannot be undone!')) return;
+
+    try {
+      // Permanently delete from del_products collection
+      await deleteDoc(doc(db, 'del_products', productId));
+      showToast('Product permanently deleted');
+      fetchProducts();
+    } catch (error) {
+      console.error('Error permanently deleting product:', error);
       showToast('Error deleting product', 'error');
     }
   };
@@ -282,23 +374,80 @@ const ProductManagement = () => {
     <div>
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">Product Management</h2>
+        <div className="flex items-center gap-4">
+          <h2 className="text-2xl font-bold text-gray-800">Product Management</h2>
+          
+          {/* View Mode Toggle */}
+          <div className="flex bg-gray-100 rounded-lg p-1">
+            <button
+              onClick={() => setViewMode('active')}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                viewMode === 'active'
+                  ? 'bg-white text-amber-600 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-800'
+              }`}
+            >
+              Active Products
+            </button>
+            <button
+              onClick={() => setViewMode('deleted')}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                viewMode === 'deleted'
+                  ? 'bg-white text-red-600 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-800'
+              }`}
+            >
+              Deleted Products
+            </button>
+          </div>
+        </div>
+        
         <div className="flex space-x-3">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setShowModal(true)}
-            className="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2"
-          >
-            <PlusIcon className="h-5 w-5" />
-            <span>Add Product</span>
-          </motion.button>
+          {viewMode === 'active' && (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setShowModal(true)}
+              className="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2"
+            >
+              <PlusIcon className="h-5 w-5" />
+              <span>Add Product</span>
+            </motion.button>
+          )}
         </div>
       </div>
 
-      {/* Products Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {products.map((product) => (
+      {/* Products Grid or Empty State */}
+      {products.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-16 bg-gray-50 rounded-lg">
+          <div className="text-gray-400 mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-24 w-24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+            </svg>
+          </div>
+          <h3 className="text-xl font-semibold text-gray-600 mb-2">
+            {viewMode === 'active' ? 'No Active Products' : 'No Deleted Products'}
+          </h3>
+          <p className="text-gray-500 mb-4">
+            {viewMode === 'active' 
+              ? 'Start by adding your first product' 
+              : 'All deleted products will appear here'}
+          </p>
+          {viewMode === 'active' && (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setShowModal(true)}
+              className="bg-amber-500 hover:bg-amber-600 text-white px-6 py-3 rounded-lg flex items-center space-x-2"
+            >
+              <PlusIcon className="h-5 w-5" />
+              <span>Add Your First Product</span>
+            </motion.button>
+          )}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {products.map((product) => (
           <motion.div
             key={product.id}
             initial={{ opacity: 0, y: 20 }}
@@ -312,23 +461,60 @@ const ProductManagement = () => {
                 className="w-full h-48 object-cover"
               />
               <div className="absolute top-2 right-2 flex space-x-1">
-                <button
-                  onClick={() => handleEdit(product)}
-                  className="bg-white/80 hover:bg-white p-2 rounded-full transition-colors"
-                >
-                  <PencilIcon className="h-4 w-4 text-gray-600" />
-                </button>
-                <button
-                  onClick={() => handleDelete(product.id, product.images)}
-                  className="bg-white/80 hover:bg-white p-2 rounded-full transition-colors"
-                >
-                  <TrashIcon className="h-4 w-4 text-red-600" />
-                </button>
+                {viewMode === 'active' ? (
+                  <>
+                    <button
+                      onClick={() => handleEdit(product)}
+                      className="bg-white/80 hover:bg-white p-2 rounded-full transition-colors"
+                      title="Edit Product"
+                    >
+                      <PencilIcon className="h-4 w-4 text-gray-600" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(product.id)}
+                      className="bg-white/80 hover:bg-white p-2 rounded-full transition-colors"
+                      title="Delete Product"
+                    >
+                      <TrashIcon className="h-4 w-4 text-red-600" />
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => handleRestore(product.id)}
+                      className="bg-green-500/90 hover:bg-green-600 p-2 rounded-full transition-colors"
+                      title="Restore Product"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={() => handlePermanentDelete(product.id)}
+                      className="bg-red-500/90 hover:bg-red-600 p-2 rounded-full transition-colors"
+                      title="Permanently Delete"
+                    >
+                      <XMarkIcon className="h-4 w-4 text-white" />
+                    </button>
+                  </>
+                )}
               </div>
             </div>
             <div className="p-4">
-              <h3 className="font-semibold text-gray-800 mb-2">{product.title}</h3>
-              <p className="text-sm text-gray-600 mb-2 line-clamp-2">{product.desc}</p>
+              <div className="flex items-start justify-between mb-2">
+                <h3 className="font-semibold text-gray-800 flex-1">{product.title}</h3>
+                {viewMode === 'deleted' && (
+                  <span className="ml-2 px-2 py-1 bg-red-100 text-red-600 text-xs rounded-full">
+                    Deleted
+                  </span>
+                )}
+              </div>
+              <p className="text-sm text-gray-600 mb-2 line-clamp-2">{product.desc || product.description}</p>
+              {viewMode === 'deleted' && product.deletedAt && (
+                <p className="text-xs text-gray-500 mb-2">
+                  Deleted on: {new Date(product.deletedAt.seconds * 1000).toLocaleDateString()}
+                </p>
+              )}
               <div className="flex justify-between items-center">
                 <div>
                   <span className="text-lg font-bold text-amber-600">₹{product.price}</span>
@@ -355,7 +541,8 @@ const ProductManagement = () => {
             </div>
           </motion.div>
         ))}
-      </div>
+        </div>
+      )}
 
       {/* Add/Edit Product Modal */}
       <AnimatePresence>
