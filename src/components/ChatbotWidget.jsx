@@ -1,9 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaPaperPlane, FaTimes } from 'react-icons/fa';
+import { FaPaperPlane, FaTimes, FaTrash, FaHistory } from 'react-icons/fa';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import { v4 as uuidv4 } from 'uuid';
+import { useAuth } from '../context/AuthContext';
+import { auth } from '../config/firebase';
 
 const ChatbotWidget = () => {
+  const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
     {
@@ -15,16 +19,213 @@ const ChatbotWidget = () => {
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  const [anonymousId, setAnonymousId] = useState('');
+  const [authStatus, setAuthStatus] = useState('anonymous');
+  const [messageCount, setMessageCount] = useState(0);
   const messagesEndRef = useRef(null);
   const chatWindowRef = useRef(null);
 
   // API Base URL from environment
   const API_BASE_URL = (import.meta.env.VITE_BACKEND_API_URL || '').replace(/\/$/, '');
 
+  // Helper: Get or create anonymous ID
+  const getOrCreateAnonymousId = () => {
+    let anonId = localStorage.getItem('chatbot_anonymous_id');
+    if (!anonId) {
+      anonId = `anon-${uuidv4()}`;
+      localStorage.setItem('chatbot_anonymous_id', anonId);
+    }
+    return anonId;
+  };
+
+  // Helper: Get valid auth token (with auto-refresh)
+  const getValidAuthToken = async () => {
+    // Get the actual Firebase auth user (not the custom user from context)
+    const firebaseUser = auth.currentUser;
+    
+    if (!firebaseUser) return null;
+    
+    try {
+      // Force refresh to get a fresh token (Firebase tokens expire after 1 hour)
+      const token = await firebaseUser.getIdToken(true);
+      localStorage.setItem('authToken', token);
+      console.log('✅ Token refreshed successfully');
+      return token;
+    } catch (error) {
+      console.error('❌ Token refresh failed:', error);
+      localStorage.removeItem('authToken');
+      return null;
+    }
+  };
+
   // Check if user is authenticated
   const isUserAuthenticated = () => {
-    const token = localStorage.getItem('authToken');
-    return !!token;
+    return !!user;
+  };
+
+  // Initialize anonymous ID on mount
+  useEffect(() => {
+    const anonId = getOrCreateAnonymousId();
+    setAnonymousId(anonId);
+  }, []);
+
+  // Update auth status whenever user changes
+  useEffect(() => {
+    const newStatus = isUserAuthenticated() ? 'authenticated' : 'anonymous';
+    console.log('🔐 Auth status update:', {
+      firebaseUser: !!user,
+      userEmail: user?.email,
+      newStatus: newStatus
+    });
+    setAuthStatus(newStatus);
+  }, [user]);
+
+  // Fetch chat history on mount and when user logs in
+  useEffect(() => {
+    if (anonymousId) {
+      console.log('🔄 Triggering history fetch:', {
+        anonymousId,
+        hasUser: !!user,
+        userEmail: user?.email
+      });
+      fetchChatHistory();
+    }
+  }, [anonymousId, user]);
+
+  const fetchChatHistory = async () => {
+    try {
+      setIsLoadingHistory(true);
+      
+      // Get fresh auth token (will auto-refresh if needed)
+      const authToken = await getValidAuthToken();
+      const isAuthenticated = !!authToken;
+      
+      let url = `${API_BASE_URL}/api1/llm/history`;
+      const headers = {
+        'Content-Type': 'application/json',
+      };
+
+      if (isAuthenticated) {
+        // ✅ AUTHENTICATED: Send ONLY Authorization header (NO anonymousId)
+        headers['Authorization'] = `Bearer ${authToken}`;
+        console.log('📤 Fetching authenticated history');
+      } else {
+        // ✅ ANONYMOUS: Send ONLY anonymousId (NO Authorization header)
+        const anonId = getOrCreateAnonymousId();
+        url += `?anonymousId=${anonId}`;
+        console.log('📤 Fetching anonymous history with ID:', anonId);
+      }
+
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: headers,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        
+        console.log('📥 History response:', {
+          user_type: data.user_type,
+          message_count: data.message_count,
+          expected: isAuthenticated ? 'authenticated' : 'anonymous'
+        });
+        
+        // Update auth status from backend response
+        if (data.user_type) {
+          setAuthStatus(data.user_type);
+          
+          // Verify we got what we expected
+          const expectedType = isAuthenticated ? 'authenticated' : 'anonymous';
+          if (data.user_type !== expectedType) {
+            console.warn(`⚠️ Expected ${expectedType} but got ${data.user_type}`);
+            console.warn('Check backend terminal logs for details!');
+          }
+        }
+        
+        // Update message count
+        if (data.message_count) {
+          setMessageCount(data.message_count);
+        }
+        
+        // Keep the welcome message and append history
+        if (data.history && Array.isArray(data.history) && data.history.length > 0) {
+          const historyMessages = data.history.map((msg, index) => ({
+            id: index + 2,
+            text: msg.content || msg.text || msg.message,
+            sender: msg.role === 'user' ? 'user' : 'bot',
+            timestamp: msg.timestamp ? new Date(msg.timestamp) : new Date()
+          }));
+          
+          // Use functional update to get current messages
+          setMessages(currentMessages => {
+            const welcomeMessage = currentMessages[0];
+            return [welcomeMessage, ...historyMessages];
+          });
+          setMessageCount(historyMessages.length);
+        }
+      } else if (response.status === 401 && isAuthenticated) {
+        // Token invalid, fallback to anonymous
+        console.log('❌ Auth token invalid, switching to anonymous');
+        setAuthStatus('anonymous');
+        localStorage.removeItem('authToken');
+      }
+    } catch (error) {
+      console.error('Error fetching chat history:', error);
+      // Silently fail - user can still chat
+    } finally {
+      setIsLoadingHistory(false);
+    }
+  };
+
+  // Clear chat history (authenticated users only)
+  const handleClearChat = async () => {
+    if (!isUserAuthenticated()) {
+      alert('Only logged-in users can clear chat history');
+      return;
+    }
+
+    if (!confirm('Are you sure you want to clear your entire chat history? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      const authToken = await getValidAuthToken();
+      if (!authToken) {
+        alert('Session expired. Please log in again.');
+        setAuthStatus('anonymous');
+        return;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/api1/llm/clearchat`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`
+        }
+      });
+
+      if (response.ok) {
+        // Reset messages to welcome message only
+        setMessages([{
+          id: 1,
+          text: "Hello! 👋 Welcome to Laxmi Honey Industry. How can I help you today?",
+          sender: 'bot',
+          timestamp: new Date()
+        }]);
+        setMessageCount(0);
+        alert('✅ Chat history cleared successfully!');
+      } else if (response.status === 401) {
+        alert('Session expired. Please log in again.');
+        setAuthStatus('anonymous');
+        localStorage.removeItem('authToken');
+      } else {
+        throw new Error('Failed to clear chat');
+      }
+    } catch (error) {
+      console.error('Error clearing chat:', error);
+      alert('Failed to clear chat history. Please try again.');
+    }
   };
 
   const scrollToBottom = () => {
@@ -71,37 +272,76 @@ const ChatbotWidget = () => {
         throw new Error('Backend API base URL is not configured');
       }
 
-      const isAuthenticated = isUserAuthenticated();
+      // Get fresh auth token (will auto-refresh if needed)
+      const authToken = await getValidAuthToken();
+      const isAuthenticated = !!authToken;
+      
+      // Determine endpoint based on authentication
       const endpoint = isAuthenticated ? '/api1/llm/authenticated' : '/api1/llm/public';
+
+      // Prepare request body
+      const requestBody = {
+        message: userMessage
+      };
+
+      // Prepare headers
+      const headers = {
+        'Content-Type': 'application/json'
+      };
+
+      if (isAuthenticated) {
+        // ✅ AUTHENTICATED: Send ONLY Authorization header (NO anonymousId)
+        headers['Authorization'] = `Bearer ${authToken}`;
+        console.log('📤 Sending authenticated message');
+      } else {
+        // ✅ ANONYMOUS: Add anonymousId to body (NO Authorization header)
+        requestBody.anonymousId = anonymousId;
+        console.log('📤 Sending anonymous message with ID:', anonymousId);
+      }
 
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(isAuthenticated && {
-            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-          })
-        },
-        body: JSON.stringify({
-          message: userMessage
-        }),
+        headers: headers,
+        body: JSON.stringify(requestBody),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to get response from LLM');
+        if (response.status === 401 && isAuthenticated) {
+          // Token expired, fallback to anonymous
+          console.log('❌ Token expired, retrying as anonymous');
+          setAuthStatus('anonymous');
+          localStorage.removeItem('authToken');
+          // Retry as anonymous
+          return await getBotResponseFromLLM(userMessage);
+        }
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
       const data = await response.json();
       
-      if (typeof data === 'object' && data.response) {
-        return data.response;
-      } else if (typeof data === 'string') {
-        return data;
-      } else {
-        return "I apologize, but I received an unexpected response. Please try again! 🙏";
+      console.log('📥 Message response:', {
+        user_type: data.user_type,
+        expected: isAuthenticated ? 'authenticated' : 'anonymous'
+      });
+      
+      // Update auth status from backend response
+      if (data.user_type) {
+        setAuthStatus(data.user_type);
+        
+        // Verify we got what we expected
+        const expectedType = isAuthenticated ? 'authenticated' : 'anonymous';
+        if (data.user_type !== expectedType) {
+          console.warn(`⚠️ Expected ${expectedType} but got ${data.user_type}`);
+        }
       }
+      
+      // Update message count
+      setMessageCount(prev => prev + 2); // User message + bot response
+      
+      return data.response || "I apologize, but I received an unexpected response. Please try again! 🙏";
+      
     } catch (error) {
-      console.error('Chatbot error:', error.message);
+      console.error('Chatbot error:', error);
       return "I apologize, but I'm having trouble processing your request right now. Please try again or contact us directly at +977 981-9492581. 🙏";
     }
   };
@@ -196,18 +436,31 @@ const ChatbotWidget = () => {
           >
             {/* Header - Modern & Minimal */}
             <div className="bg-gradient-to-br from-amber-500 via-orange-500 to-amber-600 p-5 relative">
-              {/* Close Button - Top Right */}
-              <motion.button
-                onClick={() => setIsOpen(false)}
-                whileHover={{ scale: 1.1, rotate: 90 }}
-                whileTap={{ scale: 0.9 }}
-                className="absolute top-4 right-4 w-9 h-9 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center transition-colors duration-200"
-              >
-                <FaTimes className="w-4 h-4 text-white" />
-              </motion.button>
+              {/* Action Buttons - Top Right */}
+              <div className="absolute top-4 right-4 flex gap-2">
+                {authStatus === 'authenticated' && (
+                  <motion.button
+                    onClick={handleClearChat}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    className="w-9 h-9 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center transition-colors duration-200"
+                    title="Clear Chat History"
+                  >
+                    <FaTrash className="w-3.5 h-3.5 text-white" />
+                  </motion.button>
+                )}
+                <motion.button
+                  onClick={() => setIsOpen(false)}
+                  whileHover={{ scale: 1.1, rotate: 90 }}
+                  whileTap={{ scale: 0.9 }}
+                  className="w-9 h-9 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center transition-colors duration-200"
+                >
+                  <FaTimes className="w-4 h-4 text-white" />
+                </motion.button>
+              </div>
 
               {/* Header Content */}
-              <div className="flex items-center gap-3 pr-10">
+              <div className="flex items-center gap-3 pr-24">
                 <div className="w-14 h-14 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-lg">
                   <div className="w-10 h-10">
                     <DotLottieReact
@@ -218,19 +471,39 @@ const ChatbotWidget = () => {
                     />
                   </div>
                 </div>
-                <div>
+                <div className="flex-1">
                   <h3 className="text-white font-bold text-xl">Laxmi Honey</h3>
                   <div className="flex items-center gap-2 mt-1">
                     <span className="w-2 h-2 bg-green-300 rounded-full animate-pulse shadow-sm"></span>
-                    <span className="text-white/95 text-sm font-medium">Always here to help</span>
+                    <span className="text-white/95 text-sm font-medium">
+                      {authStatus === 'authenticated' ? 'Logged in' : 'Guest'}
+                    </span>
                   </div>
+                  {messageCount > 0 && (
+                    <p className="text-white/75 text-xs mt-0.5">
+                      {messageCount} {messageCount === 1 ? 'message' : 'messages'}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
 
             {/* Messages Container */}
             <div className="flex-1 overflow-y-auto p-5 space-y-3 bg-gradient-to-b from-amber-50/30 to-orange-50/20">
-              {messages.map((message) => (
+              {isLoadingHistory ? (
+                <div className="flex justify-center items-center h-full">
+                  <div className="text-center">
+                    <div className="flex gap-1.5 justify-center mb-2">
+                      <span className="w-2.5 h-2.5 bg-amber-400 rounded-full animate-bounce"></span>
+                      <span className="w-2.5 h-2.5 bg-orange-400 rounded-full animate-bounce" style={{ animationDelay: '0.15s' }}></span>
+                      <span className="w-2.5 h-2.5 bg-amber-500 rounded-full animate-bounce" style={{ animationDelay: '0.3s' }}></span>
+                    </div>
+                    <p className="text-sm text-gray-500">Loading chat history...</p>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  {messages.map((message) => (
                 <motion.div
                   key={message.id}
                   initial={{ opacity: 0, y: 10 }}
@@ -271,6 +544,8 @@ const ChatbotWidget = () => {
               )}
 
               <div ref={messagesEndRef} />
+                </>
+              )}
             </div>
 
             {/* Quick Replies */}
