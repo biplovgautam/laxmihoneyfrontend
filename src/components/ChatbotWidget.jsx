@@ -21,6 +21,12 @@ const ChatbotWidget = () => {
   // API Base URL from environment
   const API_BASE_URL = (import.meta.env.VITE_BACKEND_API_URL || '').replace(/\/$/, '');
 
+  // Check if user is authenticated
+  const isUserAuthenticated = () => {
+    const token = localStorage.getItem('authToken');
+    return !!token;
+  };
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -57,24 +63,7 @@ const ChatbotWidget = () => {
     "How can I contact you?"
   ];
 
-  // Context about Laxmi Honey Industry for the LLM
-  const getContextualPrompt = (userMessage) => {
-    return `You are a friendly customer service assistant for Laxmi Honey Industry, a premium honey company in Nepal. 
 
-Company Information:
-- We sell 100% pure, natural, and unprocessed honey
-- We work directly with local beekeepers
-- Free delivery on orders above Rs. 1000 across Nepal
-- Standard delivery takes 2-3 business days
-- Contact: +977 981-9492581, info@laxmibeekeeping.com.np
-- CTO & MD: Biplov Gautam - cto@laxmibeekeeping.com.np
-- We offer various types of honey products
-- All products are of highest quality with no additives or preservatives
-
-User Question: ${userMessage}
-
-Please provide a helpful, friendly, and concise response (2-3 sentences max). Use emojis appropriately. If the question is about products, delivery, contact info, or honey benefits, provide specific details from the company information above.`;
-  };
 
   const getBotResponseFromLLM = async (userMessage) => {
     try {
@@ -82,13 +71,19 @@ Please provide a helpful, friendly, and concise response (2-3 sentences max). Us
         throw new Error('Backend API base URL is not configured');
       }
 
-      const response = await fetch(`${API_BASE_URL}/llm`, {
+      const isAuthenticated = isUserAuthenticated();
+      const endpoint = isAuthenticated ? '/api1/llm/authenticated' : '/api1/llm/public';
+
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...(isAuthenticated && {
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          })
         },
         body: JSON.stringify({
-          prompt: getContextualPrompt(userMessage)
+          message: userMessage
         }),
       });
 
@@ -98,7 +93,6 @@ Please provide a helpful, friendly, and concise response (2-3 sentences max). Us
 
       const data = await response.json();
       
-      // Extract the response field from the returned object
       if (typeof data === 'object' && data.response) {
         return data.response;
       } else if (typeof data === 'string') {
@@ -108,7 +102,6 @@ Please provide a helpful, friendly, and concise response (2-3 sentences max). Us
       }
     } catch (error) {
       console.error('Chatbot error:', error.message);
-      // Fallback response if API fails
       return "I apologize, but I'm having trouble processing your request right now. Please try again or contact us directly at +977 981-9492581. 🙏";
     }
   };
@@ -124,21 +117,19 @@ Please provide a helpful, friendly, and concise response (2-3 sentences max). Us
     };
 
     setMessages(prev => [...prev, userMessage]);
+    setIsTyping(true);
     const currentMessage = inputMessage;
     setInputMessage('');
-    setIsTyping(true);
 
     try {
-      // Get response from LLM API
+      // Pass only the raw user message to backend
       const botResponseText = await getBotResponseFromLLM(currentMessage);
-      
       const botResponse = {
         id: messages.length + 2,
         text: botResponseText,
         sender: 'bot',
         timestamp: new Date()
       };
-      
       setMessages(prev => [...prev, botResponse]);
     } catch (error) {
       console.error('Error getting bot response:', error);
