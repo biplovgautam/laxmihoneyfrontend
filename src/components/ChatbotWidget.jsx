@@ -5,6 +5,7 @@ import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { v4 as uuidv4 } from 'uuid';
 import { useAuth } from '../context/AuthContext';
 import { auth } from '../config/firebase';
+import Toast from './Toast';
 
 const ChatbotWidget = () => {
   const { user } = useAuth();
@@ -25,6 +26,17 @@ const ChatbotWidget = () => {
   const [messageCount, setMessageCount] = useState(0);
   const messagesEndRef = useRef(null);
   const chatWindowRef = useRef(null);
+  
+  // Toast state
+  const [toast, setToast] = useState({ show: false, type: 'success', message: '' });
+
+  const showToast = (type, message) => {
+    setToast({ show: true, type, message });
+  };
+
+  const hideToast = () => {
+    setToast({ ...toast, show: false });
+  };
 
   // API Base URL from environment
   const API_BASE_URL = (import.meta.env.VITE_BACKEND_API_URL || '').replace(/\/$/, '');
@@ -181,7 +193,7 @@ const ChatbotWidget = () => {
   // Clear chat history (authenticated users only)
   const handleClearChat = async () => {
     if (!isUserAuthenticated()) {
-      alert('Only logged-in users can clear chat history');
+      showToast('warning', 'Only logged-in users can clear chat history');
       return;
     }
 
@@ -192,7 +204,7 @@ const ChatbotWidget = () => {
     try {
       const authToken = await getValidAuthToken();
       if (!authToken) {
-        alert('Session expired. Please log in again.');
+        showToast('error', 'Session expired. Please log in again.');
         setAuthStatus('anonymous');
         return;
       }
@@ -214,9 +226,9 @@ const ChatbotWidget = () => {
           timestamp: new Date()
         }]);
         setMessageCount(0);
-        alert('✅ Chat history cleared successfully!');
+        showToast('success', 'Chat history cleared successfully!');
       } else if (response.status === 401) {
-        alert('Session expired. Please log in again.');
+        showToast('error', 'Session expired. Please log in again.');
         setAuthStatus('anonymous');
         localStorage.removeItem('authToken');
       } else {
@@ -224,7 +236,7 @@ const ChatbotWidget = () => {
       }
     } catch (error) {
       console.error('Error clearing chat:', error);
-      alert('Failed to clear chat history. Please try again.');
+      showToast('error', 'Failed to clear chat history. Please try again.');
     }
   };
 
@@ -398,6 +410,15 @@ const ChatbotWidget = () => {
 
   return (
     <>
+      {/* Toast Notification */}
+      <Toast
+        type={toast.type}
+        message={toast.message}
+        show={toast.show}
+        onClose={hideToast}
+        duration={4000}
+      />
+
       {/* Floating Chat Button with Lottie Animation - Only shows when chat is closed */}
       {!isOpen && (
         <motion.button
