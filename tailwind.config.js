@@ -51,6 +51,8 @@ export default {
       },
       animation: {
         buzzingBee: 'buzzing 3s ease-in-out infinite',
+        fadeIn: 'fadeIn 0.5s ease-in-out',
+        blob: 'blob 7s infinite',
       },
       keyframes: {
         buzzing: {
@@ -58,6 +60,19 @@ export default {
           '50%': { transform: 'translateX(50px) translateY(-30px)' },
           '100%': { transform: 'translateX(-50px) translateY(0)' },
         },
+        fadeIn: {
+          '0%': { opacity: '0', transform: 'translateY(10px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        blob: {
+          '0%': { transform: 'translate(0px, 0px) scale(1)' },
+          '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+          '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+          '100%': { transform: 'translate(0px, 0px) scale(1)' },
+        },
+      },
+      animationDelay: {
+        '2000': '2000ms',
       },
     },
   },

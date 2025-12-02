@@ -98,7 +98,12 @@ const Navbar = () => {
       await logout();
       setUserMenuOpen(false);
       setMenuOpen(false);
+      
+      // Redirect to home page
       navigate('/');
+      
+      // Force a full page refresh to reset all state
+      window.location.reload();
     } catch (error) {
       console.error('Logout error:', error);
     }

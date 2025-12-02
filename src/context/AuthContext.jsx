@@ -220,6 +220,18 @@ export const AuthProvider = ({ children }) => {
       await signOut(auth);
       setNeedsPhoneNumber(false);
       setNeedsProfileCompletion(false);
+      
+      // Clear all auth-related data from localStorage
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('chatbot_anonymous_id');
+      
+      // Clear any profile prompt timestamps
+      Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('lastProfilePrompt_')) {
+          localStorage.removeItem(key);
+        }
+      });
+      
       return { success: true };
     } catch (error) {
       console.error('Logout error:', error);

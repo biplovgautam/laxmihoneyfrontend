@@ -193,7 +193,12 @@ const Account = () => {
   const handleLogout = async () => {
     try {
       await logout();
+      
+      // Redirect to home page
       navigate('/');
+      
+      // Force a full page refresh to reset all state
+      window.location.reload();
     } catch (error) {
       console.error('Logout error:', error);
       setToast({ show: true, message: 'Failed to logout. Please try again.', type: 'error' });

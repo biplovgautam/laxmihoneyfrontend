@@ -1,8 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaPaperPlane, FaTimes, FaTrash, FaHistory, FaComments } from 'react-icons/fa';
-import { DotLottieReact } from '@lottiefiles/dotlottie-react';
-import { v4 as uuidv4 } from 'uuid';
+import { FaPaperPlane, FaTimes, FaTrash, FaRobot, FaUser, FaCircle } from 'react-icons/fa';
+import { HiSparkles } from 'react-icons/hi';
 import { useAuth } from '../context/AuthContext';
 import { auth } from '../config/firebase';
 import Toast from './Toast';
@@ -21,7 +20,6 @@ const ChatbotWidget = () => {
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
-  const [anonymousId, setAnonymousId] = useState('');
   const [authStatus, setAuthStatus] = useState('anonymous');
   const [messageCount, setMessageCount] = useState(0);
   const messagesEndRef = useRef(null);
@@ -46,16 +44,6 @@ const ChatbotWidget = () => {
     if (import.meta.env.DEV) {
       console.log(message, data);
     }
-  };
-
-  // Helper: Get or create anonymous ID
-  const getOrCreateAnonymousId = () => {
-    let anonId = localStorage.getItem('chatbot_anonymous_id');
-    if (!anonId) {
-      anonId = `anon-${uuidv4()}`;
-      localStorage.setItem('chatbot_anonymous_id', anonId);
-    }
-    return anonId;
   };
 
   // Helper: Get valid auth token (with auto-refresh)
@@ -83,12 +71,6 @@ const ChatbotWidget = () => {
     return !!user;
   };
 
-  // Initialize anonymous ID on mount
-  useEffect(() => {
-    const anonId = getOrCreateAnonymousId();
-    setAnonymousId(anonId);
-  }, []);
-
   // Update auth status whenever user changes
   useEffect(() => {
     const newStatus = isUserAuthenticated() ? 'authenticated' : 'anonymous';
@@ -98,43 +80,39 @@ const ChatbotWidget = () => {
       newStatus: newStatus
     });
     setAuthStatus(newStatus);
-  }, [user]);
 
-  // Fetch chat history on mount and when user logs in
-  useEffect(() => {
-    if (anonymousId) {
-      devLog('🔄 Triggering history fetch:', {
-        anonymousId,
-        hasUser: !!user,
-        userEmail: user?.email
-      });
+    // Fetch history only for authenticated users
+    if (user) {
       fetchChatHistory();
     }
-  }, [anonymousId, user]);
+  }, [user]);
 
   const fetchChatHistory = async () => {
+    // Only fetch history for authenticated users
+    if (!isUserAuthenticated()) {
+      devLog('📭 Skipping history fetch for guest user');
+      return;
+    }
+
     try {
       setIsLoadingHistory(true);
       
       // Get fresh auth token (will auto-refresh if needed)
       const authToken = await getValidAuthToken();
-      const isAuthenticated = !!authToken;
       
-      let url = `${API_BASE_URL}/api1/llm/history`;
+      if (!authToken) {
+        console.log('❌ No auth token available');
+        setAuthStatus('anonymous');
+        return;
+      }
+      
+      const url = `${API_BASE_URL}/api1/llm/history`;
       const headers = {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`
       };
 
-      if (isAuthenticated) {
-        // ✅ AUTHENTICATED: Send ONLY Authorization header (NO anonymousId)
-        headers['Authorization'] = `Bearer ${authToken}`;
-        devLog('📤 Fetching authenticated history');
-      } else {
-        // ✅ ANONYMOUS: Send ONLY anonymousId (NO Authorization header)
-        const anonId = getOrCreateAnonymousId();
-        url += `?anonymousId=${anonId}`;
-        devLog('📤 Fetching anonymous history with ID:', anonId);
-      }
+      devLog('📤 Fetching authenticated history');
 
       const response = await fetch(url, {
         method: 'GET',
@@ -146,20 +124,12 @@ const ChatbotWidget = () => {
         
         devLog('📥 History response:', {
           user_type: data.user_type,
-          message_count: data.message_count,
-          expected: isAuthenticated ? 'authenticated' : 'anonymous'
+          message_count: data.message_count
         });
         
         // Update auth status from backend response
         if (data.user_type) {
           setAuthStatus(data.user_type);
-          
-          // Verify we got what we expected
-          const expectedType = isAuthenticated ? 'authenticated' : 'anonymous';
-          if (data.user_type !== expectedType) {
-            console.warn(`⚠️ Expected ${expectedType} but got ${data.user_type}`);
-            console.warn('Check backend terminal logs for details!');
-          }
         }
         
         // Update message count
@@ -183,7 +153,7 @@ const ChatbotWidget = () => {
           });
           setMessageCount(historyMessages.length);
         }
-      } else if (response.status === 401 && isAuthenticated) {
+      } else if (response.status === 401) {
         // Token invalid, fallback to anonymous
         console.log('❌ Auth token invalid, switching to anonymous');
         setAuthStatus('anonymous');
@@ -298,7 +268,7 @@ const ChatbotWidget = () => {
       // Determine endpoint based on authentication
       const endpoint = isAuthenticated ? '/api1/llm/authenticated' : '/api1/llm/public';
 
-      // Prepare request body
+      // Prepare request body - SIMPLIFIED for guest users
       const requestBody = {
         message: userMessage
       };
@@ -309,13 +279,12 @@ const ChatbotWidget = () => {
       };
 
       if (isAuthenticated) {
-        // ✅ AUTHENTICATED: Send ONLY Authorization header (NO anonymousId)
+        // ✅ AUTHENTICATED: Send Authorization header for session memory
         headers['Authorization'] = `Bearer ${authToken}`;
-        devLog('📤 Sending authenticated message');
+        devLog('📤 Sending authenticated message (with session memory)');
       } else {
-        // ✅ ANONYMOUS: Add anonymousId to body (NO Authorization header)
-        requestBody.anonymousId = anonymousId;
-        devLog('📤 Sending anonymous message with ID:', anonymousId);
+        // ✅ GUEST: Simple stateless request - no anonymousId, no tracking
+        devLog('📤 Sending guest message (stateless)');
       }
 
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
@@ -327,10 +296,10 @@ const ChatbotWidget = () => {
       if (!response.ok) {
         if (response.status === 401 && isAuthenticated) {
           // Token expired, fallback to anonymous
-          console.log('❌ Token expired, retrying as anonymous');
+          console.log('❌ Token expired, retrying as guest');
           setAuthStatus('anonymous');
           localStorage.removeItem('authToken');
-          // Retry as anonymous
+          // Retry as guest (will use /api1/llm/public endpoint)
           return await getBotResponseFromLLM(userMessage);
         }
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -340,28 +309,24 @@ const ChatbotWidget = () => {
       
       devLog('📥 Message response:', {
         user_type: data.user_type,
-        expected: isAuthenticated ? 'authenticated' : 'anonymous'
+        expected: isAuthenticated ? 'authenticated' : 'guest'
       });
       
       // Update auth status from backend response
       if (data.user_type) {
         setAuthStatus(data.user_type);
-        
-        // Verify we got what we expected
-        const expectedType = isAuthenticated ? 'authenticated' : 'anonymous';
-        if (data.user_type !== expectedType) {
-          console.warn(`⚠️ Expected ${expectedType} but got ${data.user_type}`);
-        }
       }
       
-      // Update message count
-      setMessageCount(prev => prev + 2); // User message + bot response
+      // Update message count (only for authenticated users with session)
+      if (isAuthenticated) {
+        setMessageCount(prev => prev + 2); // User message + bot response
+      }
       
-      return data.response || "I apologize, but I received an unexpected response. Please try again! 🙏";
+      return data.response || "I apologize, but I received an unexpected response. Please try again!";
       
     } catch (error) {
       console.error('Chatbot error:', error);
-      return "I apologize, but I'm having trouble processing your request right now. Please try again or contact us directly at +977 981-9492581. 🙏";
+      return "I apologize, but I'm having trouble processing your request right now. Please try again or contact us directly at +977 981-9492581.";
     }
   };
 
@@ -394,7 +359,7 @@ const ChatbotWidget = () => {
       console.error('Error getting bot response:', error);
       const errorResponse = {
         id: messages.length + 2,
-        text: "I apologize, but I'm having trouble right now. Please try again or contact us at +977 981-9492581. 🙏",
+        text: "I apologize, but I'm having trouble right now. Please try again or contact us at +977 981-9492581.",
         sender: 'bot',
         timestamp: new Date()
       };
@@ -426,29 +391,55 @@ const ChatbotWidget = () => {
         duration={4000}
       />
 
-      {/* Floating Chat Button with Lottie Animation - Only shows when chat is closed */}
+      {/* Floating Chat Button - Modern Icon Design */}
       {!isOpen && (
         <motion.button
           id="chatbot-floating-button"
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 z-50"
-          whileHover={{ scale: 1.1 }}
+          className="fixed bottom-6 right-6 z-50 group"
+          whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0, opacity: 0 }}
           transition={{ type: "spring", stiffness: 260, damping: 20 }}
-          style={{ background: 'transparent', border: 'none', padding: 0 }}
         >
-          <div className="relative w-20 h-20 flex items-center justify-center">
-            {/* Always render Lottie */}
-            <div className="w-full h-full">
-              <DotLottieReact
-                src="https://lottie.host/e5551b86-c2f2-4f2e-80f1-a55d7640f385/VS5zzBIn9D.lottie"
-                loop
-                autoplay
-                style={{ width: '100%', height: '100%' }}
-              />
+          {/* Glow Effect */}
+          <div className="absolute inset-0 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl blur-xl opacity-60 group-hover:opacity-80 transition-opacity duration-300"></div>
+          
+          {/* Button Content */}
+          <div className="relative w-16 h-16 bg-gradient-to-br from-amber-500 via-orange-500 to-amber-600 rounded-2xl shadow-2xl flex items-center justify-center overflow-hidden">
+            {/* Animated Background Pattern */}
+            <div className="absolute inset-0 opacity-20">
+              <div className="absolute top-0 -left-4 w-24 h-24 bg-white rounded-full mix-blend-overlay filter blur-xl animate-blob"></div>
+              <div className="absolute top-0 -right-4 w-24 h-24 bg-white rounded-full mix-blend-overlay filter blur-xl animate-blob animation-delay-2000"></div>
+            </div>
+            
+            {/* Icon */}
+            <div className="relative">
+              <FaRobot className="w-7 h-7 text-white group-hover:scale-110 transition-transform duration-300" />
+              
+              {/* Notification Badge */}
+              {messageCount > 0 && (
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center border-2 border-white"
+                >
+                  <span className="text-white text-xs font-bold">{messageCount > 9 ? '9+' : messageCount}</span>
+                </motion.div>
+              )}
+              
+              {/* Pulse Ring */}
+              <span className="absolute inset-0 rounded-full bg-white opacity-30 animate-ping"></span>
+            </div>
+          </div>
+          
+          {/* Tooltip */}
+          <div className="absolute bottom-full right-0 mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+            <div className="bg-gray-900 text-white text-sm py-2 px-3 rounded-lg whitespace-nowrap shadow-lg">
+              Chat with us
+              <div className="absolute top-full right-4 -mt-1 border-4 border-transparent border-t-gray-900"></div>
             </div>
           </div>
         </motion.button>
@@ -463,135 +454,165 @@ const ChatbotWidget = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.3 }}
-            className="fixed bottom-6 right-6 z-50 w-[400px] max-w-[calc(100vw-2rem)] h-[650px] max-h-[calc(100vh-5rem)] bg-white rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-amber-100"
+            className="fixed bottom-6 right-6 z-50 w-[420px] max-w-[calc(100vw-2rem)] h-[680px] max-h-[calc(100vh-3rem)] bg-white rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-gray-100"
           >
-            {/* Header - Modern & Minimal */}
-            <div className="bg-gradient-to-br from-amber-500 via-orange-500 to-amber-600 p-5 relative">
-              {/* Action Buttons - Top Right */}
-              <div className="absolute top-4 right-4 flex gap-2">
-                {authStatus === 'authenticated' && (
-                  <motion.button
-                    onClick={handleClearChat}
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    className="w-9 h-9 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center transition-colors duration-200"
-                    title="Clear Chat History"
-                  >
-                    <FaTrash className="w-3.5 h-3.5 text-white" />
-                  </motion.button>
-                )}
-                <motion.button
-                  onClick={() => setIsOpen(false)}
-                  whileHover={{ scale: 1.1, rotate: 90 }}
-                  whileTap={{ scale: 0.9 }}
-                  className="w-9 h-9 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center transition-colors duration-200"
-                >
-                  <FaTimes className="w-4 h-4 text-white" />
-                </motion.button>
+            {/* Header - Premium Design */}
+            <div className="relative bg-gradient-to-br from-amber-500 via-orange-500 to-amber-600 p-6">
+              {/* Animated Background Pattern */}
+              <div className="absolute inset-0 opacity-10">
+                <div className="absolute top-0 left-0 w-32 h-32 bg-white rounded-full mix-blend-overlay filter blur-2xl animate-blob"></div>
+                <div className="absolute bottom-0 right-0 w-32 h-32 bg-white rounded-full mix-blend-overlay filter blur-2xl animate-blob animation-delay-2000"></div>
               </div>
 
               {/* Header Content */}
-              <div className="flex items-center gap-3 pr-24">
-                <div className="relative w-14 h-14 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-lg overflow-hidden">
-                  {/* Lottie Animation */}
-                  <div className="w-10 h-10">
-                    <DotLottieReact
-                      src="https://lottie.host/e5551b86-c2f2-4f2e-80f1-a55d7640f385/VS5zzBIn9D.lottie"
-                      loop
-                      autoplay
-                      style={{ width: '100%', height: '100%' }}
-                    />
+              <div className="relative flex items-start justify-between">
+                <div className="flex items-center gap-4">
+                  {/* Bot Avatar */}
+                  <div className="relative">
+                    <div className="w-14 h-14 bg-white/90 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-lg">
+                      <FaRobot className="w-7 h-7 text-amber-600" />
+                    </div>
+                    {/* Status Indicator */}
+                    <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-400 rounded-full border-3 border-white flex items-center justify-center">
+                      <FaCircle className="w-2 h-2 text-white animate-pulse" />
+                    </div>
+                  </div>
+
+                  {/* Bot Info */}
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="text-white font-bold text-lg">Laxmi Assistant</h3>
+                      <HiSparkles className="w-4 h-4 text-yellow-300 animate-pulse" />
+                    </div>
+                    <p className="text-white/90 text-sm font-medium">
+                      {authStatus === 'authenticated' ? '🔐 Secure Session' : '👋 Guest Mode'}
+                    </p>
+                    {messageCount > 0 && authStatus === 'authenticated' && (
+                      <p className="text-white/75 text-xs mt-0.5">
+                        {messageCount} conversation{messageCount === 1 ? '' : 's'}
+                      </p>
+                    )}
                   </div>
                 </div>
-                <div className="flex-1">
-                  <h3 className="text-white font-bold text-xl">Laxmi Honey</h3>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="w-2 h-2 bg-green-300 rounded-full animate-pulse shadow-sm"></span>
-                    <span className="text-white/95 text-sm font-medium">
-                      {authStatus === 'authenticated' ? 'Logged in' : 'Guest'}
-                    </span>
-                  </div>
-                  {messageCount > 0 && (
-                    <p className="text-white/75 text-xs mt-0.5">
-                      {messageCount} {messageCount === 1 ? 'message' : 'messages'}
-                    </p>
+
+                {/* Action Buttons */}
+                <div className="flex gap-2">
+                  {authStatus === 'authenticated' && (
+                    <motion.button
+                      onClick={handleClearChat}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      className="w-10 h-10 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-xl flex items-center justify-center transition-colors duration-200 group"
+                      title="Clear Chat History"
+                    >
+                      <FaTrash className="w-4 h-4 text-white group-hover:scale-110 transition-transform" />
+                    </motion.button>
                   )}
+                  <motion.button
+                    onClick={() => setIsOpen(false)}
+                    whileHover={{ scale: 1.1, rotate: 90 }}
+                    whileTap={{ scale: 0.9 }}
+                    className="w-10 h-10 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-xl flex items-center justify-center transition-colors duration-200"
+                  >
+                    <FaTimes className="w-4 h-4 text-white" />
+                  </motion.button>
                 </div>
               </div>
             </div>
 
             {/* Messages Container */}
-            <div className="flex-1 overflow-y-auto p-5 space-y-3 bg-gradient-to-b from-amber-50/30 to-orange-50/20">
+            <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-gradient-to-b from-gray-50 to-white custom-scrollbar">
               {isLoadingHistory ? (
                 <div className="flex justify-center items-center h-full">
                   <div className="text-center">
-                    <div className="flex gap-1.5 justify-center mb-2">
-                      <span className="w-2.5 h-2.5 bg-amber-400 rounded-full animate-bounce"></span>
-                      <span className="w-2.5 h-2.5 bg-orange-400 rounded-full animate-bounce" style={{ animationDelay: '0.15s' }}></span>
-                      <span className="w-2.5 h-2.5 bg-amber-500 rounded-full animate-bounce" style={{ animationDelay: '0.3s' }}></span>
+                    <div className="relative w-16 h-16 mx-auto mb-4">
+                      <div className="absolute inset-0 border-4 border-amber-200 rounded-full"></div>
+                      <div className="absolute inset-0 border-4 border-amber-500 rounded-full border-t-transparent animate-spin"></div>
                     </div>
-                    <p className="text-sm text-gray-500">Loading chat history...</p>
+                    <p className="text-sm text-gray-600 font-medium">Loading your conversation...</p>
                   </div>
                 </div>
               ) : (
                 <>
                   {messages.map((message) => (
-                <motion.div
-                  key={message.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div
-                    className={`max-w-[80%] rounded-2xl px-4 py-3 ${
-                      message.sender === 'user'
-                        ? 'bg-gradient-to-br from-amber-500 to-orange-500 text-white shadow-md rounded-br-sm'
-                        : 'bg-white text-gray-800 rounded-bl-sm shadow-sm'
-                    }`}
-                  >
-                    <p className="text-sm leading-relaxed whitespace-pre-line">{message.text}</p>
-                    <p className={`text-xs mt-1.5 ${message.sender === 'user' ? 'text-white/80' : 'text-gray-400'}`}>
-                      {message.timestamp.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
-                    </p>
-                  </div>
-                </motion.div>
-              ))}
+                    <motion.div
+                      key={message.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className={`flex gap-3 ${message.sender === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
+                    >
+                      {/* Avatar */}
+                      <div className={`flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center shadow-sm ${
+                        message.sender === 'user'
+                          ? 'bg-gradient-to-br from-gray-600 to-gray-700'
+                          : 'bg-gradient-to-br from-amber-500 to-orange-500'
+                      }`}>
+                        {message.sender === 'user' ? (
+                          <FaUser className="w-4 h-4 text-white" />
+                        ) : (
+                          <FaRobot className="w-4 h-4 text-white" />
+                        )}
+                      </div>
 
-              {/* Typing Indicator */}
-              {isTyping && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="flex justify-start"
-                >
-                  <div className="bg-white rounded-2xl rounded-bl-sm px-5 py-3 shadow-sm">
-                    <div className="flex gap-1.5">
-                      <span className="w-2.5 h-2.5 bg-amber-400 rounded-full animate-bounce"></span>
-                      <span className="w-2.5 h-2.5 bg-orange-400 rounded-full animate-bounce" style={{ animationDelay: '0.15s' }}></span>
-                      <span className="w-2.5 h-2.5 bg-amber-500 rounded-full animate-bounce" style={{ animationDelay: '0.3s' }}></span>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
+                      {/* Message Bubble */}
+                      <div className={`flex flex-col ${message.sender === 'user' ? 'items-end' : 'items-start'} max-w-[75%]`}>
+                        <div
+                          className={`rounded-2xl px-4 py-3 shadow-sm ${
+                            message.sender === 'user'
+                              ? 'bg-gradient-to-br from-gray-700 to-gray-800 text-white'
+                              : 'bg-white border border-gray-100 text-gray-800'
+                          }`}
+                        >
+                          <p className="text-sm leading-relaxed whitespace-pre-line">{message.text}</p>
+                        </div>
+                        <p className="text-xs text-gray-400 mt-1 px-1">
+                          {message.timestamp.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                      </div>
+                    </motion.div>
+                  ))}
 
-              <div ref={messagesEndRef} />
+                  {/* Typing Indicator */}
+                  {isTyping && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="flex gap-3"
+                    >
+                      <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-sm">
+                        <FaRobot className="w-4 h-4 text-white" />
+                      </div>
+                      <div className="bg-white border border-gray-100 rounded-2xl px-5 py-3 shadow-sm">
+                        <div className="flex gap-1.5">
+                          <span className="w-2.5 h-2.5 bg-amber-500 rounded-full animate-bounce"></span>
+                          <span className="w-2.5 h-2.5 bg-orange-500 rounded-full animate-bounce" style={{ animationDelay: '0.15s' }}></span>
+                          <span className="w-2.5 h-2.5 bg-amber-600 rounded-full animate-bounce" style={{ animationDelay: '0.3s' }}></span>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  <div ref={messagesEndRef} />
                 </>
               )}
             </div>
 
             {/* Quick Replies */}
             {messages.length <= 2 && (
-              <div className="px-5 py-3 bg-white/80 backdrop-blur-sm border-t border-amber-100/50">
-                <p className="text-xs text-gray-500 mb-2.5 font-medium">Suggested questions:</p>
+              <div className="px-5 py-4 bg-gray-50/80 backdrop-blur-sm border-t border-gray-100">
+                <div className="flex items-center gap-2 mb-3">
+                  <HiSparkles className="w-4 h-4 text-amber-500" />
+                  <p className="text-xs text-gray-600 font-semibold">Quick Questions</p>
+                </div>
                 <div className="flex flex-wrap gap-2">
                   {quickReplies.map((reply, index) => (
                     <motion.button
                       key={index}
                       onClick={() => handleQuickReply(reply)}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="px-3.5 py-2 bg-gradient-to-r from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 text-amber-700 text-xs font-medium rounded-xl border border-amber-200/50 transition-all duration-200 shadow-sm"
+                      whileHover={{ scale: 1.03, y: -2 }}
+                      whileTap={{ scale: 0.97 }}
+                      className="px-4 py-2.5 bg-white hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 text-gray-700 hover:text-amber-700 text-xs font-medium rounded-xl border border-gray-200 hover:border-amber-300 transition-all duration-200 shadow-sm hover:shadow-md"
                     >
                       {reply}
                     </motion.button>
@@ -600,30 +621,51 @@ const ChatbotWidget = () => {
               </div>
             )}
 
-            {/* Input Area */}
-            <div className="p-5 bg-white border-t border-amber-100/50">
-              <div className="flex gap-3">
-                <input
-                  type="text"
-                  value={inputMessage}
-                  onChange={(e) => setInputMessage(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder="Ask me anything..."
-                  className="flex-1 px-5 py-3.5 bg-amber-50/50 border border-amber-200/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent text-sm placeholder:text-gray-400 transition-all duration-200"
-                />
+            {/* Input Area - Modern Design */}
+            <div className="p-5 bg-white border-t border-gray-100">
+              <div className="flex gap-3 items-end">
+                <div className="flex-1 relative">
+                  <input
+                    type="text"
+                    value={inputMessage}
+                    onChange={(e) => setInputMessage(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    placeholder="Type your message..."
+                    className="w-full px-5 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent focus:bg-white text-sm placeholder:text-gray-400 transition-all duration-200"
+                  />
+                  {inputMessage.trim() && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="absolute right-3 top-1/2 -translate-y-1/2"
+                    >
+                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    </motion.div>
+                  )}
+                </div>
                 <motion.button
                   onClick={handleSendMessage}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   disabled={!inputMessage.trim()}
-                  className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-lg transition-all duration-200 ${
-                    inputMessage.trim() 
-                      ? 'bg-gradient-to-br from-amber-500 to-orange-500 hover:shadow-xl' 
-                      : 'bg-gray-300 cursor-not-allowed'
+                  className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg transition-all duration-200 ${
+                    inputMessage.trim()
+                      ? 'bg-gradient-to-br from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white hover:shadow-xl'
+                      : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                   }`}
                 >
-                  <FaPaperPlane className="w-4 h-4" />
+                  <FaPaperPlane className={`w-4 h-4 ${inputMessage.trim() ? 'translate-x-0.5 -translate-y-0.5' : ''}`} />
                 </motion.button>
+              </div>
+              
+              {/* Footer Info */}
+              <div className="flex items-center justify-center gap-1 mt-3">
+                <div className="flex items-center gap-1">
+                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+                  <p className="text-xs text-gray-400">
+                    Powered by AI
+                  </p>
+                </div>
               </div>
             </div>
           </motion.div>
