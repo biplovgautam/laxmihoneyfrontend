@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Block admin / auth-only paths from indexing
+Disallow: /admin
+Disallow: /account
+Disallow: /cart
+
+Sitemap: https://laxmibeekeeping.com.np/sitemap.xml

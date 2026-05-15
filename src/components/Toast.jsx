@@ -17,42 +17,42 @@ const Toast = ({ type = 'success', message, show, onClose, duration = 4000 }) =>
       case 'success':
         return {
           icon: FaCheck,
-          bgColor: 'bg-white/15 backdrop-blur-md',
-          borderColor: 'border-blue-300/50',
+          bgColor: 'bg-emerald-600',
+          borderColor: 'border-emerald-700',
           textColor: 'text-white',
-          iconColor: 'text-blue-300'
+          iconColor: 'text-white'
         };
       case 'error':
         return {
           icon: FaTimes,
-          bgColor: 'bg-white/15 backdrop-blur-md',
-          borderColor: 'border-red-300/50',
+          bgColor: 'bg-red-600',
+          borderColor: 'border-red-700',
           textColor: 'text-white',
-          iconColor: 'text-red-300'
+          iconColor: 'text-white'
         };
       case 'warning':
         return {
           icon: FaExclamationTriangle,
-          bgColor: 'bg-white/15 backdrop-blur-md',
-          borderColor: 'border-yellow-300/50',
+          bgColor: 'bg-amber-500',
+          borderColor: 'border-amber-600',
           textColor: 'text-white',
-          iconColor: 'text-yellow-300'
+          iconColor: 'text-white'
         };
       case 'info':
         return {
           icon: FaInfo,
-          bgColor: 'bg-white/15 backdrop-blur-md',
-          borderColor: 'border-purple-300/50',
+          bgColor: 'bg-sky-600',
+          borderColor: 'border-sky-700',
           textColor: 'text-white',
-          iconColor: 'text-purple-300'
+          iconColor: 'text-white'
         };
       default:
         return {
           icon: FaInfo,
-          bgColor: 'bg-white/15 backdrop-blur-md',
-          borderColor: 'border-gray-300/50',
+          bgColor: 'bg-gray-800',
+          borderColor: 'border-gray-900',
           textColor: 'text-white',
-          iconColor: 'text-gray-300'
+          iconColor: 'text-white'
         };
     }
   };

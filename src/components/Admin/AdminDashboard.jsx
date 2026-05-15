@@ -4,12 +4,14 @@ import { useAuth } from '../../context/AuthContext';
 import ProductManagement from './ProductManagement';
 import OrderManagement from './OrderManagement';
 import ReviewManagement from './ReviewManagement';
-import { 
-  ShoppingBagIcon, 
+import BlogManagement from './BlogManagement';
+import {
+  ShoppingBagIcon,
   ClipboardDocumentListIcon,
   ChartBarIcon,
   UsersIcon,
-  ChatBubbleLeftEllipsisIcon
+  ChatBubbleLeftEllipsisIcon,
+  NewspaperIcon,
 } from '@heroicons/react/24/outline';
 
 const AdminDashboard = () => {
@@ -35,6 +37,7 @@ const AdminDashboard = () => {
   const tabs = [
     { id: 'products', label: 'Products', icon: ShoppingBagIcon },
     { id: 'orders', label: 'Orders', icon: ClipboardDocumentListIcon },
+    { id: 'blogs', label: 'Blogs', icon: NewspaperIcon },
     { id: 'reviews', label: 'Reviews', icon: ChatBubbleLeftEllipsisIcon },
     { id: 'analytics', label: 'Analytics', icon: ChartBarIcon },
     { id: 'users', label: 'Users', icon: UsersIcon }
@@ -92,6 +95,7 @@ const AdminDashboard = () => {
         >
           {activeTab === 'products' && <ProductManagement />}
           {activeTab === 'orders' && <OrderManagement />}
+          {activeTab === 'blogs' && <BlogManagement />}
           {activeTab === 'reviews' && <ReviewManagement />}
           {activeTab === 'analytics' && <AnalyticsView />}
           {activeTab === 'users' && <UsersView />}

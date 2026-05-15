@@ -11,6 +11,7 @@ import ProductDetail from "./Pages/ProductDetail";
 import Contact from "./Pages/Contact";
 import About from "./Pages/About";
 import Blogs from "./Pages/Blogs";
+import BlogDetail from "./Pages/BlogDetail";
 import Login from "./Pages/Login";
 import Signup from "./Pages/Signup";
 import Account from "./Pages/Account";
@@ -28,9 +29,12 @@ const AppContent = () => {
   
   // Define valid routes
   const validRoutes = ['/', '/login', '/signup', '/products', '/contact', '/about', '/blogs', '/cart', '/account', '/admin'];
-  
-  // Check if current path is a valid route or starts with /product/ (for product detail pages)
-  const isValidRoute = validRoutes.includes(location.pathname) || location.pathname.startsWith('/product/');
+
+  // Check if current path is a valid route, or starts with a known dynamic prefix
+  const isValidRoute =
+    validRoutes.includes(location.pathname) ||
+    location.pathname.startsWith('/product/') ||
+    location.pathname.startsWith('/blog/');
   
   // Don't show navbar on login/signup pages, admin page, and 404 page
   const hideNavbar = ['/login', '/signup', '/admin'].includes(location.pathname) || !isValidRoute;
@@ -85,6 +89,7 @@ const AppContent = () => {
           <Route path="/contact" element={<Contact />} />
           <Route path="/about" element={<About />} />
           <Route path="/blogs" element={<Blogs />} />
+          <Route path="/blog/:id" element={<BlogDetail />} />
           <Route 
             path="/cart" 
             element={

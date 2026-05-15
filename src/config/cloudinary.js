@@ -11,12 +11,25 @@ export const CLOUDINARY_CONFIG = {
   uploadPreset: import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET
 };
 
+export const isCloudinaryConfigured = () =>
+  !!(CLOUDINARY_CONFIG.cloudName && CLOUDINARY_CONFIG.uploadPreset);
+
 // Upload image to Cloudinary using unsigned preset
 export const uploadToCloudinary = async (file) => {
+  if (!CLOUDINARY_CONFIG.cloudName) {
+    throw new Error(
+      'Cloudinary is not configured. Add VITE_CLOUDINARY_CLOUD_NAME and VITE_CLOUDINARY_UPLOAD_PRESET to your .env and restart the dev server.'
+    );
+  }
+  if (!CLOUDINARY_CONFIG.uploadPreset) {
+    throw new Error(
+      'Cloudinary upload preset missing. Add VITE_CLOUDINARY_UPLOAD_PRESET to your .env and restart the dev server.'
+    );
+  }
+
   const formData = new FormData();
   formData.append('file', file);
   formData.append('upload_preset', CLOUDINARY_CONFIG.uploadPreset);
-  // Note: folder is preset to 'product/images' in Cloudinary upload preset
 
   try {
     const response = await fetch(
@@ -28,8 +41,8 @@ export const uploadToCloudinary = async (file) => {
     );
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error?.message || 'Upload failed');
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error?.message || `Upload failed (HTTP ${response.status})`);
     }
 
     const data = await response.json();
