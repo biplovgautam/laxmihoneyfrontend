@@ -1,19 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import { doc, collection, query, where, getDocs, updateDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { FaUser, FaPhone, FaMapMarkerAlt, FaCity, FaCheck } from 'react-icons/fa';
 import { MdPhone } from 'react-icons/md';
 import { HiSparkles } from 'react-icons/hi';
 import { LottieLoader } from './LoadingSpinner';
 
+// Reduce any stored phone string to exactly 10 digits.
+// Accepts "+977 9767637006", "977-9767-637006", "9767637006", etc.
+const normalizePhone = (raw) => {
+  const digits = (raw || '').toString().replace(/\D/g, '');
+  return digits.length > 10 ? digits.slice(-10) : digits;
+};
+
 const ProfileCompletionModal = ({ isOpen, onClose }) => {
   const { user, markProfileComplete, skipProfileCompletion } = useAuth();
   const [formData, setFormData] = useState({
     displayName: user?.displayName || '',
-    phoneNumber: user?.phoneNumber || '',
-    secondaryPhone: user?.secondaryPhone || '',
+    phoneNumber: normalizePhone(user?.phoneNumber),
+    secondaryPhone: normalizePhone(user?.secondaryPhone),
     city: user?.city || '',
     address: user?.address || ''
   });
@@ -40,8 +47,8 @@ const ProfileCompletionModal = ({ isOpen, onClose }) => {
     if (user) {
       setFormData({
         displayName: user.displayName || '',
-        phoneNumber: user.phoneNumber || '',
-        secondaryPhone: user.secondaryPhone || '',
+        phoneNumber: normalizePhone(user.phoneNumber),
+        secondaryPhone: normalizePhone(user.secondaryPhone),
         city: user.city || '',
         address: user.address || ''
       });
@@ -163,24 +170,22 @@ const ProfileCompletionModal = ({ isOpen, onClose }) => {
         return;
       }
       
-      try {
-        // Update profile in Firestore directly for real-time updates
-        await updateDoc(doc(db, 'users', user.uid), {
-          displayName: formData.displayName.trim(),
-          phoneNumber: formData.phoneNumber,
-          secondaryPhone: formData.secondaryPhone || '',
-          city: formData.city,
-          address: formData.address.trim(),
-          lastUpdated: new Date()
-        });
+      const result = await markProfileComplete({
+        displayName: formData.displayName.trim(),
+        fullName: formData.displayName.trim(),
+        phoneNumber: formData.phoneNumber,
+        secondaryPhone: formData.secondaryPhone || '',
+        city: formData.city,
+        address: formData.address.trim(),
+      });
 
+      if (result) {
         setSuccessMessage('Profile updated successfully!');
         setTimeout(() => {
           onClose();
           setSuccessMessage('');
-        }, 2000);
-      } catch (error) {
-        console.error('Error updating profile:', error);
+        }, 1500);
+      } else {
         setErrors({ submit: 'Failed to update profile. Please try again.' });
       }
       setLoading(false);
